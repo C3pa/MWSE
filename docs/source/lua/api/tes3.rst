@@ -37,6 +37,7 @@ Functions
     tes3/cancelAnimationLoop
     tes3/canRest
     tes3/cast
+    tes3/checkMerchantOffersService
     tes3/checkMerchantTradesItem
     tes3/claimSpellEffectId
     tes3/clearMarkLocation
@@ -50,6 +51,7 @@ Functions
     tes3/fadeIn
     tes3/fadeOut
     tes3/fadeTo
+    tes3/findActorsInProximity
     tes3/findBirthsign
     tes3/findClass
     tes3/findClosestExteriorReferenceOfObject
@@ -142,6 +144,7 @@ Functions
     tes3/playVoiceover
     tes3/positionCell
     tes3/pushKey
+    tes3/random
     tes3/rayTest
     tes3/releaseKey
     tes3/removeEffects
@@ -185,6 +188,7 @@ Functions
     tes3/undoTransform
     tes3/unhammerKey
     tes3/unlock
+    tes3/updateInventoryGUI
     tes3/updateJournal
     tes3/wakeUp
 

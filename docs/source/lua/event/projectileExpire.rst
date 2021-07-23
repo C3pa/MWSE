@@ -9,7 +9,7 @@ Event Data
 firingWeapon
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-tes3weapon. Read-only. The weapon that fired the projectile.
+`tes3weapon`_. Read-only. The weapon that fired the projectile.
 
 mobile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -23,3 +23,4 @@ firingReference
 
 .. _`tes3mobileProjectile`: ../../lua/type/tes3mobileProjectile.html
 .. _`tes3reference`: ../../lua/type/tes3reference.html
+.. _`tes3weapon`: ../../lua/type/tes3weapon.html

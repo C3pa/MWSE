@@ -7,19 +7,19 @@ Properties
 ----------------------------------------------------------------------------------------------------
 
 `boundSize`_ (`tes3vector3`_)
-    A vector that shows the size of the bounding box in each direction.
+    Read-only. A vector that shows the size of the bounding box in each direction.
 
 `cellX`_ (`number`_)
-    The X grid coordinate of the cell the mobile is in.
+    Read-only. The X grid coordinate of the cell the mobile is in.
 
 `cellY`_ (`number`_)
-    The Y grid coordinate of the cell the mobile is in.
+    Read-only. The Y grid coordinate of the cell the mobile is in.
 
 `flags`_ (`number`_)
-    Access to the root mobile object flags, represented as an integer. Should not be accessed directly.
+    Read-only. Access to the root mobile object flags, represented as an integer. Should not be accessed directly.
 
 `height`_ (`number`_)
-    The height of the mobile above the ground.
+    Read-only. The height of the mobile above the ground.
 
 `impulseVelocity`_ (`tes3vector3`_)
     A vector that represents the 3D acceleration of the object.
@@ -28,19 +28,22 @@ Properties
     Controls if the mobile has movement collision active. When false, the mobile can move through any object, but can still block other mobiles, and can still be hit in combat. Actors will still follow pathgrids, ramps and stairs when navigating.
 
 `movementFlags`_ (`number`_)
-    Access to the root mobile object movement flags, represented as an integer. Should not be accessed directly.
+    Read-only. Access to the root mobile object movement flags, represented as an integer. Should not be accessed directly.
 
 `objectType`_ (`number`_)
-    The type of mobile object. Maps to values in tes3.objectType.
+    Read-only. The type of mobile object. Maps to values in tes3.objectType.
+
+`playerDistance`_ (`number`_)
+    The distance to the player. Updated every frame when the mobile is in an active cell.
 
 `position`_ (`tes3vector3`_)
     A vector that represents the 3D position of the object.
 
 `prevMovementFlags`_ (`number`_)
-    Access to the root mobile object movement flags from the previous frame, represented as an integer. Should not be accessed directly.
+    Read-only. Access to the root mobile object movement flags from the previous frame, represented as an integer. Should not be accessed directly.
 
 `reference`_ (`tes3reference`_)
-    Access to the reference object for the mobile, if any.
+    Read-only. Access to the reference object for the mobile, if any.
 
 `velocity`_ (`tes3vector3`_)
     A vector that represents the 3D velocity of the object.
@@ -57,6 +60,7 @@ Properties
     tes3mobileObject/movementCollision
     tes3mobileObject/movementFlags
     tes3mobileObject/objectType
+    tes3mobileObject/playerDistance
     tes3mobileObject/position
     tes3mobileObject/prevMovementFlags
     tes3mobileObject/reference
@@ -71,6 +75,7 @@ Properties
 .. _`movementCollision`: tes3mobileObject/movementCollision.html
 .. _`movementFlags`: tes3mobileObject/movementFlags.html
 .. _`objectType`: tes3mobileObject/objectType.html
+.. _`playerDistance`: tes3mobileObject/playerDistance.html
 .. _`position`: tes3mobileObject/position.html
 .. _`prevMovementFlags`: tes3mobileObject/prevMovementFlags.html
 .. _`reference`: tes3mobileObject/reference.html

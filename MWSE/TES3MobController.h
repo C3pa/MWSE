@@ -15,7 +15,9 @@ namespace TES3 {
 		bool unknown_0x18;
 		bool unknown_0x19; // Maybe force new actions?
 		CriticalSection criticalSection; // 0x1C
-		unsigned char unknown[0x7EC]; // 0x40
+		unsigned char unknown[0x18]; // 0x40
+		unsigned int plannerCount; // 0x58
+		AIPlanner * planners[500]; // 0x5C
 		float aiDistance; // 0x82C
 
 		//
@@ -23,8 +25,9 @@ namespace TES3 {
 		//
 
 		bool detectPresence(MobileActor * actor, bool unknown = true);
-		bool detectSneak(MobileActor* detector, MobileActor* target, bool unknown = true);
-		void checkRadius(MobileActor * actor, IteratedList<AIPlanner*> * container);
+		bool detectSneak(MobileActor * detector, MobileActor * target, bool unknown = true);
+		void findActorsInProximity(Vector3 * position, float range, IteratedList<MobileActor*>* outputList);
+		void checkAlarmRadius(MobileActor * actor, IteratedList<AIPlanner*> * container);
 		void checkPlayerDistance();
 
 		bool canRest();
@@ -39,6 +42,12 @@ namespace TES3 {
 		IteratedList<MobileProjectile*> activeProjectiles; // 0x0
 		NI::Pointer<NI::Node> worldProjectileRoot; // 0x14
 		CriticalSection criticalSection; // 0x18
+
+		//
+		// Custom functions.
+		//
+
+		void resolveCollisions(float deltaTime);
 	};
 	static_assert(sizeof(ProjectileController) == 0x3C, "TES3::ProjectileController failed size validation");
 

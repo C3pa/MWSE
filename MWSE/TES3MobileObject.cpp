@@ -152,27 +152,27 @@ namespace TES3 {
 		return TES3_MobileObject_getBasePositionIsUnderwater(this);
 	}
 
+	Vector3 MobileObject::getBoundSize() const {
+		return Vector3(boundSize.x, boundSize.y, height);
+	}
+
 	Vector3* MobileObject::getImpulseVelocity() {
 		return &impulseVelocity;
 	}
 
 	void MobileObject::setImpulseVelocityFromLua(sol::stack_object value) {
 		// Use our util class to support vectors or a table.
-		mwse::lua::setVectorFromLua(&impulseVelocity, value);
+		mwse::lua::setVectorFromLua(impulseVelocity, value);
 	}
 
 	Vector3* MobileObject::getPosition() {
-		return &position;
+		// Delegate to reference.
+		return &reference->position;
 	}
 
 	void MobileObject::setPositionFromLua(sol::stack_object value) {
-		// Use our util class to support vectors or a table.
-		mwse::lua::setVectorFromLua(&position, value);
-
-		// Update the reference if possible.
-		if (reference) {
-			reference->setPositionFromLua(value);
-		}
+		// Delegate to reference.
+		reference->setPositionFromLua(value);
 	}
 
 	Vector3* MobileObject::getVelocity() {
@@ -181,7 +181,7 @@ namespace TES3 {
 
 	void MobileObject::setVelocityFromLua(sol::stack_object value) {
 		// Use our util class to support vectors or a table.
-		mwse::lua::setVectorFromLua(&velocity, value);
+		mwse::lua::setVectorFromLua(velocity, value);
 	}
 
 	bool MobileObject::getMovementCollisionFlag() const {

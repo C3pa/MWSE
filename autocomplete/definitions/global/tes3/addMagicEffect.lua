@@ -1,7 +1,7 @@
 return {
 	type = "function",
-	description = [[This function creates a new spell effect.]],
-	arguments = {
+	description = [[This function creates a new custom magic effect. The effect can be scripted through lua.]],
+	arguments = {{
 		name = "params",
 		type = "table",
 		tableParams = {
@@ -9,6 +9,13 @@ return {
 				name = "id",
 				type = "tes3.effect",
 				description = "Id of the new effect. Maps to tes3.effect.* added with tes3.claimSpellEffectId. If the effect of this id already exists, an error will be thrown."
+			},
+			{
+				name = "name",
+				type = "string",
+				optional = true,
+				default = "Unnamed Effect",
+				description = "Name of the effect."
 			},
 			{
 				name = "baseCost",
@@ -21,7 +28,7 @@ return {
 				name = "school",
 				type = "tes3.magicSchool",
 				optional = true,
-				default = tes3.magicSchool.alteration,
+				default = "tes3.magicSchool.alteration",
 				description = "The magic school the new effect will be assigned to. Maps to tes3.magicSchool.* constants"
 			},
 			{
@@ -29,21 +36,21 @@ return {
 				type = "number",
 				optional = true,
 				default = 1.0,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "sizeCap",
 				type = "number",
 				optional = true,
 				default = 1.0,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "speed",
 				type = "number",
 				optional = true,
 				default = 1.0,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "description",
@@ -117,32 +124,25 @@ return {
 				name = "castVFX",
 				type = "tes3physicalObject",
 				optional = true,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "boltVFX",
 				type = "tes3physicalObject",
 				optional = true,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "hitVFX",
 				type = "tes3physicalObject",
 				optional = true,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "areaVFX",
 				type = "tes3physicalObject",
 				optional = true,
-				description = ""
-			},
-			{
-				name = "name",
-				type = "string",
-				optional = true,
-				default = "Unnamed Effect",
-				description = "Name of the effect."
+				-- description = ""
 			},
 			{
 				name = "allowEnchanting",
@@ -163,7 +163,7 @@ return {
 				type = "boolean",
 				optional = true,
 				default = true,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "canCastSelf",
@@ -191,7 +191,7 @@ return {
 				type = "boolean",
 				optional = true,
 				default = true,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "hasContinuousVFX",
@@ -205,14 +205,14 @@ return {
 				type = "boolean",
 				optional = true,
 				default = true,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "hasNoMagnitude",
 				type = "boolean",
 				optional = true,
 				default = true,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "illegalDaedra",
@@ -240,14 +240,14 @@ return {
 				type = "boolean",
 				optional = true,
 				default = true,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "targetsSkills",
 				type = "boolean",
 				optional = true,
 				default = true,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "unreflectable",
@@ -261,7 +261,7 @@ return {
 				type = "boolean",
 				optional = true,
 				default = true,
-				description = ""
+				-- description = ""
 			},
 			{
 				name = "onTick",
@@ -276,7 +276,7 @@ return {
 				description = "A function which will be called when a spell containing this spell effect collides with something."
 			},
 		},
-	},
+	}},
 	returns = "effect",
 	valuetype = "tes3effect"
 }
