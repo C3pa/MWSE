@@ -1060,28 +1060,28 @@ namespace TES3 {
 			}
 		}
 
-		void Element::unregisterBefore_lua(const std::string& eventID, sol::protected_function callback) {
+		bool Element::unregisterBefore_lua(const std::string& eventID, sol::protected_function callback) {
 			auto prop = getStandardEventFromName(eventID);
 			if (!prop) {
 				prop = TES3::UI::registerProperty(eventID.c_str());
 			}
-			mwse::lua::unregisterBeforeUIEvent(this, prop.value(), callback);
+			return mwse::lua::unregisterBeforeUIEvent(this, prop.value(), callback);
 		}
 
-		void Element::unregisterAfter_lua(const std::string& eventID, sol::protected_function callback) {
+		bool Element::unregisterAfter_lua(const std::string& eventID, sol::protected_function callback) {
 			auto prop = getStandardEventFromName(eventID);
 			if (!prop) {
 				prop = TES3::UI::registerProperty(eventID.c_str());
 			}
-			mwse::lua::unregisterAfterUIEvent(this, prop.value(), callback);
+			return mwse::lua::unregisterAfterUIEvent(this, prop.value(), callback);
 		}
 
-		void Element::unregister_lua(const std::string& eventID) {
+		bool Element::unregister_lua(const std::string& eventID) {
 			auto prop = getStandardEventFromName(eventID);
 			if (!prop) {
 				prop = TES3::UI::registerProperty(eventID.c_str());
 			}
-			mwse::lua::unregisterUIEvent(this, prop.value());
+			return mwse::lua::unregisterUIEvent(this, prop.value());
 		}
 
 		void Element::forwardEvent_lua(sol::table eventData) const {
@@ -1105,6 +1105,24 @@ namespace TES3 {
 			}
 
 			mwse::lua::triggerEvent(this, prop.value(), 0, 0);
+		}
+
+		const auto TES3_ui_saveMenuPosition = reinterpret_cast<void(__cdecl*)(Element*)>(0x596FA0);
+		void Element::saveMenuPosition() {
+			auto topLevelParent = getTopLevelParent();
+			if (this != topLevelParent) {
+				throw std::runtime_error("This function only works on top-level elements.");
+			}
+			TES3_ui_saveMenuPosition(this);
+		}
+
+		const auto TES3_ui_loadMenuPosition = reinterpret_cast<bool(__cdecl*)(Element*, short)>(0x5972C0);
+		bool Element::loadMenuPosition() {
+			auto topLevelParent = getTopLevelParent();
+			if (this != topLevelParent) {
+				throw std::runtime_error("This function only works on top-level elements.");
+			}
+			return TES3_ui_loadMenuPosition(this, 0);
 		}
 
 		bool Element::reorderChildren_lua(sol::object insertBefore, sol::object moveFrom, int count) {

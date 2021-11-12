@@ -87,7 +87,7 @@ namespace mwse {
 
 			// Binding for TES3::PackedColor
 			{
-				// Start our usertype. We must finish this with state.set_usertype.
+				// Start our usertype.
 				auto usertypeDefinition = state.new_usertype<TES3::PackedColor>("tes3packedColor");
 				usertypeDefinition["new"] = sol::no_constructor;
 
@@ -106,7 +106,7 @@ namespace mwse {
 
 			// Binding for TES3::Cell
 			{
-				// Start our usertype. We must finish this with state.set_usertype.
+				// Start our usertype.
 				auto usertypeDefinition = state.new_usertype<TES3::Cell>("tes3cell");
 				usertypeDefinition["new"] = sol::no_constructor;
 
@@ -140,6 +140,7 @@ namespace mwse {
 				usertypeDefinition["waterLevel"] = sol::property(&TES3::Cell::getWaterLevel, &TES3::Cell::setWaterLevel);
 
 				// Basic function binding.
+				usertypeDefinition["isPointInCell"] = &TES3::Cell::isPointInCell;
 				usertypeDefinition["iterateReferences"] = iterateReferences;
 			}
 		}

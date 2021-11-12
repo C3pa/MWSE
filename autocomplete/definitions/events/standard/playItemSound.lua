@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "",
     eventData = {
         ["item"] = {
@@ -17,5 +18,6 @@ return{
             description = "",
         },
     },
-    filter = { "item", "state", "reference" }, -- Is this line ok?
+    filter = "item",
+	blockable = true,
 }

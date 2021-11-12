@@ -34,12 +34,16 @@ end
 -- Try to return a lowercased module first, fall back to regular require.
 function require(moduleName)
 	-- First try to load the lowercase module.
-	local status, result = pcall(originalRequire, moduleName:gsub("[/\\]", "."):lower())
+	local lower = moduleName:gsub("[/\\]", "."):lower()
+	local status, result = pcall(originalRequire, lower)
 	if (status) then
 		return result
+	elseif (moduleName == lower) then
+		-- If this was an unchanged call, and we got an actual error, return it rather than consuming it.
+		error(result)
 	end
 
-	-- Then load the original path.
+	-- Fall back to trying to load the normal path.
 	return originalRequire(moduleName)
 end
 
@@ -87,6 +91,76 @@ end
 _G.tes3 = require("tes3.init")
 _G.event = require("event")
 _G.json = require("dkjson")
+
+-- Prevent requiring socket.core before socket from causing issues.
+local socket = require("socket")
+local socket_core = require("socket.core")
+
+
+-------------------------------------------------
+-- Translation helpers
+-------------------------------------------------
+
+local i18n = require("i18n")
+
+-- TODO: Add these.
+local pluralizationFunctions = {}
+
+-- Metatable used to wrap around i18n so mods don't have to keep passing their mod name in translation calls/files.
+local i18nWrapper = {}
+
+function i18nWrapper:set(key, value)
+	i18n.set(self.mod .. "." .. key, value)
+end
+
+function i18nWrapper:translate(key, data)
+	return i18n.translate(self.mod .. "." .. key, data)
+end
+
+i18nWrapper.__call = i18nWrapper.translate
+
+local function convertUTF8Table(t, language)
+	for k, v in pairs(t) do
+		local vType = type(v)
+		if (vType == "string") then
+			t[k] = mwse.iconv(language, v)
+		elseif (vType == "table") then
+			convertUTF8Table(v, language)
+		end
+	end
+end
+
+-- Helper around i18n.load with safety checks, package.path support, and loads the translation into its own namespace.
+local function loadLocaleFile(mod, locale)
+	local success, contents = pcall(dofile, string.format("%s.i18n.%s", mod, locale))
+	if (success) then
+		assert(type(contents) == "table", string.format("Translation file for mod %q does not have valid translation file for locale %q.", mod, locale))
+
+		-- Convert encoding from UTF8 to the right type.
+		convertUTF8Table(contents, tes3.getLanguageCode())
+
+		-- Load the translation data.
+		i18n.load({ [locale] = { [mod] = contents } })
+	end
+	return success
+end
+
+function mwse.loadTranslations(mod)
+	-- Lazy set language, since tes3.getLanguage() isn't available.
+	local language = tes3.getLanguage() or "eng"
+	i18n.setLocale(language, pluralizationFunctions[language])
+
+	-- Load the language files.
+	local loadedLanguage = false
+	local loadedDefault = loadLocaleFile(mod, "eng")
+	if (language ~= "eng") then
+		loadedLanguage = loadLocaleFile(mod, language)
+	end
+	assert(loadedDefault or loadedLanguage, "Could not load any valid i18n files.")
+
+	-- We create a wrapper around i18n prefixing with the mod key.
+	return setmetatable({ mod = mod }, i18nWrapper)
+end
 
 
 -------------------------------------------------
@@ -270,6 +344,20 @@ function table.values(t, sort)
 	return values
 end
 
+function table.invert(t)
+	local inverted = {}
+	for k, v in pairs(t) do
+		inverted[v] = k
+	end
+	return inverted
+end
+
+function table.swap(t, key, value)
+	local old = t[key]
+	t[key] = value
+	return old
+end
+
 
 -------------------------------------------------
 -- Extend base table: Add binary search/insert
@@ -390,6 +478,23 @@ function string.insert(s1, s2, pos)
 	return s1:sub(1, pos) .. s2 .. s1:sub(pos + 1)
 end
 getmetatable("").insert = string.insert
+
+function string.split(str, sep)
+	if sep == nil then
+		sep = "%s"
+	end
+	local t = {}
+	for str in string.gmatch(str, "([^" .. sep .. "]+)") do
+		table.insert(t, str)
+	end
+	return t
+end
+getmetatable("").split = string.split
+
+function string.trim(s)
+	return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
+end
+getmetatable("").trim = string.trim
 
 
 -------------------------------------------------
@@ -718,12 +823,14 @@ end
 -- Setup debugger if necessary
 -------------------------------------------------
 
+local function onError(e)
+	mwse.log('[MWSE-Lua] Error: %s', e)
+end
+
 local targetDebugger = os.getenv("MWSE_LUA_DEBUGGER")
 if (targetDebugger == "vscode-debuggee") then
 	-- Start up our debuggee.
 	local debuggee = require('vscode-debuggee')
-	local startResult, breakerType = debuggee.start(json)
-	mwse.log("[MWSE-Lua] vscode-debuggee start -> Result: %s, Type: %s", startResult, breakerType)
 
 	-- Overwrite the mwse.log function to also print to the debug console.
 	mwse.log = function(str, ...)
@@ -734,6 +841,13 @@ if (targetDebugger == "vscode-debuggee") then
 
 	-- Poll every frame.
 	event.register("enterFrame", debuggee.poll, { priority = 9001 })
+	
+	-- Start the debugger.
+	local startResult, breakerType = debuggee.start(json, { onError = onError, luaStyleLog = true })
+	mwse.log("[MWSE-Lua] vscode-debuggee start -> Result: %s, Type: %s", startResult, breakerType)
+	if (startResult) then
+		mwse.debuggee = debuggee
+	end
 end
 
 

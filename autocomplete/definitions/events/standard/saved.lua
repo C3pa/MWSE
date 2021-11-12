@@ -1,5 +1,7 @@
 return {
+	type = "event",
 	description = "The saved event fires after the game has successfully been saved. This event is preceded by the save event.",
+	related = { "save", "saved" },
 	eventData = {
 		["name"] = {
 			type = "string",

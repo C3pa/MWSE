@@ -2,6 +2,7 @@
 
 --- A simple trio of floating-point numbers.
 --- @class tes3vector3
+--- @field angle number The angle between the vector and the water plane.
 --- @field b number The third value in the vector. An alias for z.
 --- @field g number The second value in the vector. An alias for y.
 --- @field r number The first value in the vector. An alias for x.
@@ -47,14 +48,14 @@ function tes3vector3:length() end
 --- Calculates the interpolated vector between this vector and another, given a transition.
 --- @param toVector tes3vector3 The vector to interpolate towards.
 --- @param transition number The interpolation value. Must be between 0.0 (closer to this vector) and 1.0 (closer to the other vector).
---- @return any result No description yet available.
+--- @return tes3vector3 lerpedVector The calculated value.
 function tes3vector3:lerp(toVector, transition) end
 
 --- Negates all values in the vector.
 function tes3vector3:negate() end
 
 --- Normalize the vector in-place, or set its components to zero if normalization is not possible. Returns true if the vector was successfully normalized.
---- @return bool result No description yet available.
+--- @return boolean result No description yet available.
 function tes3vector3:normalize() end
 
 --- Get a normalized copy of the vector.
@@ -65,4 +66,8 @@ function tes3vector3:normalized() end
 --- @param vec tes3vector3 No description yet available.
 --- @return tes3matrix33 result No description yet available.
 function tes3vector3:outerProduct(vec) end
+
+--- Converts the vector to niColor.
+--- @return niColor result No description yet available.
+function tes3vector3:toColor() end
 

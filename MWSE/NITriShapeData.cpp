@@ -42,4 +42,11 @@ namespace NI {
 
 		return create(vertexCount, _vertices, _normals, _colors, _textureCoords, triangleCount, _triangleList);
 	}
+
+	nonstd::span<Triangle> TriShapeData::getTriangles() {
+		if (triangleList) {
+			return { triangleList, getActiveTriangleCount() };
+		}
+		return {};
+	}
 }

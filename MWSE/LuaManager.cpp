@@ -32,10 +32,12 @@
 #include "TES3DataHandler.h"
 #include "TES3Dialogue.h"
 #include "TES3DialogueInfo.h"
+#include "TES3Enchantment.h"
 #include "TES3Fader.h"
 #include "TES3Game.h"
 #include "TES3GameFile.h"
 #include "TES3GameSetting.h"
+#include "TES3Ingredient.h"
 #include "TES3InputController.h"
 #include "TES3ItemData.h"
 #include "TES3LeveledList.h"
@@ -152,6 +154,7 @@
 #include "NINodeLua.h"
 #include "NIObjectLua.h"
 #include "NILightLua.h"
+#include "NIParticlesLua.h"
 #include "NIPickLua.h"
 #include "NIPixelDataLua.h"
 #include "NIPropertyLua.h"
@@ -164,6 +167,7 @@
 
 #include "LuaDisableableEventManager.h"
 
+#include "LuaAbsorbedMagicEvent.h"
 #include "LuaActivationTargetChangedEvent.h"
 #include "LuaAddTopicEvent.h"
 #include "LuaAttackEvent.h"
@@ -181,6 +185,7 @@
 #include "LuaCrimeWitnessedEvent.h"
 #include "LuaDamageEvent.h"
 #include "LuaDamageHandToHandEvent.h"
+#include "LuaEnchantChargeUseEvent.h"
 #include "LuaEnchantedItemCreatedEvent.h"
 #include "LuaEnchantedItemCreateFailedEvent.h"
 #include "LuaEquipEvent.h"
@@ -201,6 +206,7 @@
 #include "LuaKeyDownEvent.h"
 #include "LuaKeyUpEvent.h"
 #include "LuaLeveledCreaturePickedEvent.h"
+#include "LuaLeveledItemPickedEvent.h"
 #include "LuaLevelUpEvent.h"
 #include "LuaLoadedGameEvent.h"
 #include "LuaMagicCastedEvent.h"
@@ -214,15 +220,18 @@
 #include "LuaPostInfoResponseEvent.h"
 #include "LuaPotionBrewedEvent.h"
 #include "LuaPotionBrewFailedEvent.h"
+#include "LuaPotionBrewSkillCheckEvent.h"
 #include "LuaPowerRechargedEvent.h"
 #include "LuaPreLevelUpEvent.h"
 #include "LuaPreventRestEvent.h"
 #include "LuaProjectileExpireEvent.h"
+#include "LuaReferenceActivatedEvent.h"
 #include "LuaRestInterruptEvent.h"
 #include "LuaSimulateEvent.h"
 #include "LuaSkillRaisedEvent.h"
 #include "LuaSpellCastedEvent.h"
 #include "LuaSpellCreatedEvent.h"
+#include "LuaSpellMagickaUseEvent.h"
 #include "LuaSpellResistEvent.h"
 #include "LuaSpellTickEvent.h"
 #include "LuaUiRefreshedEvent.h"
@@ -233,7 +242,6 @@
 #include "LuaWeatherCycledEvent.h"
 #include "LuaWeatherTransitionFinishedEvent.h"
 #include "LuaWeatherTransitionStartedEvent.h"
-#include "LuaLeveledItemPickedEvent.h"
 
 #include "NITextureEffectLua.h"
 
@@ -341,8 +349,10 @@ namespace mwse {
 			auto& luaManager = mwse::lua::LuaManager::getInstance();
 			auto stateHandle = luaManager.getThreadSafeStateHandle();
 			sol::state& state = stateHandle.state;
-			// TODO: Optimize by caching function here.
-			std::string result = state["tostring"](message);
+
+			static sol::protected_function luaTostring = state["tostring"];
+			std::string result = luaTostring(message);
+
 			log::getLog() << result << std::endl;
 		}
 
@@ -365,10 +375,6 @@ namespace mwse {
 
 			// Bind our data types.
 			bindData();
-		}
-
-		void lua_os_getClipboardText() {
-
 		}
 
 		void LuaManager::bindData() {
@@ -394,8 +400,11 @@ namespace mwse {
 			bindMWSEUtil();
 
 			// Extend OS library.
+			luaState["os"]["createProcess"] = createProcess;
 			luaState["os"]["getClipboardText"] = getClipboardText;
+			luaState["os"]["openURL"] = openURL;
 			luaState["os"]["setClipboardText"] = setClipboardText;
+			LuaExecutor::defineLuaBindings();
 
 			// Bind TES3 data types.
 			bindTES3ActionData();
@@ -481,6 +490,7 @@ namespace mwse {
 			bindNINode();
 			bindNIObject();
 			bindNILight();
+			bindNIParticles();
 			bindNIPick();
 			bindNIPixelData();
 			bindNIProperties();
@@ -1190,6 +1200,58 @@ namespace mwse {
 		}
 
 		//
+		// Alchemy brewing potion strength and skill check event.
+		// 
+
+		TES3::Item* getAlchemyMenuObject(DWORD parentIdAddress) {
+			using namespace TES3::UI;
+
+			auto menuAlchemy = findMenu(*reinterpret_cast<UI_ID*>(0x7D225C));
+			if (!menuAlchemy) {
+				return nullptr;
+			}
+
+			auto child = menuAlchemy->findChild(*reinterpret_cast<UI_ID*>(parentIdAddress));
+			if (!child) {
+				return nullptr;
+			}
+
+			Property MenuAlchemy_object = *reinterpret_cast<Property*>(0x7D2344);
+			return reinterpret_cast<TES3::Item*>(child->getProperty(PropertyType::Pointer, MenuAlchemy_object).ptrValue);
+		}
+
+		const auto TES3_alchemySkillRoll = reinterpret_cast<float(__cdecl*)()>(0x59D610);
+		float __cdecl OnAlchemySkillRoll() {
+			float potionStrength = TES3_alchemySkillRoll();
+
+			TES3::AlchemyBrewingItems items = {
+				static_cast<TES3::Apparatus*>(getAlchemyMenuObject(0x7D221C)),
+				static_cast<TES3::Apparatus*>(getAlchemyMenuObject(0x7D2270)),
+				static_cast<TES3::Apparatus*>(getAlchemyMenuObject(0x7D2298)),
+				static_cast<TES3::Apparatus*>(getAlchemyMenuObject(0x7D2314)),
+				static_cast<TES3::Ingredient*>(getAlchemyMenuObject(0x7D22F0)),
+				static_cast<TES3::Ingredient*>(getAlchemyMenuObject(0x7D22F2)),
+				static_cast<TES3::Ingredient*>(getAlchemyMenuObject(0x7D22C0)),
+				static_cast<TES3::Ingredient*>(getAlchemyMenuObject(0x7D2292)),
+			};
+
+			if (event::PotionBrewSkillCheckEvent::getEventEnabled()) {
+				auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
+				sol::table eventData = stateHandle.triggerEvent(new event::PotionBrewSkillCheckEvent(potionStrength, items));
+
+				if (eventData.valid()) {
+					if (eventData.get_or("success", true)) {
+						potionStrength = eventData.get_or("potionStrength", potionStrength);
+					}
+					else {
+						potionStrength = -1.0f;
+					}
+				}
+			}
+			return potionStrength;
+		}
+
+		//
 		// Potion brewed event.
 		//
 
@@ -1201,30 +1263,23 @@ namespace mwse {
 			return reinterpret_cast<DWORD(__thiscall*)(TES3::UI::InventoryTile*, TES3::Object*, TES3::ItemData*, DWORD, DWORD, DWORD, DWORD)>(0x6313E0)(inventoryTile, object, itemData, unk1, unk2, unk3, unk4);
 		}
 
-		TES3::Ingredient* getBrewingIngredient(DWORD parentIdAddress) {
-			auto menuAlchemy = TES3::UI::findMenu(*reinterpret_cast<TES3::UI::UI_ID*>(0x7D225C));
-			if (!menuAlchemy) {
-				return nullptr;
-			}
-
-			auto child = menuAlchemy->findChild(*reinterpret_cast<TES3::UI::UI_ID*>(parentIdAddress));
-			if (!child) {
-				return nullptr;
-			}
-
-			return reinterpret_cast<TES3::Ingredient*>(child->getProperty(TES3::UI::PropertyType::Pointer, *reinterpret_cast<TES3::UI::Property*>(0x7D2344)).ptrValue);
-		}
-
 		const auto TES3_AttemptPotionBrew = reinterpret_cast<bool(__cdecl*)()>(0x59C030);
 		bool __cdecl OnBrewPotionAttempt() {
 			// Reset success state.
 			lastBrewedPotion = nullptr;
 
+			// Store apparatus used. MobilePlayer::lastUsed* members do not reflect what is currently equipped by the game.
 			// Store the last used ingredients, since they get nuked.
-			auto ingredient1 = getBrewingIngredient(0x7D22F0);
-			auto ingredient2 = getBrewingIngredient(0x7D22F2);
-			auto ingredient3 = getBrewingIngredient(0x7D22C0);
-			auto ingredient4 = getBrewingIngredient(0x7D2292);
+			TES3::AlchemyBrewingItems items = {
+				static_cast<TES3::Apparatus*>(getAlchemyMenuObject(0x7D221C)),
+				static_cast<TES3::Apparatus*>(getAlchemyMenuObject(0x7D2270)),
+				static_cast<TES3::Apparatus*>(getAlchemyMenuObject(0x7D2298)),
+				static_cast<TES3::Apparatus*>(getAlchemyMenuObject(0x7D2314)),
+				static_cast<TES3::Ingredient*>(getAlchemyMenuObject(0x7D22F0)),
+				static_cast<TES3::Ingredient*>(getAlchemyMenuObject(0x7D22F2)),
+				static_cast<TES3::Ingredient*>(getAlchemyMenuObject(0x7D22C0)),
+				static_cast<TES3::Ingredient*>(getAlchemyMenuObject(0x7D2292)),
+			};
 
 			// Call original function.
 			if (!TES3_AttemptPotionBrew()) {
@@ -1238,12 +1293,12 @@ namespace mwse {
 
 				// Pass a lua event.
 				if (event::PotionBrewedEvent::getEventEnabled()) {
-					LuaManager::getInstance().getThreadSafeStateHandle().triggerEvent(new event::PotionBrewedEvent(lastBrewedPotion, ingredient1, ingredient2, ingredient3, ingredient4));
+					LuaManager::getInstance().getThreadSafeStateHandle().triggerEvent(new event::PotionBrewedEvent(lastBrewedPotion, items));
 				}
 			}
 			else {
 				if (event::PotionBrewFailedEvent::getEventEnabled()) {
-					LuaManager::getInstance().getThreadSafeStateHandle().triggerEvent(new event::PotionBrewFailedEvent(ingredient1, ingredient2, ingredient3, ingredient4));
+					LuaManager::getInstance().getThreadSafeStateHandle().triggerEvent(new event::PotionBrewFailedEvent(items));
 				}
 			}
 
@@ -2388,8 +2443,46 @@ namespace mwse {
 			// Call overwritten code.
 			dataHandler->updateLightingForReference(reference);
 
-			if (mwse::lua::event::ItemDroppedEvent::getEventEnabled()) {
-				mwse::lua::LuaManager::getInstance().getThreadSafeStateHandle().triggerEvent(new mwse::lua::event::ItemDroppedEvent(reference));
+			if (event::ItemDroppedEvent::getEventEnabled()) {
+				LuaManager::getInstance().getThreadSafeStateHandle().triggerEvent(new event::ItemDroppedEvent(reference));
+			}
+
+			// Work-around for items being dropped not triggering activation. This should probably be consolidated elsewhere at some point.
+			if (event::ReferenceActivatedEvent::getEventEnabled()) {
+				auto cell = reference->getCell();
+				if (cell && cell->getCellActive()) {
+					reference->setReferenceActive();
+				}
+			}
+		}
+
+		static TES3::Reference* OnItemDroppedExterior_LastCreatedReference = nullptr;
+
+		void __fastcall OnItemDropped_ReferenceCreated(TES3::Reference* reference) {
+			// Call overwritten code.
+			reference->ctor();
+
+			// Store the last created reference for later use.
+			OnItemDroppedExterior_LastCreatedReference = reference;
+		}
+
+		const auto TES3_DataHandler_updateAllLights = reinterpret_cast<void(__thiscall*)(TES3::DataHandler*)>(0x485C50);
+		void __fastcall OnItemDropped_UpdateExteriors(TES3::DataHandler* dataHandler) {
+			// Call overwritten code.
+			dataHandler->updateLightingForExteriorCells();
+
+			if (OnItemDroppedExterior_LastCreatedReference) {
+				if (event::ItemDroppedEvent::getEventEnabled()) {
+					LuaManager::getInstance().getThreadSafeStateHandle().triggerEvent(new event::ItemDroppedEvent(OnItemDroppedExterior_LastCreatedReference));
+				}
+
+				// Work-around for items being dropped not triggering activation. This should probably be consolidated elsewhere at some point.
+				if (event::ReferenceActivatedEvent::getEventEnabled()) {
+					auto cell = OnItemDroppedExterior_LastCreatedReference->getCell();
+					if (cell && cell->getCellActive()) {
+						OnItemDroppedExterior_LastCreatedReference->setReferenceActive();
+					}
+				}
 			}
 		}
 
@@ -3001,6 +3094,102 @@ namespace mwse {
 		}
 
 		//
+		// Event: Spell magicka cost on cast
+		//
+		
+		double __stdcall onSpellCastMagickaRequired(TES3::MagicSourceInstance* source) {
+			// Restore overwritten code.
+			unsigned int magickaCost = source->sourceCombo.source.asSpell->magickaCost;
+
+			if (event::SpellMagickaUseEvent::getEventEnabled()) {
+				auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
+
+				sol::object eventResult = stateHandle.triggerEvent(new event::SpellMagickaUseEvent(source));
+				if (eventResult.valid()) {
+					sol::table eventData = eventResult;
+					sol::optional<unsigned int> newCost = eventData["cost"];
+					if (newCost) {
+						magickaCost = newCost.value();
+					}
+				}
+			}
+
+			return magickaCost;
+		}
+
+		__declspec(naked) void patchSpellCastMagickaRequired() {
+			__asm {
+				add edi, 0x2C0						// edi += offset of MACT.magicka
+				push esi							// magicSourceInstance
+				call onSpellCastMagickaRequired		// Replace with call generation
+				jmp short $+6
+			}
+		}
+		const size_t patchSpellCastMagickaRequired_size = 0xE;
+
+		//
+		// Event: Enchanted item charge needed to cast
+		//
+
+		static TES3::Enchantment* lastExaminedEnchantment = nullptr;
+
+		float __stdcall onEnchantItemChargeRequired(TES3::MobileActor* mobile, TES3::Enchantment* enchant, float charge, TES3::MagicSourceInstance* magicSource) {
+			// Restore overwritten code.
+			charge = std::max(1.0f, charge);
+
+			// Ignore cast once items, the charge calculated is later ignored.
+			if (enchant->castType != TES3::EnchantmentCastType::Once) {
+				// Fire off the event.
+				if (event::EnchantChargeUseEvent::getEventEnabled()) {
+					auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
+					bool isCast = magicSource != nullptr;
+
+					sol::object eventResult = stateHandle.triggerEvent(new event::EnchantChargeUseEvent(enchant, mobile, charge, isCast));
+					if (eventResult.valid()) {
+						sol::table eventData = eventResult;
+						sol::optional<float> newCharge = eventData["charge"];
+						if (newCharge) {
+							charge = newCharge.value();
+						}
+					}
+				}
+			}
+
+			return charge;
+		}
+
+		TES3::Enchantment* __fastcall onEnchantItemChargeRequired_getEnchantment(TES3::Object* object) {
+			auto ench = object->getEnchantment();
+			lastExaminedEnchantment = ench;
+			return ench;
+		}
+
+		// _ftol substitute used to replace final operation of inlined calculations.
+		int onEnchantItemChargeRequired_ftol() {
+			float charge;
+			__asm { fstp [charge] }
+
+			auto castType = lastExaminedEnchantment->castType;
+			auto macp = TES3::WorldController::get()->getMobilePlayer();
+			charge = onEnchantItemChargeRequired(macp, lastExaminedEnchantment, charge, nullptr);
+
+			return int(charge);
+		}
+
+		__declspec(naked) void patchEnchantItemChargeRequired_onCast() {
+			__asm {
+				push esi					// magicSourceInstance
+				push ecx
+				fstp [esp]					// Charge required
+				push [esi+0xA0]				// Casting enchantment
+				push edi					// Casting mobileActor
+				call onEnchantItemChargeRequired	// Replace with call generation
+				fstp [ebp-0x18]				// Store updated charge required
+			}
+		}
+		const size_t patchEnchantItemChargeRequired_onCast_size = 0x14;
+
+		//
 		// Patch: Getting the correct radius of a light attached to a non-light entity.
 		//
 		
@@ -3132,6 +3321,15 @@ namespace mwse {
 		}
 
 		void LuaManager::hook() {
+			// Add core/lib directories to path.
+			{
+				std::stringstream envPath;
+				envPath << (std::filesystem::current_path() / "Data Files" / "MWSE" / "core").string() << ";";
+				envPath << (std::filesystem::current_path() / "Data Files" / "MWSE" / "lib").string() << ";";
+				envPath << getenv("Path");
+				_putenv_s("Path", envPath.str().c_str());
+			}
+
 			// Execute mwse_init.lua
 			try {
 				sol::protected_function_result result = luaState.safe_script_file("Data Files\\MWSE\\core\\mwse_init.lua");
@@ -3439,6 +3637,14 @@ namespace mwse {
 			// Event: Spell Resist
 			genCallEnforced(0x518616, 0x517E40, reinterpret_cast<DWORD>(OnSpellResist));
 
+			// Event: Absorb magic
+			auto onAbsorbedMagic = &TES3::MagicSourceInstance::onAbsorbedMagic;
+			genCallEnforced(0x51783E, 0x519900, *reinterpret_cast<DWORD*>(&onAbsorbedMagic));
+			genCallEnforced(0x5178E9, 0x519900, *reinterpret_cast<DWORD*>(&onAbsorbedMagic));
+			genCallEnforced(0x517A50, 0x519900, *reinterpret_cast<DWORD*>(&onAbsorbedMagic));
+			genCallEnforced(0x517CA7, 0x519900, *reinterpret_cast<DWORD*>(&onAbsorbedMagic));
+			genCallEnforced(0x517D90, 0x519900, *reinterpret_cast<DWORD*>(&onAbsorbedMagic));
+
 			// Event: Player exercise skill.
 			genCallEnforced(0x4EB387, 0x56A5D0, reinterpret_cast<DWORD>(OnExerciseSkill));
 			genCallEnforced(0x4EB586, 0x56A5D0, reinterpret_cast<DWORD>(OnExerciseSkill));
@@ -3462,6 +3668,9 @@ namespace mwse {
 			genCallEnforced(0x6004CD, 0x56A5D0, reinterpret_cast<DWORD>(OnExerciseSkill));
 			genCallEnforced(0x60E81C, 0x56A5D0, reinterpret_cast<DWORD>(OnExerciseSkill));
 			genCallEnforced(0x60ECB2, 0x56A5D0, reinterpret_cast<DWORD>(OnExerciseSkill));
+
+			// Event: Potion strength and skill check.
+			genCallEnforced(0x59CB62, 0x59D610, reinterpret_cast<DWORD>(OnAlchemySkillRoll));
 
 			// Event: Brew potion (failed).
 			genCallEnforced(0x59C010, 0x59C030, reinterpret_cast<DWORD>(OnBrewPotionAttempt));
@@ -3868,6 +4077,8 @@ namespace mwse {
 			genCallEnforced(0x4A2A0F, 0x4A2A90, *reinterpret_cast<DWORD*>(&bookGetText));
 
 			// Event: Item Dropped.
+			genCallEnforced(0x49B1DF, 0x4E4510, reinterpret_cast<DWORD>(OnItemDropped_ReferenceCreated)); // Store the last created dropped reference.
+			genCallEnforced(0x49B542, 0x485C50, reinterpret_cast<DWORD>(OnItemDropped_UpdateExteriors)); // Send event for exterior cells.
 			genCallEnforced(0x485FCA, 0x485E40, reinterpret_cast<DWORD>(OnItemDropped)); // MCP-added function.
 			genCallEnforced(0x49B550, 0x485E40, reinterpret_cast<DWORD>(OnItemDropped)); // Vanilla function.
 
@@ -4374,6 +4585,24 @@ namespace mwse {
 
 			// Event: Power Recharged
 			overrideVirtualTableEnforced(0x74AC54, offsetof(PowersHashMap::VirtualTable, deleteKeyValuePair), 0x4F1C50, reinterpret_cast<DWORD>(OnDeletePowerHashMapKVP));
+
+			// Event: Spell magicka cost on cast
+			writePatchCodeUnprotected(0x51517A, (BYTE*)&patchSpellCastMagickaRequired, patchSpellCastMagickaRequired_size);
+			genCallUnprotected(0x515181, reinterpret_cast<DWORD>(onSpellCastMagickaRequired));
+
+			// Event: Enchanted item charge needed to cast.
+			writePatchCodeUnprotected(0x514F1E, (BYTE*)&patchEnchantItemChargeRequired_onCast, patchEnchantItemChargeRequired_onCast_size);
+			genCallUnprotected(0x514F2A, reinterpret_cast<DWORD>(onEnchantItemChargeRequired));
+			genCallUnprotected(0x5E014A, reinterpret_cast<DWORD>(onEnchantItemChargeRequired_getEnchantment), 6);
+			genCallUnprotected(0x5E04EF, reinterpret_cast<DWORD>(onEnchantItemChargeRequired_getEnchantment), 6);
+			genCallUnprotected(0x5E1FE3, reinterpret_cast<DWORD>(onEnchantItemChargeRequired_getEnchantment), 6);
+			genCallUnprotected(0x5E3264, reinterpret_cast<DWORD>(onEnchantItemChargeRequired_getEnchantment), 6);
+			genCallUnprotected(0x5E35F6, reinterpret_cast<DWORD>(onEnchantItemChargeRequired_getEnchantment), 6);
+			genCallEnforced(0x5E02F6, 0x72769E, reinterpret_cast<DWORD>(onEnchantItemChargeRequired_ftol));
+			genCallEnforced(0x5E05D1, 0x72769E, reinterpret_cast<DWORD>(onEnchantItemChargeRequired_ftol));
+			genCallEnforced(0x5E201C, 0x72769E, reinterpret_cast<DWORD>(onEnchantItemChargeRequired_ftol));
+			genCallEnforced(0x5E33FB, 0x72769E, reinterpret_cast<DWORD>(onEnchantItemChargeRequired_ftol));
+			genCallEnforced(0x5E3724, 0x72769E, reinterpret_cast<DWORD>(onEnchantItemChargeRequired_ftol));
 
 			// UI framework hooks
 			TES3::UI::hook();

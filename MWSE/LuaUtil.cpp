@@ -367,6 +367,59 @@ namespace mwse {
 			return value;
 		}
 
+		bool getOptionalComplexObjectParams(sol::optional<sol::table> params, TES3::Reference*& out_reference, TES3::BaseObject*& out_object, TES3::MobileActor*& out_mobile, const char* referenceKey, const char* mobileKey, const char* objectKey) {
+			if (params) {
+				// Were we passed a reference?
+				auto reference = getOptionalParamReference(params, referenceKey);
+				if (reference) {
+					out_reference = reference;
+					out_mobile = reference->getAttachedMobileActor();
+					out_object = reference->baseObject;
+					return true;
+				}
+
+				// A mobile?
+				auto mobile = getOptionalParamMobileActor(params, mobileKey);
+				if (mobile) {
+					out_reference = mobile->reference;
+					out_mobile = mobile;
+					out_object = mobile->reference->baseObject;
+					return true;
+				}
+
+				// How about an object?
+				TES3::BaseObject* object = getOptionalParamObject<TES3::BaseObject>(params, objectKey);
+				if (object) {
+					out_reference = nullptr;
+					out_mobile = nullptr;
+					out_object = object;
+
+					// Try to recover reference/mobile from object.
+					if (object->isActor()) {
+						auto actor = static_cast<TES3::Actor*>(object);
+
+						auto reference = actor->getReference();
+						if (reference) {
+							out_reference = reference;
+							out_mobile = reference->getAttachedMobileActor();
+							return true;
+						}
+
+						auto mobile = static_cast<TES3::MobileActor*>(actor->getMobile());
+						if (mobile) {
+							out_reference = mobile->reference;
+							out_mobile = mobile;
+							return true;
+						}
+					}
+
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		const TES3::UI::UI_ID TES3_UI_ID_NULL = static_cast<TES3::UI::UI_ID>(TES3::UI::Property::null);
 
 		TES3::UI::Property getPropertyFromObject(sol::object object) {
@@ -437,7 +490,9 @@ namespace mwse {
 
 			auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
 			sol::state& state = stateHandle.state;
-			sol::protected_function_result result = state["debug"]["traceback"]();
+			static sol::protected_function luaDebugTraceback = state["debug"]["traceback"];
+
+			sol::protected_function_result result = luaDebugTraceback();
 			if (result.valid()) {
 				sol::optional<std::string> asString = result;
 				if (asString) {

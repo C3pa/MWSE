@@ -327,11 +327,13 @@ namespace mwse {
 		// Seen with StarFire's StarfireNPCA_nightlife script. Doesn't seem to actually call RemoveItem.
 		// Mostly here to gather more information to help diagnose the crash.
 		//
-		// Note: This assumes the target reference is of an actor.
+		// referenceToThis is only accessed for clones.
 		//
 
 		TES3::Reference::ReferenceData* __fastcall PatchFixupActorSelfReference(TES3::Reference* self) {
-			if (self->baseObject->referenceToThis == nullptr) {
+			bool isClone = self->baseObject->isActor() && static_cast<TES3::Actor*>(self->baseObject)->isClone();
+
+			if (isClone && self->baseObject->referenceToThis == nullptr) {
 				self->baseObject->referenceToThis = self;
 
 				using namespace mwse::log;
@@ -344,7 +346,7 @@ namespace mwse {
 				log << "Object: " << self->baseObject->getObjectID() << std::endl;
 				prettyDump(static_cast<TES3::Actor*>(self->baseObject));
 
-				auto script = self->baseObject->getScript();
+				auto script = TES3::Script::currentlyExecutingScript;
 				if (script) {
 					log << "Script: " << script->getObjectID() << std::endl;
 					prettyDump(script);
@@ -418,6 +420,61 @@ namespace mwse {
 				mwse::log::getLog() << "MWSE_RAISED_FILE_LIMIT: GetModuleHandleA(\"msvcrt.dll\") failed." << std::endl;
 			}
 			return false;
+		}
+
+		//
+		// Patch: Fix empty menu positions from saving to the ini.
+		//
+
+		BOOL __stdcall PatchNonEmptyWritePrivateProfileStringA(LPCSTR lpAppName, LPCSTR lpKeyName, LPCSTR lpString, LPCSTR lpFileName) {
+			if (lpString == nullptr || strnlen_s(lpString, 1) == 0) {
+				return FALSE;
+			}
+			return WritePrivateProfileStringA(lpAppName, lpKeyName, lpString, lpFileName);
+		}
+
+		//
+		// Patch: Fix enchantment copying on books and weapons.
+		//
+
+		__declspec(naked) void PatchCopyBookEnchantmentCaller() {
+			__asm {
+				push ebp
+				mov ecx, ebx
+			}
+		}
+		__declspec(naked) void PatchCopyWeaponEnchantmentCaller() {
+			__asm {
+				push ebx
+				mov ecx, ebp
+			}
+		}
+		constexpr size_t PatchCopyEnchantmentCaller_size = 0x3;
+
+		void __fastcall PatchCopyEnchantment(TES3::Item* item, DWORD _EDX_, const TES3::Item* from) {
+			// Free existing enchantment ID string if available.
+			if (item->getEnchantment() && !item->getLinksResolved()) {
+				tes3::free(item->getEnchantment());
+			}
+			item->setEnchantment(nullptr);
+
+			if (from->getEnchantment()) {
+				if (from->getLinksResolved()) {
+					item->setEnchantment(from->getEnchantment());
+				}
+				else {
+					// Helper union so we don't have to reinterpret memory all the time.
+					union EnchantUnion { TES3::Enchantment* enchantment; char* id; };
+					EnchantUnion toEnchantment = {}, fromEnchantment = {};
+
+					// Make a copy of the enchantment's ID.
+					fromEnchantment.enchantment = from->getEnchantment();
+					const auto enchantmentIDLength = strnlen_s(fromEnchantment.id, 32) + 1;
+					toEnchantment.id = reinterpret_cast<char*>(tes3::malloc(enchantmentIDLength));
+					strncpy_s(toEnchantment.id, enchantmentIDLength, fromEnchantment.id, enchantmentIDLength);
+					item->setEnchantment(toEnchantment.enchantment);
+				}
+			}
 		}
 
 		//
@@ -544,69 +601,67 @@ namespace mwse {
 #if MWSE_RAISED_FILE_LIMIT
 			// Patch: Raise esm/esp limit from 256 to 1024.
 
-			// First, raise C runtime fopen limit from 512 to 2048.
-			bool canHandle2048OpenFiles = raiseStdioFileLimit();
-
-			if (canHandle2048OpenFiles && mcp::getFeatureEnabled(mcp::feature::SavegameCorruptionFix)) {
-				// Change hardcoded 256 checks to 1024.
-				writeValueEnforced<DWORD>(0x4B7A22 + 0x1, PatchRaiseESXLimit::ModCountVanilla, PatchRaiseESXLimit::ModCountMWSE);
+			// Change hardcoded 256 checks to 1024.
+			writeValueEnforced<DWORD>(0x4B7A22 + 0x1, PatchRaiseESXLimit::ModCountVanilla, PatchRaiseESXLimit::ModCountMWSE);
+			if (raiseStdioFileLimit()) {
+				// Actually only allow loading more than 256 mods if we were able to raise the fopen limit.
 				writeValueEnforced<DWORD>(0x4BB4AE + 0x3, PatchRaiseESXLimit::ModCountVanilla, PatchRaiseESXLimit::ModCountMWSE);
 				writeValueEnforced<DWORD>(0x4BB588 + 0x3, PatchRaiseESXLimit::ModCountVanilla, PatchRaiseESXLimit::ModCountMWSE);
-
-				// Fix accesses into the active mods list to point to the new array.
-				writeValueEnforced<DWORD>(0x4B7A27 + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
-				writeValueEnforced<DWORD>(0x4B87A9 + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
-				writeValueEnforced<DWORD>(0x4BB498 + 0x3, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
-				writeValueEnforced<DWORD>(0x4BB56F + 0x3, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
-				writeValueEnforced<DWORD>(0x4BB5ED + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
-				writeValueEnforced<DWORD>(0x4BB650 + 0x3, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
-				writeValueEnforced<DWORD>(0x4BBD21 + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
-				writeValueEnforced<DWORD>(0x4BD252 + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
-				writeValueEnforced<DWORD>(0x4C8B92 + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
-
-				// Change of form ID: 8 bit to 10 bit game file mask.
-				writeValueEnforced<BYTE>(0x4DD03F + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x4DD2A7 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x4DD31E + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x4DD813 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x4DDA09 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x4DDBB1 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x7367A0 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x736809 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x73685A + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x736890 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x7368D7 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x736B56 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<BYTE>(0x736B75 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
-				writeValueEnforced<DWORD>(0x4B54DD + 0x1, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
-				writeValueEnforced<DWORD>(0x4DD030 + 0x1, PatchRaiseESXLimit::ModMaskVanilla, PatchRaiseESXLimit::ModMaskMWSE);
-				writeValueEnforced<DWORD>(0x4DD089 + 0x1, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
-				writeValueEnforced<DWORD>(0x4DD107 + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
-				writeValueEnforced<DWORD>(0x4DD80B + 0x2, PatchRaiseESXLimit::ModMaskVanilla, PatchRaiseESXLimit::ModMaskMWSE);
-				writeValueEnforced<DWORD>(0x4DD829 + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
-				writeValueEnforced<DWORD>(0x4E0C8B + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
-				writeValueEnforced<DWORD>(0x4E0C91 + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
-				writeValueEnforced<DWORD>(0x7367A3 + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
-				writeValueEnforced<DWORD>(0x73680C + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
-				writeValueEnforced<DWORD>(0x736B78 + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
-
-				// Patch loading to support either the old or new format.
-				genCallEnforced(0x4C01B1, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
-				genCallEnforced(0x4DCE01, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
-				genCallEnforced(0x4DD027, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
-				genCallEnforced(0x4DE197, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
-				genCallEnforced(0x4E0C2F, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
-				genCallEnforced(0x4E0C6D, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
-				genJumpEnforced(0x7367BA, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
-				genCallEnforced(0x736B48, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
-
-				// Patch saving to try to use the old format if possible, and use the new format if it can't.
-				genCallEnforced(0x4E1144, 0x4B6BA0, reinterpret_cast<DWORD>(PatchRaiseESXLimit::SaveFormId));
-				genCallEnforced(0x4E14D5, 0x4B6BA0, reinterpret_cast<DWORD>(PatchRaiseESXLimit::SaveFormId));
-				genCallEnforced(0x4E1B15, 0x4B6BA0, reinterpret_cast<DWORD>(PatchRaiseESXLimit::SaveFormId));
-				genCallEnforced(0x4E1E78, 0x4B6BA0, reinterpret_cast<DWORD>(PatchRaiseESXLimit::SaveFormId));
-				genCallEnforced(0x4FFB78, 0x4B6BA0, reinterpret_cast<DWORD>(PatchRaiseESXLimit::SaveFormId));
 			}
+
+			// Fix accesses into the active mods list to point to the new array.
+			writeValueEnforced<DWORD>(0x4B7A27 + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
+			writeValueEnforced<DWORD>(0x4B87A9 + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
+			writeValueEnforced<DWORD>(0x4BB498 + 0x3, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
+			writeValueEnforced<DWORD>(0x4BB56F + 0x3, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
+			writeValueEnforced<DWORD>(0x4BB5ED + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
+			writeValueEnforced<DWORD>(0x4BB650 + 0x3, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
+			writeValueEnforced<DWORD>(0x4BBD21 + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
+			writeValueEnforced<DWORD>(0x4BD252 + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
+			writeValueEnforced<DWORD>(0x4C8B92 + 0x2, 0xAE64, offsetof(TES3::NonDynamicData, activeMods));
+
+			// Change of form ID: 8 bit to 10 bit game file mask.
+			writeValueEnforced<BYTE>(0x4DD03F + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x4DD2A7 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x4DD31E + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x4DD813 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x4DDA09 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x4DDBB1 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x7367A0 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x736809 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x73685A + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x736890 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x7368D7 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x736B56 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<BYTE>(0x736B75 + 0x2, PatchRaiseESXLimit::FormBitsVanilla, PatchRaiseESXLimit::FormBitsMWSE);
+			writeValueEnforced<DWORD>(0x4B54DD + 0x1, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
+			writeValueEnforced<DWORD>(0x4DD030 + 0x1, PatchRaiseESXLimit::ModMaskVanilla, PatchRaiseESXLimit::ModMaskMWSE);
+			writeValueEnforced<DWORD>(0x4DD089 + 0x1, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
+			writeValueEnforced<DWORD>(0x4DD107 + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
+			writeValueEnforced<DWORD>(0x4DD80B + 0x2, PatchRaiseESXLimit::ModMaskVanilla, PatchRaiseESXLimit::ModMaskMWSE);
+			writeValueEnforced<DWORD>(0x4DD829 + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
+			writeValueEnforced<DWORD>(0x4E0C8B + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
+			writeValueEnforced<DWORD>(0x4E0C91 + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
+			writeValueEnforced<DWORD>(0x7367A3 + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
+			writeValueEnforced<DWORD>(0x73680C + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
+			writeValueEnforced<DWORD>(0x736B78 + 0x2, PatchRaiseESXLimit::FormMaskVanilla, PatchRaiseESXLimit::FormMaskMWSE);
+
+			// Patch loading to support either the old or new format.
+			genCallEnforced(0x4C01B1, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
+			genCallEnforced(0x4DCE01, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
+			genCallEnforced(0x4DD027, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
+			genCallEnforced(0x4DE197, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
+			genCallEnforced(0x4E0C2F, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
+			genCallEnforced(0x4E0C6D, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
+			genJumpEnforced(0x7367BA, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
+			genCallEnforced(0x736B48, 0x4B6880, reinterpret_cast<DWORD>(PatchRaiseESXLimit::LoadFormId));
+
+			// Patch saving to try to use the old format if possible, and use the new format if it can't.
+			genCallEnforced(0x4E1144, 0x4B6BA0, reinterpret_cast<DWORD>(PatchRaiseESXLimit::SaveFormId));
+			genCallEnforced(0x4E14D5, 0x4B6BA0, reinterpret_cast<DWORD>(PatchRaiseESXLimit::SaveFormId));
+			genCallEnforced(0x4E1B15, 0x4B6BA0, reinterpret_cast<DWORD>(PatchRaiseESXLimit::SaveFormId));
+			genCallEnforced(0x4E1E78, 0x4B6BA0, reinterpret_cast<DWORD>(PatchRaiseESXLimit::SaveFormId));
+			genCallEnforced(0x4FFB78, 0x4B6BA0, reinterpret_cast<DWORD>(PatchRaiseESXLimit::SaveFormId));
 #endif
 
 			// Patch: Fix crash when trying to draw cell markers that don't fit on the map.
@@ -638,6 +693,19 @@ namespace mwse {
 
 			// Patch: Correctly initialize MobileProjectile tag/objectType
 			genCallEnforced(0x572444, 0x4EE8A0, reinterpret_cast<DWORD>(PatchInitializeMobileProjectileType));
+
+			// Patch: Prevent the game from saving empty menu names to the INI file.
+			genCallUnprotected(0x5972AA, reinterpret_cast<DWORD>(PatchNonEmptyWritePrivateProfileStringA), 0x6);
+
+			// Patch: Fix book enchantment copying.
+			genNOPUnprotected(0x4A2618, 0x4A26D8 - 0x4A2618);
+			writePatchCodeUnprotected(0x4A2618, (BYTE*)&PatchCopyBookEnchantmentCaller, PatchCopyEnchantmentCaller_size);
+			genCallUnprotected(0x4A2618 + PatchCopyEnchantmentCaller_size, reinterpret_cast<DWORD>(PatchCopyEnchantment));
+
+			// Patch: Fix weapon enchantment copying.
+			genNOPUnprotected(0x4F26FF, 0x4F27BC - 0x4F26FF);
+			writePatchCodeUnprotected(0x4F26FF, (BYTE*)&PatchCopyWeaponEnchantmentCaller, PatchCopyEnchantmentCaller_size);
+			genCallUnprotected(0x4F26FF + PatchCopyEnchantmentCaller_size, reinterpret_cast<DWORD>(PatchCopyEnchantment));
 		}
 
 		void installPostLuaPatches() {
@@ -801,6 +869,11 @@ namespace mwse {
 				safePrintObjectToLog("Reference", TES3::Script::currentlyExecutingScriptReference);
 				log::getLog() << "  OpCode: 0x" << std::hex << *reinterpret_cast<DWORD*>(0x7A91C4) << std::endl;
 				log::getLog() << "  Cursor Offset: 0x" << std::hex << *reinterpret_cast<DWORD*>(0x7CEBB0) << std::endl;
+			}
+
+			// Show if we failed to load a mesh.
+			if (TES3::DataHandler::currentlyLoadingMesh) {
+				log::getLog() << "Currently loading mesh: " << TES3::DataHandler::currentlyLoadingMesh << std::endl;
 			}
 
 			// Open the file.

@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "This event is triggered on a collision.",
     eventData = {
         ["mobile"] = {
@@ -17,7 +18,7 @@ return{
             description = "Reference which mobile object has collided with.",
         },
     },
-    filter = { "mobile", "target" },
+    filter = "reference",
 }
 
 --[[

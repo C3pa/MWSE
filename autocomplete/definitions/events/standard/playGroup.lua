@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "",
     eventData = {
         ["animationData"] = {
@@ -32,5 +33,6 @@ return{
             description = "",
         },
     },
-    filter = { "animationData", "group", "index", "flags", "loopCount" }, -- Is this ok?
+    filter = "reference",
+	blockable = true,
 }

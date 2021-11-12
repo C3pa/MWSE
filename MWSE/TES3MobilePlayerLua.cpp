@@ -24,7 +24,7 @@ namespace mwse {
 
 			// Binding for TES3::MobilePlayer
 			{
-				// Start our usertype. We must finish this with state.set_usertype.
+				// Start our usertype.
 				auto usertypeDefinition = state.new_usertype<TES3::MobilePlayer>("tes3mobilePlayer");
 				usertypeDefinition["new"] = sol::no_constructor;
 
@@ -60,7 +60,7 @@ namespace mwse {
 				usertypeDefinition["restHoursRemaining"] = &TES3::MobilePlayer::restHoursRemaining;
 				usertypeDefinition["sleeping"] = &TES3::MobilePlayer::sleeping;
 				usertypeDefinition["telekinesis"] = &TES3::MobilePlayer::telekinesis;
-				usertypeDefinition["travelling"] = &TES3::MobilePlayer::playerIsTravelling;
+				usertypeDefinition["traveling"] = &TES3::MobilePlayer::playerIsTraveling;
 				usertypeDefinition["vanityDisabled"] = &TES3::MobilePlayer::vanityDisabled;
 				usertypeDefinition["viewSwitchDisabled"] = &TES3::MobilePlayer::viewSwitchDisabled;
 				usertypeDefinition["visionBonus"] = &TES3::MobilePlayer::visionBonus;
@@ -85,11 +85,14 @@ namespace mwse {
 				// Functions exposed as properties.
 				usertypeDefinition["cameraHeight"] = sol::property(&TES3::MobilePlayer::getCameraHeight, &TES3::MobilePlayer::setCameraHeight_lua);
 				usertypeDefinition["is3rdPerson"] = sol::readonly_property(&TES3::MobilePlayer::is3rdPerson);
+
+				// Legacy bindings.
+				usertypeDefinition["travelling"] = &TES3::MobilePlayer::playerIsTraveling;
 			}
 
 			// Binding for TES3::MarkData.
 			{
-				// Start our usertype. We must finish this with state.set_usertype.
+				// Start our usertype.
 				auto usertypeDefinition = state.new_usertype<TES3::MarkData>("tes3markData");
 
 				// Basic property bindings.

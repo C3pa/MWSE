@@ -8,17 +8,41 @@
 #include "TES3Vectors.h"
 
 namespace TES3 {
+	enum class QuickKeyType : unsigned int {
+		None = 0,
+		Item = 1,
+		Magic = 2,
+	};
+
+	struct QuickKey {
+		QuickKeyType type; // 0x0
+		Spell* spell; // 0x4
+		Item* item; // 0x8
+		ItemData* itemData; // 0xC
+
+		std::tuple<TES3::BaseObject*, TES3::ItemData*> getMagic();
+		void setMagic(TES3::BaseObject* object, sol::optional<TES3::ItemData*> itemData);
+
+		std::tuple<TES3::Item*, TES3::ItemData*> getItem();
+		void setItem(TES3::Item* object, sol::optional<TES3::ItemData*> itemData);
+
+		void clear();
+
+		static QuickKey* getQuickKey(unsigned int slot);
+		static nonstd::span<QuickKey, 9> getQuickKeys();
+	};
+	static_assert(sizeof(QuickKey) == 0x10, "TES3::QuickKey failed size validation");
+
 	struct ItemStack {
 		int count; // 0x0
 		Object * object; // 0x4
 		NI::TArray<ItemData*> * variables; // 0x8
-
 	};
 	static_assert(sizeof(ItemStack) == 0xC, "TES3::ItemStack failed size validation");
 
 	struct EquipmentStack {
 		Object * object; // 0x0
-		ItemData * variables; // 0x4
+		ItemData * itemData; // 0x4
 
 		//
 		// Other related helper functions.
@@ -31,7 +55,7 @@ namespace TES3 {
 	struct Inventory {
 		unsigned int flags; // 0x0
 		IteratedList<ItemStack*> itemStacks; // 0x4
-		int unknown_0x18;
+		Light * internalLight; // 0x18
 
 		//
 		// Other related this-call functions.

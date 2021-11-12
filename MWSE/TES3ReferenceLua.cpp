@@ -24,7 +24,7 @@ namespace mwse {
 			auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
 			sol::state& state = stateHandle.state;
 
-			// Start our usertype. We must finish this with state.set_usertype.
+			// Start our usertype.
 			auto usertypeDefinition = state.new_usertype<TES3::Reference>("tes3reference");
 			usertypeDefinition["new"] = sol::no_constructor;
 
@@ -43,6 +43,7 @@ namespace mwse {
 			usertypeDefinition["activate"] = &TES3::Reference::activate_lua;
 			usertypeDefinition["clearActionFlag"] = &TES3::Reference::clearActionFlag;
 			usertypeDefinition["clone"] = &TES3::Reference::clone;
+			usertypeDefinition["delete"] = &TES3::Reference::setDeletedWithSafety;
 			usertypeDefinition["deleteDynamicLightAttachment"] = &TES3::Reference::deleteDynamicLightAttachment;
 			usertypeDefinition["detachDynamicLightFromAffectedNodes"] = &TES3::Reference::detachDynamicLightFromAffectedNodes;
 			usertypeDefinition["disable"] = &TES3::Reference::disable;

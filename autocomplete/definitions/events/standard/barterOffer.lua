@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "This event is called when a potentially successful barter offer is made by the player. Potentially successful means both parties have the required funds to make the trade.",
     eventData = {
         ["mobile"] = {
@@ -8,13 +9,12 @@ return{
         },
         ["success"] = {
             type = "boolean",
-            --readOnly = true,
             description = "Whether the trade was accepted or not.",
         },
         ["value"] = {
             type = "number",
             readOnly = true,
-            description = "Total value in gold of items being traded.",
+            description = "Total value in gold of items being traded. Negative means the player owes coin, positive means the player gets coin.",
         },
         ["offer"] = {
             type = "number",
@@ -32,4 +32,5 @@ return{
             description = "Table of tes3what being bought. These items will be transfered to player's inventory on a successful bartering event.",
         },
     },
+	blockable = true,
 }

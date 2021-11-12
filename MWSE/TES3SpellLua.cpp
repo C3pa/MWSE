@@ -66,7 +66,7 @@ namespace mwse {
 			auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
 			sol::state& state = stateHandle.state;
 
-			// Start our usertype. We must finish this with state.set_usertype.
+			// Start our usertype.
 			auto usertypeDefinition = state.new_usertype<TES3::Spell>("tes3spell");
 			usertypeDefinition["new"] = sol::no_constructor;
 
@@ -79,6 +79,7 @@ namespace mwse {
 			usertypeDefinition["castType"] = &TES3::Spell::castType;
 			usertypeDefinition["effects"] = sol::readonly_property(&TES3::Spell::getEffects);
 			usertypeDefinition["flags"] = &TES3::Spell::spellFlags;
+			usertypeDefinition["isActiveCast"] = sol::readonly_property(&TES3::Spell::isActiveCast);
 			usertypeDefinition["magickaCost"] = &TES3::Spell::magickaCost;
 			usertypeDefinition["name"] = sol::property(&TES3::Spell::getName, &TES3::Spell::setName);
 

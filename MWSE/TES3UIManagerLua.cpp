@@ -86,7 +86,8 @@ namespace mwse {
 						eventData["relativeY"] = target->cached_screenY - data1;
 					}
 
-					for (const auto& eventLua : iterCallback->second) {
+					auto callbacks = iterCallback->second;
+					for (const auto& eventLua : callbacks) {
 						// Note: sol::protected_function needs to be a local, as Lua functions can destroy it when modifying events.
 						sol::protected_function callback = eventLua.callback;
 						sol::protected_function_result result = callback(eventData);
@@ -177,7 +178,8 @@ namespace mwse {
 						eventData["relativeY"] = target->cached_screenY - data1;
 					}
 
-					for (const auto& eventLua : iterCallback->second) {
+					auto callbacks = iterCallback->second;
+					for (const auto& eventLua : callbacks) {
 						// Note: sol::protected_function needs to be a local, as Lua functions can destroy it when modifying events.
 						sol::protected_function callback = eventLua.callback;
 						sol::protected_function_result result = callback(eventData);
@@ -226,6 +228,11 @@ namespace mwse {
 			auto& properties = eventCallbacksBefore[target];
 			auto& callbacks = properties[eventID];
 
+			auto existing = std::find_if(callbacks.begin(), callbacks.end(), [&](auto& s) { return s.callback == callback && s.priority == priority; });
+			if (existing != callbacks.end()) {
+				return;
+			}
+
 			auto pos = std::find_if(callbacks.begin(), callbacks.end(), [priority](auto& s) { return s.priority < priority; });
 			callbacks.insert(pos, { callback, priority });
 
@@ -250,6 +257,11 @@ namespace mwse {
 		void registerAfterUIEvent(TES3::UI::Element* target, TES3::UI::Property eventID, sol::protected_function callback, double priority) {
 			auto& properties = eventCallbacksAfter[target];
 			auto& callbacks = properties[eventID];
+
+			auto existing = std::find_if(callbacks.begin(), callbacks.end(), [&](auto& s) { return s.callback == callback && s.priority == priority; });
+			if (existing != callbacks.end()) {
+				return;
+			}
 
 			auto pos = std::find_if(callbacks.begin(), callbacks.end(), [priority](auto& s) { return s.priority < priority; });
 			callbacks.insert(pos, { callback, priority });
@@ -334,7 +346,7 @@ namespace mwse {
 			return false;
 		}
 
-		void unregisterUIEvent(Element* target, Property eventID) {
+		bool unregisterUIEvent(Element* target, Property eventID) {
 			auto& elementEvents = legacyEventMap[target];
 
 			// Check for existing event
@@ -342,9 +354,11 @@ namespace mwse {
 				if (it->id == eventID) {
 					// Remove event
 					elementEvents.erase(it);
-					return;
+					return true;
 				}
 			}
+
+			return false;
 		}
 
 		bool eventForwarder(sol::table eventData) {
@@ -393,6 +407,8 @@ namespace mwse {
 			tes3ui["getMenuOnTop"] = TES3::UI::getMenuOnTop;
 			tes3ui["getPalette"] = TES3::UI::getPalette_lua;
 			tes3ui["getServiceActor"] = TES3::UI::getServiceActor;
+			tes3ui["getViewportSize"] = TES3::UI::getViewportSize_lua;
+			tes3ui["getViewportScale"] = TES3::UI::getViewportScale;
 			tes3ui["leaveMenuMode"] = TES3::UI::leaveMenuMode;
 			tes3ui["logToConsole"] = TES3::UI::logToConsole_lua;
 			tes3ui["lookupID"] = TES3::UI::lookupID;

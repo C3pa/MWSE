@@ -113,11 +113,40 @@ namespace TES3 {
 		}
 	}
 
+	bool BaseObject::isItem() const {
+		switch (objectType) {
+		case TES3::ObjectType::Alchemy:
+		case TES3::ObjectType::Ammo:
+		case TES3::ObjectType::Apparatus:
+		case TES3::ObjectType::Armor:
+		case TES3::ObjectType::Book:
+		case TES3::ObjectType::Clothing:
+		case TES3::ObjectType::Ingredient:
+		case TES3::ObjectType::Light:
+		case TES3::ObjectType::Lockpick:
+		case TES3::ObjectType::Misc:
+		case TES3::ObjectType::Probe:
+		case TES3::ObjectType::Repair:
+		case TES3::ObjectType::Weapon:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	const char* BaseObject::getSourceFilename() const {
 		if (sourceMod) {
 			return sourceMod->filename;
 		}
 		return nullptr;
+	}
+
+	bool BaseObject::getLinksResolved() const {
+		return BIT_TEST(objectFlags, TES3::ObjectFlag::LinksResolvedBit);
+	}
+
+	void BaseObject::setLinksResolved(bool value) {
+		BIT_SET(objectFlags, TES3::ObjectFlag::LinksResolvedBit, value);
 	}
 
 	bool BaseObject::getDisabled() const {
@@ -587,6 +616,20 @@ namespace TES3 {
 
 	bool Object::getIsLocationMarker() const {
 		return vTable.object->isLocationMarker(this);
+	}
+
+	bool Object::getSupportsLuaData() const {
+		// Do our base object checks.
+		if (!BaseObject::getSupportsLuaData()) {
+			return false;
+		}
+
+		// Prevent markers from supporting lua data.
+		if (getIsLocationMarker()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	NI::Node * Object::getSceneGraphNode() {

@@ -1,5 +1,7 @@
 return {
+	type = "event",
 	description = "The damage event triggers before an actor is damaged. The damage value can be modified, or the damage can be prevented completely by blocking the event.",
+	related = { "damage", "damaged", "damageHandToHand", "damagedHandToHand" },
 	eventData = {
 		damage = {
 			type = "number",
@@ -46,6 +48,7 @@ return {
 			description = "The origin of damage. Values of this variable can be: \"script\", \"fall\", \"suffocation\", \"attack\", \"magic\", \"shield\" or nil.",
 		},
 	},
+	blockable = true,
 	examples = {
 		["changeFallDamage"] = {
 			title = "Change fall damage"

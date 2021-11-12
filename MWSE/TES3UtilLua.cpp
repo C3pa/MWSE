@@ -186,6 +186,10 @@ namespace mwse {
 		}
 
 		TES3::BaseObject* getObject(const char* id) {
+			if (!id) {
+				throw std::invalid_argument("Invalid first parameter provided. Must be a string ID.");
+			}
+
 			TES3::DataHandler* dataHandler = TES3::DataHandler::get();
 			if (dataHandler) {
 				return dataHandler->nonDynamicData->resolveObject(id);
@@ -552,6 +556,15 @@ namespace mwse {
 			}
 
 			return archives;
+		}
+
+		TES3::QuickKey* getQuickKey(sol::table params) {
+			auto slotNumber = getOptionalParam(params, "slot", 0) - 1;
+			if (slotNumber < 0 || slotNumber > 8) {
+				throw std::invalid_argument("Invalid 'slot' param provided.");
+			}
+
+			return TES3::QuickKey::getQuickKey(slotNumber);
 		}
 
 		void playItemPickupSound(sol::optional<sol::table> params) {
@@ -1899,6 +1912,9 @@ namespace mwse {
 				else if (statistic == &mobile->fatigue) {
 					TES3::UI::updateFatigueFillBar(statistic->current, statistic->base);
 				}
+				else if (statistic == &mobile->encumbrance) {
+					TES3::UI::updateEncumbranceBar();
+				}
 				else {
 					// Check to see if an attribute was edited.
 					for (size_t i = TES3::Attribute::FirstAttribute; i <= TES3::Attribute::LastAttribute; i++) {
@@ -1988,6 +2004,7 @@ namespace mwse {
 
 			// Retype our variables to something more friendly, and get additional params.
 			sol::optional<bool> limit = params["limit"];
+			sol::optional<bool> limitToBase = params["limitToBase"];
 
 			sol::optional<float> current = params["current"];
 			sol::optional<float> base = params["base"];
@@ -1996,11 +2013,11 @@ namespace mwse {
 			// Edit both.
 			if (value) {
 				statistic->modBaseCapped(value.value(), limit.value_or(false), limit.value_or(false));
-				statistic->modCurrentCapped(value.value(), limit.value_or(false), limit.value_or(false), limit.value_or(false));
+				statistic->modCurrentCapped(value.value(), limit.value_or(false), limitToBase.value_or(false), limit.value_or(false));
 			}
 			// If we're given a current value, modify it.
 			else if (current) {
-				statistic->modCurrentCapped(current.value(), limit.value_or(false), limit.value_or(false), limit.value_or(false));
+				statistic->modCurrentCapped(current.value(), limit.value_or(false), limitToBase.value_or(false), limit.value_or(false));
 			}
 			// If we're given a base value, modify it.
 			else if (base) {
@@ -2030,6 +2047,9 @@ namespace mwse {
 				}
 				else if (statistic == &mobile->fatigue) {
 					TES3::UI::updateFatigueFillBar(statistic->current, statistic->base);
+				}
+				else if (statistic == &mobile->encumbrance) {
+					TES3::UI::updateEncumbranceBar();
 				}
 				else {
 					// Check to see if an attribute was edited.
@@ -2274,6 +2294,224 @@ namespace mwse {
 			}
 
 			return true;
+		}
+
+		const auto TES3_UI_updatSpellsList = reinterpret_cast<void(__cdecl*)()>(0x5E3D10);
+		const auto TES3_UI_updatEnchantmentsList = reinterpret_cast<void(__cdecl*)()>(0x5E3070);
+		void updateMagicGUI_internal(TES3::Reference* reference, bool updateSpells = true, bool updateEnchantments = true) {
+			auto worldController = TES3::WorldController::get();
+			auto macp = worldController->getMobilePlayer();
+
+			// Player-specific handling.
+			if (macp && reference == macp->reference) {
+				// Update MenuMagic
+				auto menuMagic = TES3::UI::findMenu(*reinterpret_cast<TES3::UI::UI_ID*>(0x7D431E));
+				if (menuMagic) {
+					if (updateSpells) {
+						TES3_UI_updatSpellsList();
+					}
+
+					if (updateEnchantments) {
+						TES3_UI_updatEnchantmentsList();
+					}
+				}
+			}
+		}
+
+		bool addSpell(sol::table params) {
+			// Get some complex inputs...
+			TES3::Reference* reference = nullptr;
+			TES3::BaseObject* object = nullptr;
+			TES3::MobileActor* mobile = nullptr;
+			if (!getOptionalComplexObjectParams(params, reference, object, mobile, "reference", "mobile", "actor")) {
+				throw std::invalid_argument("Could not determine target. Provide a valid reference, mobile, or object.");
+			}
+
+			// Make sure we were given an actor that can use spells.
+			if (object->objectType != TES3::ObjectType::NPC && object->objectType != TES3::ObjectType::Creature) {
+				throw std::invalid_argument("Input target was not a valid spell-supporting actor.");
+			}
+
+			// Get a spell to add.
+			auto spell = getOptionalParamSpell(params, "spell");
+			if (spell == nullptr) {
+				throw std::invalid_argument("Invalid 'spell' parameter provided.");
+			}
+
+			// Get the spell list.
+			auto actor = static_cast<TES3::Actor*>(object);
+			auto spellList = actor->getSpellList();
+
+			// Do we already know this spell?
+			if (spellList->contains(spell)) {
+				return false;
+			}
+
+			// Do we already know if because of our race?
+			auto race = actor->getRace();
+			if (race && race->abilities->contains(spell)) {
+				return false;
+			}
+
+			// How about our birthsign?
+			auto mobilePlayer = TES3::WorldController::get()->getMobilePlayer();
+			if (mobilePlayer && mobilePlayer == mobile) {
+				if (mobilePlayer->birthsign && mobilePlayer->birthsign->spellList.contains(spell)) {
+					return false;
+				}
+			}
+
+			// We are free to add the spell.
+			if (!spellList->add(spell)) {
+				return false;
+			}
+
+			// Do we need to activate the effects?
+			auto instance = nullptr;
+			if (mobile && mobile->isActive() && !spell->isActiveCast()) {
+				auto magicInstanceController = TES3::WorldController::get()->magicInstanceController;
+
+				TES3::MagicSourceCombo sourceCombo = spell;
+				auto serial = magicInstanceController->activateSpell(reference, nullptr, &sourceCombo);
+				if (serial != 0) {
+					// Force bypass resistances.
+					auto instance = magicInstanceController->getInstanceFromSerial(serial);
+					if (instance) {
+						instance->bypassResistances = getOptionalParam(params, "bypassResistances", true);
+					}
+				}
+			}
+
+			// Update GUI elements if necessary.
+			if (spell->isActiveCast() && getOptionalParam(params, "updateGUI", true)) {
+				updateMagicGUI_internal(reference, true, false);
+			}
+
+			// Update modified flags.
+			object->getBaseObject()->setObjectModified(true);
+			if (reference) {
+				reference->setObjectModified(true);
+			}
+
+			return true;
+		}
+
+		const auto TES3_UI_removeSpellFromGUIList = reinterpret_cast<void(__cdecl*)(TES3::Spell*)>(0x5E3BD0);
+		bool removeSpell(sol::table params) {
+			// Get some complex inputs...
+			TES3::Reference* reference = nullptr;
+			TES3::BaseObject* object = nullptr;
+			TES3::MobileActor* mobile = nullptr;
+			if (!getOptionalComplexObjectParams(params, reference, object, mobile, "reference", "mobile", "actor")) {
+				throw std::invalid_argument("Could not determine target. Provide a valid reference, mobile, or object.");
+			}
+
+			// Make sure we were given an actor that can use spells.
+			if (object->objectType != TES3::ObjectType::NPC && object->objectType != TES3::ObjectType::Creature) {
+				throw std::invalid_argument("Input target was not a valid spell-supporting actor.");
+			}
+
+			// Get a spell to remove.
+			auto spell = getOptionalParamSpell(params, "spell");
+			if (spell == nullptr) {
+				throw std::invalid_argument("Invalid 'spell' parameter provided.");
+			}
+
+			// Get the spell list.
+			auto actor = static_cast<TES3::Actor*>(object);
+			auto spellList = actor->getSpellList();
+
+			// Remove the spell.
+			if (!spellList->remove(spell)) {
+				return false;
+			}
+
+			// End any active effects for the spell.
+			if (mobile && !spell->isActiveCast()) {
+				std::unordered_set<unsigned int> instancesToRetire;
+
+				for (const auto& effect : mobile->activeMagicEffects) {
+					if (instancesToRetire.find(effect.magicInstanceSerial) != instancesToRetire.end()) {
+						continue;
+					}
+
+					auto instance = effect.getInstance();
+					if (instance) {
+						auto source = &instance->sourceCombo;
+						if (source->sourceType == TES3::MagicSourceType::Spell && source->source.asSpell == spell) {
+							instancesToRetire.insert(effect.magicInstanceSerial);
+						}
+					}
+				}
+
+				if (!instancesToRetire.empty()) {
+					auto magicInstanceController = TES3::WorldController::get()->magicInstanceController;
+					for (const auto serial : instancesToRetire) {
+						auto instance = magicInstanceController->getInstanceFromSerial(serial);
+						if (instance) {
+							instance->retire(reference);
+						}
+					}
+				}
+			}
+
+			// Update GUI elements if necessary.
+			auto mobilePlayer = TES3::WorldController::get()->getMobilePlayer();
+			if (mobilePlayer && mobile == mobilePlayer && spell->isActiveCast() && getOptionalParam(params, "updateGUI", true)) {
+				TES3_UI_removeSpellFromGUIList(spell);
+			}
+
+			// Update modified flags.
+			object->getBaseObject()->setObjectModified(true);
+			if (reference) {
+				reference->setObjectModified(true);
+			}
+
+			return true;
+		}
+
+		bool hasSpell(sol::table params) {
+			// Get some complex inputs...
+			TES3::Reference* reference = nullptr;
+			TES3::BaseObject* object = nullptr;
+			TES3::MobileActor* mobile = nullptr;
+			if (!getOptionalComplexObjectParams(params, reference, object, mobile, "reference", "mobile", "actor")) {
+				throw std::invalid_argument("Could not determine target. Provide a valid reference, mobile, or object.");
+			}
+
+			// Make sure we were given an actor that can use spells.
+			if (object->objectType != TES3::ObjectType::NPC && object->objectType != TES3::ObjectType::Creature) {
+				throw std::invalid_argument("Input target was not a valid spell-supporting actor.");
+			}
+
+			// Get a spell to check.
+			auto spell = getOptionalParamSpell(params, "spell");
+			if (spell == nullptr) {
+				throw std::invalid_argument("Invalid 'spell' parameter provided.");
+			}
+
+			// Check the racial list.
+			auto actor = static_cast<TES3::Actor*>(object);
+			auto race = actor->getRace();
+			if (race && race->abilities->contains(spell)) {
+				return true;
+			}
+
+			// How about our birthsign?
+			auto mobilePlayer = TES3::WorldController::get()->getMobilePlayer();
+			if (mobilePlayer && mobilePlayer == mobile) {
+				if (mobilePlayer->birthsign && mobilePlayer->birthsign->spellList.contains(spell)) {
+					return true;
+				}
+			}
+
+			// Now for the main spell list...
+			auto spellList = actor->getSpellList();
+			if (spellList->contains(spell)) {
+				return true;
+			}
+
+			return false;
 		}
 
 		void addArmorSlot(sol::table params) {
@@ -2659,7 +2897,7 @@ namespace mwse {
 				else if (sourceCombo.sourceType == TES3::MagicSourceType::Enchantment) {
 					// Add enchantment source item to recharger.
 					auto stack = from.value();
-					TES3::WorldController::get()->rechargerAddItem(stack->object, stack->variables, sourceCombo.source.asEnchantment);
+					TES3::WorldController::get()->rechargerAddItem(stack->object, stack->itemData, sourceCombo.source.asEnchantment);
 				}
 			}
 
@@ -2725,6 +2963,13 @@ namespace mwse {
 			}
 		}
 
+		void updateMagicGUI(sol::optional<sol::table> params) {
+			TES3::Reference* reference = getOptionalParamReference(params, "reference");
+			if (reference) {
+				updateMagicGUI_internal(reference, getOptionalParam(params, "updateSpells", true), getOptionalParam(params, "updateEnchantments", true));
+			}
+		}
+
 		int addItem(sol::table params) {
 			// Get the reference we are manipulating.
 			TES3::Reference* reference = getOptionalParamReference(params, "reference");
@@ -2733,8 +2978,24 @@ namespace mwse {
 			}
 
 			// Get the item we are going to add.
-			TES3::Item* item = getOptionalParamObject<TES3::Item>(params, "item");
-			if (item == nullptr) {
+			TES3::Item* item = nullptr;
+			TES3::PhysicalObject* itemBase = getOptionalParamObject<TES3::PhysicalObject>(params, "item");
+			if (itemBase == nullptr) {
+				throw std::invalid_argument("Invalid 'item' parameter provided.");
+			}
+			else if (itemBase->objectType == TES3::ObjectType::LeveledItem) {
+				item = static_cast<TES3::Item*>(static_cast<TES3::LeveledItem*>(itemBase)->resolve());
+				if (!item) {
+					return 0;
+				}
+				else if (!item->isItem()) {
+					throw std::invalid_argument("Unexpected item case. Report this issue.");
+				}
+			}
+			else if (itemBase->isItem()) {
+				item = static_cast<TES3::Item*>(itemBase);
+			}
+			else {
 				throw std::invalid_argument("Invalid 'item' parameter provided.");
 			}
 
@@ -2774,7 +3035,7 @@ namespace mwse {
 				desiredCount = 1;
 			}
 
-			if (getOptionalParam<bool>(params, "limit", false)) {
+			if (actor->objectType == TES3::ObjectType::Container && getOptionalParam<bool>(params, "limit", false)) {
 				// Prevent placing items into organic containers.
 				if (BIT_TEST(actor->actorFlags, TES3::ActorFlagContainer::OrganicBit)) {
 					if (createdItemData) {
@@ -2787,7 +3048,7 @@ namespace mwse {
 				// Figure out how many more of the item can fit in the container.
 				auto maxCapacity = static_cast<TES3::Container*>(reference->getBaseObject())->capacity;
 				auto currentWeight = actor->inventory.calculateContainedWeight();
-				int fulfilledCount = std::min((int)((maxCapacity - currentWeight) / item->getWeight()), desiredCount);
+				fulfilledCount = std::min((int)((maxCapacity - currentWeight) / item->getWeight()), desiredCount);
 			}
 			else {
 				fulfilledCount = desiredCount;
@@ -2816,10 +3077,10 @@ namespace mwse {
 			// Add the item and return the added count, since we do no inventory checking.
 			auto mobile = reference->getAttachedMobileActor();
 			if (itemData) {
-				fulfilledCount = actor->inventory.addItem(mobile, item, fulfilledCount, false, &itemData);
+				actor->inventory.addItem(mobile, item, fulfilledCount, false, &itemData);
 			}
 			else {
-				fulfilledCount = actor->inventory.addItemWithoutData(mobile, item, fulfilledCount, false);
+				actor->inventory.addItemWithoutData(mobile, item, fulfilledCount, false);
 			}
 
 			// Play the relevant sound.
@@ -2859,6 +3120,12 @@ namespace mwse {
 					}
 				}
 				updateInventoryGUI_internal(reference, newContainerWeight);
+
+				// Do we need to update the magic menu?
+				auto enchantment = item->getEnchantment();
+				if (enchantment && (enchantment->castType == TES3::EnchantmentCastType::Once || enchantment->castType == TES3::EnchantmentCastType::OnUse)) {
+					updateMagicGUI_internal(reference, false, true);
+				}
 			}
 
 			reference->setObjectModified(true);
@@ -2917,14 +3184,54 @@ namespace mwse {
 				return 0;
 			}
 
-			// Try to unequip the item if it's equipped.
+			// Were we given an ItemData? If so, we only need to remove one item.
 			auto mobile = reference->getAttachedMobileActor();
-			if (itemData != nullptr) {
+			if (itemData) {
+				actor->inventory.removeItemWithData(mobile, item, itemData, 1, false);
 				actor->unequipItem(item, true, mobile, false, itemData);
+				actor->postUnequipUIRefresh(mobile);
 			}
+			// No ItemData? We have to go through and remove items over one by one.
+			else {
+				auto equipStack = actor->getEquippedItem(item);
+				int itemsLeftToRemove = fulfilledCount;
 
-			// Add the item and return the added count, since we do no inventory checking.
-			actor->inventory.removeItemWithData(mobile, item, itemData, fulfilledCount, deleteItemData);
+				// Remove items without data first. Stack may be deleted after this point.
+				int countWithoutVariables = stack->count - (stack->variables ? stack->variables->endIndex : 0);
+				if (countWithoutVariables > 0) {
+					int amountToRemove = std::min(countWithoutVariables, itemsLeftToRemove);
+					actor->inventory.removeItemWithData(mobile, item, nullptr, amountToRemove, false);
+					itemsLeftToRemove -= amountToRemove;
+
+					// Update ammunition count and unequip ammunition when exhausted.
+					// Located here because ammunition does not generate itemData when equipped.
+					if (equipStack && mobile && mobile->readiedAmmo == equipStack) {
+						mobile->readiedAmmoCount = std::max(0, int(mobile->readiedAmmoCount) - amountToRemove);
+						if (mobile->readiedAmmoCount == 0) {
+							actor->unequipItem(item, true, mobile, false, itemData);
+							actor->postUnequipUIRefresh(mobile);
+						}
+					}
+				}
+
+				// Then remove items with data, one at a time.
+				for (; itemsLeftToRemove > 0; itemsLeftToRemove--) {
+					TES3::ItemData* firstAvailableItemData = nullptr;
+
+					if (stack->variables) {
+						firstAvailableItemData = stack->variables->at(0);
+
+						// Unequip if itemData matches.
+						if (equipStack && firstAvailableItemData == equipStack->itemData) {
+							actor->unequipItem(item, true, mobile, false, itemData);
+							actor->postUnequipUIRefresh(mobile);
+							equipStack = nullptr;
+						}
+					}
+
+					actor->inventory.removeItemWithData(mobile, item, firstAvailableItemData, 1, false);
+				}
+			}
 
 			// Play the relevant sound.
 			auto worldController = TES3::WorldController::get();
@@ -2933,17 +3240,6 @@ namespace mwse {
 				if (mobile == playerMobile) {
 					worldController->playItemUpDownSound(item, TES3::ItemSoundState::Up);
 				}
-			}
-
-			// Update body parts for creatures/NPCs that may have items unequipped.
-			if (mobile) {
-				reference->updateBipedParts();
-
-				if (mobile == playerMobile) {
-					playerMobile->firstPersonReference->updateBipedParts();
-				}
-
-				mobile->updateOpacity();
 			}
 
 			// If either of them are the player, we need to update the GUI.
@@ -2963,6 +3259,12 @@ namespace mwse {
 					newContainerWeight = currentWeight - item->getWeight() * fulfilledCount;
 				}
 				updateInventoryGUI_internal(reference, newContainerWeight);
+
+				// Do we need to update the magic menu?
+				auto enchantment = item->getEnchantment();
+				if (enchantment && (enchantment->castType == TES3::EnchantmentCastType::Once || enchantment->castType == TES3::EnchantmentCastType::OnUse)) {
+					updateMagicGUI_internal(reference, false, true);
+				}
 			}
 
 			reference->setObjectModified(true);
@@ -3059,6 +3361,11 @@ namespace mwse {
 				}
 			}
 
+			// When transferring to the player, the OnPCAdd script variable should be set if it exists.
+			auto worldController = TES3::WorldController::get();
+			auto playerMobile = worldController->getMobilePlayer();
+			bool onPCAdd = playerMobile && (toMobile == playerMobile);
+
 			// Were we given an ItemData? If so, we only need to transfer one item.
 			if (itemData) {
 				if ((maxCapacity == -1.0f || currentWeight + itemWeight <= maxCapacity) && fromActor->inventory.containsItem(item, itemData)) {
@@ -3067,6 +3374,11 @@ namespace mwse {
 
 					if (!fromIsContainer) {
 						fromActor->unequipItem(item, true, fromMobile, false, itemData);
+					}
+
+					// Set this item's OnPCAdd notification script variable if it exists.
+					if (onPCAdd && itemData->script) {
+						itemData->setScriptShortValue("OnPCAdd", 1);
 					}
 
 					fulfilledCount = 1;
@@ -3118,13 +3430,13 @@ namespace mwse {
 							}
 							else {
 								// Item was unequipped, but remains the first item? Preserve the item data.
-								if (fromStack->variables && fromStack->variables->at(0) == removedEquipStack->variables) {
+								if (fromStack->variables && fromStack->variables->at(0) == removedEquipStack->itemData) {
 									itemDataRef = &fromStack->variables->at(0);
 								}
 
 								// Clean up after our check and manually delete.
 								removedEquipStack->object = nullptr;
-								removedEquipStack->variables = nullptr;
+								removedEquipStack->itemData = nullptr;
 								mwse::tes3::_delete(removedEquipStack);
 								removedEquipStack = nullptr;
 							}
@@ -3132,6 +3444,11 @@ namespace mwse {
 
 						toActor->inventory.addItem(toMobile, item, 1, false, itemDataRef);
 						fromActor->inventory.removeItemWithData(fromMobile, item, itemDataRef ? *itemDataRef : nullptr, 1, false);
+
+						// Set this item's OnPCAdd notification script variable if it exists.
+						if (onPCAdd && itemDataRef && *itemDataRef && (*itemDataRef)->script) {
+							(*itemDataRef)->setScriptShortValue("OnPCAdd", 1);
+						}
 
 						fulfilledCount++;
 						itemsLeftToTransfer--;
@@ -3145,8 +3462,6 @@ namespace mwse {
 			}
 
 			// Play the relevant sound.
-			auto worldController = TES3::WorldController::get();
-			auto playerMobile = worldController->getMobilePlayer();
 			if (playerMobile && getOptionalParam<bool>(params, "playSound", true)) {
 				if (toMobile == playerMobile) {
 					worldController->playItemUpDownSound(item, TES3::ItemSoundState::Down);
@@ -3212,6 +3527,13 @@ namespace mwse {
 
 				updateInventoryGUI_internal(fromReference, newContainerWeight);
 				updateInventoryGUI_internal(toReference, newContainerWeight);
+
+				// Do we need to update the magic menu?
+				auto enchantment = item->getEnchantment();
+				if (enchantment && (enchantment->castType == TES3::EnchantmentCastType::Once || enchantment->castType == TES3::EnchantmentCastType::OnUse)) {
+					updateMagicGUI_internal(fromReference, false, true);
+					updateMagicGUI_internal(toReference, false, true);
+				}
 			}
 
 			fromReference->setObjectModified(true);
@@ -3274,6 +3596,12 @@ namespace mwse {
 
 			if (getOptionalParam<bool>(params, "updateGUI", true)) {
 				updateInventoryGUI_internal(toReference);
+
+				// Do we need to update the magic menu?
+				auto enchantment = item->getEnchantment();
+				if (enchantment && (enchantment->castType == TES3::EnchantmentCastType::Once || enchantment->castType == TES3::EnchantmentCastType::OnUse)) {
+					updateMagicGUI_internal(toReference, false, true);
+				}
 			}
 
 			toReference->setObjectModified(true);
@@ -3584,6 +3912,12 @@ namespace mwse {
 			// Update inventory tiles if needed.
 			if (getOptionalParam<bool>(params, "updateGUI", true)) {
 				updateInventoryGUI_internal(mobile->reference);
+
+				// Do we need to update the magic menu?
+				auto enchantment = item->getEnchantment();
+				if (enchantment && (enchantment->castType == TES3::EnchantmentCastType::Once || enchantment->castType == TES3::EnchantmentCastType::OnUse)) {
+					updateMagicGUI_internal(mobile->reference, false, true);
+				}
 			}
 
 			return droppedReference;
@@ -3639,6 +3973,11 @@ namespace mwse {
 		}
 
 		TES3::Dialogue* findDialogue(sol::table params) {
+			auto topic = getOptionalParam<const char*>(params, "topic", nullptr);
+			if (topic) {
+				return TES3::DataHandler::get()->nonDynamicData->findDialogue(topic);
+			}
+
 			int type = getOptionalParam<int>(params, "type", -1);
 			int page = getOptionalParam<int>(params, "page", -1);
 			return TES3::Dialogue::getDialogue(type, page);
@@ -4066,39 +4405,39 @@ namespace mwse {
 			}
 
 			sol::optional<std::string> castSound = params["castSound"];
-			if (!castSound || castSound.value().length() >= 31) {
-				delete effect;
-				throw std::invalid_argument("Invalid 'castSound' parameter provided. Must be a string no longer than 31 characters long.");
-			}
-			else {
-				strcpy_s(effect->castSoundEffect, 32, castSound.value().c_str());
+			if (castSound) {
+				if (castSound.value().length() >= 31) {
+					delete effect;
+					throw std::invalid_argument("Invalid 'castSound' parameter provided. Must be a string no longer than 31 characters long.");
+				}
+				strcpy_s(effect->castSoundEffectID, 32, castSound.value().c_str());
 			}
 
 			sol::optional<std::string> boltSound = params["boltSound"];
-			if (!boltSound || boltSound.value().length() >= 31) {
-				delete effect;
-				throw std::invalid_argument("Invalid 'boltSound' parameter provided. Must be a string no longer than 31 characters long.");
-			}
-			else {
-				strcpy_s(effect->boltSoundEffect, 32, boltSound.value().c_str());
+			if (boltSound) {
+				if (boltSound.value().length() >= 31) {
+					delete effect;
+					throw std::invalid_argument("Invalid 'boltSound' parameter provided. Must be a string no longer than 31 characters long.");
+				}
+				strcpy_s(effect->boltSoundEffectID, 32, boltSound.value().c_str());
 			}
 
 			sol::optional<std::string> hitSound = params["hitSound"];
-			if (!hitSound || hitSound.value().length() >= 31) {
-				delete effect;
-				throw std::invalid_argument("Invalid 'hitSound' parameter provided. Must be a string no longer than 31 characters long.");
-			}
-			else {
-				strcpy_s(effect->hitSoundEffect, 32, hitSound.value().c_str());
+			if (hitSound) {
+				if (hitSound.value().length() >= 31) {
+					delete effect;
+					throw std::invalid_argument("Invalid 'hitSound' parameter provided. Must be a string no longer than 31 characters long.");
+				}
+				strcpy_s(effect->hitSoundEffectID, 32, hitSound.value().c_str());
 			}
 
 			sol::optional<std::string> areaSound = params["areaSound"];
-			if (!areaSound || areaSound.value().length() >= 31) {
-				delete effect;
-				throw std::invalid_argument("Invalid 'areaSound' parameter provided. Must be a string no longer than 31 characters long.");
-			}
-			else {
-				strcpy_s(effect->areaSoundEffect, 32, areaSound.value().c_str());
+			if (areaSound) {
+				if (areaSound.value().length() >= 31) {
+					delete effect;
+					throw std::invalid_argument("Invalid 'areaSound' parameter provided. Must be a string no longer than 31 characters long.");
+				}
+				strcpy_s(effect->areaSoundEffectID, 32, areaSound.value().c_str());
 			}
 
 			effect->castEffect = getOptionalParamObject<TES3::PhysicalObject>(params, "castVFX");
@@ -4328,6 +4667,29 @@ namespace mwse {
 			}
 		}
 
+		int getItemCount(sol::table params) {
+			TES3::Reference* reference = getOptionalParamExecutionReference(params);
+			if (reference == nullptr) {
+				throw std::invalid_argument("Invalid 'reference' parameter provided.");
+			}
+			else if (!reference->baseObject->isActor()) {
+				throw std::invalid_argument("Invalid 'reference' parameter provided: reference does not have an inventory.");
+			}
+
+			auto item = getOptionalParamObject<TES3::Item>(params, "item");
+			if (item == nullptr) {
+				throw std::invalid_argument("Invalid 'item' parameter provided.");
+			}
+
+			auto asActor = reinterpret_cast<TES3::Actor*>(reference->baseObject);
+			auto stack = asActor->inventory.findItemStack(item);
+			if (stack == nullptr) {
+				return 0;
+			}
+
+			return std::abs(stack->count);
+		}
+
 		bool getItemIsStolen(sol::table params) {
 			auto item = getOptionalParamObject<TES3::Item>(params, "item");
 			auto from = getOptionalParamObject<TES3::BaseObject>(params, "from");
@@ -4464,7 +4826,7 @@ namespace mwse {
 			if (actor == nullptr) {
 				throw std::invalid_argument("Invalid 'actor' parameter provided: must be an actor id.");
 			}
-			
+
 			sol::optional<int> count = params["count"];
 			if (!count) {
 				throw std::invalid_argument("Invalid 'count' parameter provided: must be a number.");
@@ -4521,22 +4883,14 @@ namespace mwse {
 			}
 		}
 
-		sol::optional<bool> canRest() {
-			auto worldController = TES3::WorldController::get();
-			if (worldController) {
-				return worldController->mobController->processManager->canRest();
-			}
-			return {};
-		}
-
-		bool showRestMenu(sol::optional<sol::table> params) {
-			auto worldController = TES3::WorldController::get();
+		bool canRest_internal(sol::optional<sol::table> params, bool showMessageByDefault) {
 			auto dataHandler = TES3::DataHandler::get();
+			auto worldController = TES3::WorldController::get();
 			if (!worldController || !dataHandler) return false;
 
 			// Check to see if there are enemies nearby.
-			if (getOptionalParam<bool>(params, "checkForEnemies", true) && !worldController->mobController->processManager->canRest()) {
-				if (getOptionalParam<bool>(params, "showMessage", true)) {
+			if (getOptionalParam<bool>(params, "checkForEnemies", true) && !worldController->mobController->processManager->checkNearbyEnemiesAllowRest()) {
+				if (getOptionalParam<bool>(params, "showMessage", showMessageByDefault)) {
 					TES3::UI::showMessageBox(dataHandler->nonDynamicData->GMSTs[TES3::GMST::sNotifyMessage2]->value.asString, nullptr, true);
 				}
 				return false;
@@ -4547,11 +4901,32 @@ namespace mwse {
 			if (getOptionalParam<bool>(params, "checkForSolidGround", true)) {
 				const auto excludedMovement = TES3::ActorMovement::Flying | TES3::ActorMovement::Jumping;
 				if ((macp->movementFlags & excludedMovement) || macp->getBasePositionIsUnderwater()) {
-					if (getOptionalParam<bool>(params, "showMessage", true)) {
+					if (getOptionalParam<bool>(params, "showMessage", showMessageByDefault)) {
 						TES3::UI::showMessageBox(dataHandler->nonDynamicData->GMSTs[TES3::GMST::sNotifyMessage1]->value.asString, nullptr, true);
 					}
 					return false;
 				}
+			}
+
+			return true;
+		}
+
+		sol::optional<bool> canRest(sol::optional<sol::table> params) {
+			auto dataHandler = TES3::DataHandler::get();
+			auto worldController = TES3::WorldController::get();
+			if (!worldController || !dataHandler) return {};
+
+			return canRest_internal(params, false);
+		}
+
+		bool showRestMenu(sol::optional<sol::table> params) {
+			auto worldController = TES3::WorldController::get();
+			auto dataHandler = TES3::DataHandler::get();
+			if (!worldController || !dataHandler) return false;
+
+			// Perform standard rest checks.
+			if (!canRest_internal(params, true)) {
+				return false;
 			}
 
 			// Allow using resting/waiting param. Defaults to resting.
@@ -4563,6 +4938,7 @@ namespace mwse {
 			}
 
 			// Werewolves can't sleep.
+			auto macp = worldController->getMobilePlayer();
 			if (resting && getOptionalParam<bool>(params, "checkIsWerewolf", true) && macp->getIsWerewolf()) {
 				resting = false;
 			}
@@ -4612,6 +4988,11 @@ namespace mwse {
 
 			macp->wakeUp();
 			return true;
+		}
+
+		std::tuple<unsigned int, unsigned int> getViewportSize() {
+			auto game = TES3::Game::get();
+			return { game->windowWidth, game->windowHeight };
 		}
 
 		bool setVanityMode(sol::optional<sol::table> params) {
@@ -4763,6 +5144,7 @@ namespace mwse {
 			tes3["addJournalEntry"] = addJournalEntry;
 			tes3["addMagicEffect"] = addMagicEffect;
 			tes3["addSoulGem"] = addSoulGem;
+			tes3["addSpell"] = addSpell;
 			tes3["adjustSoundVolume"] = adjustSoundVolume;
 			tes3["advanceTime"] = advanceTime;
 			tes3["applyMagicSource"] = applyMagicSource;
@@ -4818,6 +5200,7 @@ namespace mwse {
 			tes3["getGlobal"] = getGlobal;
 			tes3["getGMST"] = getGMST;
 			tes3["getInputBinding"] = getInputBinding;
+			tes3["getItemCount"] = getItemCount;
 			tes3["getItemIsStolen"] = getItemIsStolen;
 			tes3["getJournalIndex"] = getJournalIndex;
 			tes3["getKillCount"] = getKillCount;
@@ -4839,6 +5222,7 @@ namespace mwse {
 			tes3["getPlayerGold"] = getPlayerGold;
 			tes3["getPlayerRef"] = getPlayerRef;
 			tes3["getPlayerTarget"] = getPlayerTarget;
+			tes3["getQuickKey"] = getQuickKey;
 			tes3["getReference"] = getReference;
 			tes3["getRegion"] = getRegion;
 			tes3["getScript"] = getScript;
@@ -4849,11 +5233,13 @@ namespace mwse {
 			tes3["getSoundPlaying"] = getSoundPlaying;
 			tes3["getTopMenu"] = TES3::UI::getMenuOnTop;
 			tes3["getTrap"] = getTrap;
+			tes3["getViewportSize"] = getViewportSize;
 			tes3["getWerewolfKillCount"] = getWerewolfKillCount;
 			tes3["getWorldController"] = TES3::WorldController::get;
 			tes3["hammerKey"] = hammerKey;
 			tes3["hasCodePatchFeature"] = hasCodePatchFeature;
 			tes3["hasOwnershipAccess"] = hasOwnershipAccess;
+			tes3["hasSpell"] = hasSpell;
 			tes3["incrementKillCount"] = incrementKillCount;
 			tes3["is3rdPerson"] = isThirdPerson;
 			tes3["isAffectedBy"] = isAffectedBy;
@@ -4880,6 +5266,7 @@ namespace mwse {
 			tes3["removeEffects"] = removeEffects;
 			tes3["removeItem"] = removeItem;
 			tes3["removeSound"] = removeSound;
+			tes3["removeSpell"] = removeSpell;
 			tes3["runLegacyScript"] = runLegacyScript;
 			tes3["saveGame"] = saveGame;
 			tes3["say"] = say;
@@ -4920,6 +5307,7 @@ namespace mwse {
 			tes3["unlock"] = unlock;
 			tes3["updateInventoryGUI"] = updateInventoryGUI;
 			tes3["updateJournal"] = updateJournal;
+			tes3["updateMagicGUI"] = updateMagicGUI;
 			tes3["wakeUp"] = wakeUp;
 		}
 	}

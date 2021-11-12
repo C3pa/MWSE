@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when a trap is being disarmed.",
 	eventData = {
 		["reference"] = {
@@ -32,9 +33,10 @@ return {
 			description = "The chance the trap disarm will be successful.",
 		},
 		["trapPresent"] = {
-			type = "bool",
+			type = "boolean",
 			readOnly = true,
 			description = "Indicates if a trap is present on the reference.",
 		},
-	}
+	},
+	blockable = true,
 }

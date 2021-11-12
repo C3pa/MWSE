@@ -1,4 +1,5 @@
-return{
+return {
+	type = "event",
     description = "",
     eventData = {
         ["sound"] = {
@@ -27,5 +28,6 @@ return{
             description = "",
         },
     },
-    filter = { "sound", "flags", "volume", "pitch", "isNot3D" }, -- Is this line ok?,
+    filter = "sound",
+	blockable = true,
 }

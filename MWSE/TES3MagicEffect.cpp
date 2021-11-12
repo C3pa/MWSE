@@ -6,6 +6,8 @@
 #include "TES3DataHandler.h"
 #include "TES3GameSetting.h"
 #include "TES3MagicEffectController.h"
+#include "TES3MobileActor.h"
+#include "TES3Sound.h"
 
 namespace TES3 {
 	const auto TES3_MagicEffect_ctor = reinterpret_cast<void(__thiscall*)(MagicEffect*)>(0x4A8C90);
@@ -57,6 +59,20 @@ namespace TES3 {
 		return icon;
 	}
 
+	std::string MagicEffect::getBigIcon() const {
+		std::string bigIcon = icon;
+
+		auto lastSeparator = bigIcon.rfind('\\');
+		if (lastSeparator != std::string::npos) {
+			bigIcon.insert(lastSeparator + 1, "B_");
+		}
+		else {
+			bigIcon.insert(0, "B_");
+		}
+
+		return std::move(bigIcon);
+	}
+
 	void MagicEffect::setIcon(const char* path) {
 		strcpy_s(icon, sizeof(icon), path);
 	}
@@ -69,36 +85,53 @@ namespace TES3 {
 		strcpy_s(particleTexture, sizeof(particleTexture), path);
 	}
 
-	const char* MagicEffect::getCastSoundEffect() const {
-		return castSoundEffect;
+	const auto TES3_MagicEffect_getCastSoundID = reinterpret_cast<const char*(__thiscall*)(const MagicEffect*)>(0x4A9E40);
+	Sound* MagicEffect::getCastSoundEffect() const {
+		auto id = TES3_MagicEffect_getCastSoundID(this);
+		return static_cast<Sound*>(DataHandler::get()->nonDynamicData->findSound(id));
 	}
 
-	void MagicEffect::setCastSoundEffect(const char* path) {
-		strcpy_s(castSoundEffect, sizeof(castSoundEffect), path);
+	void MagicEffect::setCastSoundEffect(Sound *sound) {
+		auto id = sound ? sound->id : "";
+		strcpy_s(castSoundEffectID, sizeof(castSoundEffectID), id);
 	}
 
-	const char* MagicEffect::getBoltSoundEffect() const {
-		return boltSoundEffect;
+	const auto TES3_MagicEffect_getBoltSoundID = reinterpret_cast<const char* (__thiscall*)(const MagicEffect*)>(0x4A9E60);
+	Sound* MagicEffect::getBoltSoundEffect() const {
+		auto id = TES3_MagicEffect_getBoltSoundID(this);
+		return static_cast<Sound*>(DataHandler::get()->nonDynamicData->findSound(id));
 	}
 
-	void MagicEffect::setBoltSoundEffect(const char* path) {
-		strcpy_s(boltSoundEffect, sizeof(boltSoundEffect), path);
+	void MagicEffect::setBoltSoundEffect(Sound* sound) {
+		auto id = sound ? sound->id : "";
+		strcpy_s(boltSoundEffectID, sizeof(boltSoundEffectID), id);
 	}
 
-	const char* MagicEffect::getHitSoundEffect() const {
-		return hitSoundEffect;
+	const auto TES3_MagicEffect_getHitSoundID = reinterpret_cast<const char* (__thiscall*)(const MagicEffect*)>(0x4A9E80);
+	Sound* MagicEffect::getHitSoundEffect() const {
+		auto id = TES3_MagicEffect_getHitSoundID(this);
+		return static_cast<Sound*>(DataHandler::get()->nonDynamicData->findSound(id));
 	}
 
-	void MagicEffect::setHitSoundEffect(const char* path) {
-		strcpy_s(hitSoundEffect, sizeof(hitSoundEffect), path);
+	void MagicEffect::setHitSoundEffect(Sound* sound) {
+		auto id = sound ? sound->id : "";
+		strcpy_s(hitSoundEffectID, sizeof(hitSoundEffectID), id);
 	}
 
-	const char* MagicEffect::getAreaSoundEffect() const {
-		return areaSoundEffect;
+	const auto TES3_MagicEffect_getAreaSoundID = reinterpret_cast<const char* (__thiscall*)(const MagicEffect*)>(0x4A9EA0);
+	Sound* MagicEffect::getAreaSoundEffect() const {
+		auto id = TES3_MagicEffect_getAreaSoundID(this);
+		return static_cast<Sound*>(DataHandler::get()->nonDynamicData->findSound(id));
 	}
 
-	void MagicEffect::setAreaSoundEffect(const char* path) {
-		strcpy_s(areaSoundEffect, sizeof(areaSoundEffect), path);
+	void MagicEffect::setAreaSoundEffect(Sound* sound) {
+		auto id = sound ? sound->id : "";
+		strcpy_s(areaSoundEffectID, sizeof(areaSoundEffectID), id);
+	}
+
+	const auto TES3_MagicEffect_getSpellFailureSound = reinterpret_cast<Sound* (__thiscall*)(const MagicEffect*)>(0x4A9F00);
+	Sound* MagicEffect::getSpellFailureSoundEffect() const {
+		return TES3_MagicEffect_getSpellFailureSound(this);
 	}
 
 	unsigned int MagicEffect::getEffectFlags() const {
@@ -249,6 +282,98 @@ namespace TES3 {
 		return reinterpret_cast<int*>(0x7926B8)[school];
 	}
 
+	Effect::Effect() {
+		effectID = EffectID::None;
+		skillID = SkillID::Invalid;
+		attributeID = Attribute::Invalid;
+		rangeType = EffectRange::Invalid;
+		radius = 0;
+		duration = 0;
+		magnitudeMin = 0;
+		magnitudeMax = 0;
+	}
+
+	Effect::Effect(const Effect& from) {
+		effectID = from.effectID;
+		skillID = from.skillID;
+		attributeID = from.attributeID;
+		rangeType = from.rangeType;
+		radius = from.radius;
+		duration = from.duration;
+		magnitudeMin = from.magnitudeMin;
+		magnitudeMax = from.magnitudeMax;
+	}
+
+	Effect::Effect(const sol::table& from) {
+		effectID = from.get_or("id", EffectID::None);
+		skillID = from.get_or("skill", SkillID::Invalid);
+		attributeID = from.get_or("attribute", Attribute::Invalid);
+		rangeType = from.get_or("rangeType", EffectRange::Self);
+		radius = from.get_or("radius", 0);
+		duration = from.get_or("duration", 0);
+		magnitudeMin = from.get_or("min", 0);
+		magnitudeMax = from.get_or("max", 0);
+	}
+
+	Effect& Effect::operator=(const Effect& effect) {
+		effectID = effect.effectID;
+		skillID = effect.skillID;
+		attributeID = effect.attributeID;
+		rangeType = effect.rangeType;
+		radius = effect.radius;
+		duration = effect.duration;
+		magnitudeMin = effect.magnitudeMin;
+		magnitudeMax = effect.magnitudeMax;
+		return *this;
+	}
+
+	Effect& Effect::operator=(const sol::table table) {
+		effectID = table.get_or("id", EffectID::None);
+		skillID = table.get_or("skill", SkillID::Invalid);
+		attributeID = table.get_or("attribute", Attribute::Invalid);
+		rangeType = table.get_or("rangeType", EffectRange::Self);
+		radius = table.get_or("radius", 0);
+		duration = table.get_or("duration", 0);
+		magnitudeMin = table.get_or("min", 0);
+		magnitudeMax = table.get_or("max", 0);
+		return *this;
+	}
+
+	Effect& Effect::operator=(const sol::object object) {
+		if (object.is<Effect>()) {
+			*this = object.as<Effect>();
+		}
+		else if (object.is<sol::table>()) {
+			*this = object.as<sol::table>();
+		}
+		else {
+			throw std::invalid_argument("Could not convert lua object to tes3effect.");
+		}
+		return *this;
+	}
+
+	bool Effect::operator==(const Effect& other) const {
+		return effectID == other.effectID &&
+			skillID == other.skillID &&
+			attributeID == other.attributeID &&
+			rangeType == other.rangeType &&
+			radius == other.radius &&
+			duration == other.duration &&
+			magnitudeMin == other.magnitudeMin &&
+			magnitudeMax == other.magnitudeMax;
+	}
+
+	bool Effect::operator!=(const Effect& other) const {
+		return effectID != other.effectID ||
+			skillID != other.skillID ||
+			attributeID != other.attributeID ||
+			rangeType != other.rangeType ||
+			radius != other.radius ||
+			duration != other.duration ||
+			magnitudeMin != other.magnitudeMin ||
+			magnitudeMax != other.magnitudeMax;
+	}
+
 	const auto TES3_Effect_calculateCost = reinterpret_cast<double(__cdecl*)(const Effect*)>(0x4AA700);
 	float Effect::calculateCost() const {
 		return TES3_Effect_calculateCost(this);
@@ -258,7 +383,7 @@ namespace TES3 {
 		return TES3::DataHandler::get()->nonDynamicData->magicEffects->getEffectObject(effectID);
 	}
 
-	bool Effect::matchesEffectsWith(const Effect * other ) const {
+	bool Effect::matchesEffectsWith(const Effect * other) const {
 		return effectID == other->effectID &&
 			skillID == other->skillID &&
 			attributeID == other->attributeID &&

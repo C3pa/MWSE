@@ -268,6 +268,7 @@ namespace TES3 {
 		bool isAffectedByEnchantment(Enchantment * enchantment) const;
 		bool isAffectedBySpell(Spell * spell) const;
 
+		SpellList* getSpellList();
 		IteratedList<Spell*> * getCombatSpellList();
 
 		bool isActive();
@@ -296,6 +297,11 @@ namespace TES3 {
 		void setMobileActorMovementFlag(ActorMovement::Flag, bool);
 
 		bool equipItem(Object* item, ItemData * itemData = nullptr, bool addItem = false, bool selectBestCondition = false, bool selectWorstCondition = false);
+		bool equip_lua(sol::object arg);
+		bool unequip_lua(sol::table args);
+
+		bool getWeaponReady() const;
+		void setWeaponReady(bool value);
 
 		void updateOpacity();
 
@@ -427,7 +433,7 @@ namespace TES3 {
 		bool getMobToMobCollision() const;
 		void setMobToMobCollision(bool collide);
 
-		sol::table getActiveMagicEffectsList_lua(sol::table params);
+		sol::table getActiveMagicEffectsList_lua(sol::optional<sol::table> params);
 		ActiveMagicEffect* getActiveMagicEffects_legacy() const;
 		int getActiveMagicEffectCount_legacy() const;
 	};

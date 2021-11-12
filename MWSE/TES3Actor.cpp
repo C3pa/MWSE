@@ -2,8 +2,10 @@
 
 #include "TES3AIConfig.h"
 #include "TES3Class.h"
+#include "TES3Creature.h"
 #include "TES3MobileActor.h"
 #include "TES3MobilePlayer.h"
+#include "TES3NPC.h"
 #include "TES3Reference.h"
 
 #include "LuaUtil.h"
@@ -20,6 +22,7 @@ namespace TES3 {
 	const auto TES3_Actor_getEquippedClothingBySlot = reinterpret_cast<EquipmentStack* (__thiscall*)(Actor*, ClothingSlot::value_type)>(0x496E00);
 	const auto TES3_Actor_getEquippedItem = reinterpret_cast<EquipmentStack* (__thiscall*)(Actor*, Object*)>(0x496DD0);
 	const auto TES3_Actor_getEquippedItemExact = reinterpret_cast<EquipmentStack* (__thiscall*)(Actor*, Object*, ItemData*)>(0x496D90);
+	const auto TES3_Actor_getEquippedWeapon = reinterpret_cast<EquipmentStack* (__thiscall*)(Actor*)>(0x496EB0);
 
 	Actor * Actor::getBaseActor() {
 		return vTable.actor->getBaseActor(this);
@@ -95,7 +98,7 @@ namespace TES3 {
 		const auto TES3_ui_updateCharacterImage = reinterpret_cast<void (__cdecl*)(bool)>(0x5CD2A0);
 		const auto TES3_ui_updateMagicMenu = reinterpret_cast<void (__cdecl*)()>(0x5E2E80);
 
-		if (mobileActor->actorType == MobileActorType::Player) {
+		if (mobileActor && mobileActor->actorType == MobileActorType::Player) {
 			auto player = static_cast<MobilePlayer*>(mobileActor);
 
 			if (player->actorFlags & MobileActorFlag::BodypartsChanged) {
@@ -126,6 +129,10 @@ namespace TES3 {
 
 	EquipmentStack* Actor::getEquippedClothingBySlot(ClothingSlot::value_type slot) {
 		return TES3_Actor_getEquippedClothingBySlot(this, slot);
+	}
+
+	EquipmentStack* Actor::getEquippedWeapon() {
+		return TES3_Actor_getEquippedWeapon(this);
 	}
 
 	bool Actor::isBaseActor() const {
@@ -187,6 +194,26 @@ namespace TES3 {
 		// Clear blood flags.
 		actorFlags &= ~0x1C00;
 		actorFlags |= (value << 0xA);
+	}
+
+	SpellList* Actor::getSpellList() {
+		if (objectType == TES3::ObjectType::NPC) {
+			if (isBaseActor()) {
+				return &static_cast<TES3::NPC*>(this)->spellList;
+			}
+			else {
+				return static_cast<TES3::NPCInstance*>(this)->getBaseSpellList();
+			}
+		}
+		else if (objectType == TES3::ObjectType::Creature) {
+			if (isBaseActor()) {
+				return static_cast<TES3::Creature*>(this)->spellList;
+			}
+			else {
+				return static_cast<TES3::CreatureInstance*>(this)->getBaseSpells();
+			}
+		}
+		return nullptr;
 	}
 
 	void Actor::onCloseInventory_lua(TES3::Reference* reference, sol::optional<int> unknown) {

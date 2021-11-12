@@ -23,21 +23,25 @@ function mwse.getVersion() end
 --- @return number result No description yet available.
 function mwse.getVirtualMemoryUsage() end
 
---- Loads a config table from Data Files\MWSE\config\{fileName}.json.
+--- Loads a config table from Data Files\\MWSE\\config\\{fileName}.json.
 --- 	
 --- If the default values table is passed, empty keys in the config will be filled in using its values. Additionally, if no file exists, the function will return the default table.
 --- @param fileName string The non-extensioned name of the config file.
---- @param defaults table A table of default values.
+--- @param defaults table *Optional*. A table of default values.
 --- @return table result No description yet available.
 function mwse.loadConfig(fileName, defaults) end
 
---- This function writes information to the MWSELog.txt file in the user's installation directory.
+--- Loads translations from the i18n folder for a given mod. This is locale-aware, using the result from `tes3.getLanguage()`. See the [http://127.0.0.1:8000/guides/mod-translations/](mod translations guide) for more information.
+--- @param mod string Name of the folder that your main.lua mod can be found in.
+--- @return function i18n The callable translation results.
+function mwse.loadTranslations(mod) end
+
+--- This function writes information to the mwse.log file in the user's installation directory.
 --- 
 --- The message accepts formatting and additional parameters matching string.format's usage.
 --- @param message string No description yet available.
---- @param unknown variadic No description yet available.
---- @return nil result No description yet available.
-function mwse.log(message, unknown) end
+--- @vararg any *Optional*. No description yet available.
+function mwse.log(message, ...) end
 
 --- Converts a TES3 object type (e.g. from tes3.objectType) into an uppercase, 4-character string.
 --- @param type number No description yet available.
@@ -50,10 +54,10 @@ function mwse.longToString(type) end
 --- @return boolean result No description yet available.
 function mwse.overrideScript(scriptId, callback) end
 
---- Saves a config table to Data Files\MWSE\config\{fileName}.json.
+--- Saves a config table to Data Files\\MWSE\\config\\{fileName}.json.
 --- @param fileName string No description yet available.
 --- @param object unknown No description yet available.
---- @param config table No description yet available.
+--- @param config table *Optional*. No description yet available.
 --- @return table result No description yet available.
 function mwse.saveConfig(fileName, object, config) end
 

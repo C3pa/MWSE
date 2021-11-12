@@ -1503,9 +1503,6 @@
     <ClInclude Include="LuaDamagedHandToHandEvent.h">
       <Filter>Header Files\Lua\Events</Filter>
     </ClInclude>
-    <ClInclude Include="LuaAttackStartEvent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TES3Sound.h">
       <Filter>Header Files\DataAdapters\TES3\_Unsorted_</Filter>
     </ClInclude>
@@ -1520,6 +1517,42 @@
     </ClInclude>
     <ClInclude Include="LuaEnchantedItemCreateFailedEvent.h">
       <Filter>Header Files\Lua\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaEnchantChargeUseEvent.h">
+      <Filter>Header Files\Lua\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaPotionBrewSkillCheckEvent.h">
+      <Filter>Header Files\Lua\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaAttackStartEvent.h">
+      <Filter>Header Files\Lua\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="NIParticlesLua.h">
+      <Filter>Header Files\Lua\Bindings\NI</Filter>
+    </ClInclude>
+    <ClInclude Include="NIParticles.h">
+      <Filter>Header Files\DataAdapters\NI</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaAbsorbedMagicEvent.h">
+      <Filter>Header Files\Lua\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="NILookAtController.h">
+      <Filter>Header Files\DataAdapters\NI</Filter>
+    </ClInclude>
+    <ClInclude Include="NIBillboardNode.h">
+      <Filter>Header Files\Lua\Bindings\NI</Filter>
+    </ClInclude>
+    <ClInclude Include="NITriangle.h">
+      <Filter>Header Files\DataAdapters\NI</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaExecutor.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaSpellMagickaUseEvent.h">
+      <Filter>Header Files\Lua\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="UTF8Convert.h">
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3323,9 +3356,6 @@
     <ClCompile Include="LuaDamagedHandToHandEvent.cpp">
       <Filter>Source Files\Lua\Events</Filter>
     </ClCompile>
-    <ClCompile Include="LuaAttackStartEvent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TES3SpellList.cpp">
       <Filter>Source Files\DataAdapters\TES3\Collections</Filter>
     </ClCompile>
@@ -3346,6 +3376,48 @@
     </ClCompile>
     <ClCompile Include="NITriShapeData.cpp">
       <Filter>Source Files\DataAdapters\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaAttackStartEvent.cpp">
+      <Filter>Source Files\Lua\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaEnchantChargeUseEvent.cpp">
+      <Filter>Source Files\Lua\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="NIParticleSystemController.cpp">
+      <Filter>Source Files\Lua\Bindings\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="NIParticleModifier.cpp">
+      <Filter>Source Files\Lua\Bindings\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="NIParticlesLua.cpp">
+      <Filter>Source Files\Lua\Bindings\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="NIParticles.cpp">
+      <Filter>Source Files\DataAdapters\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaAbsorbedMagicEvent.cpp">
+      <Filter>Source Files\Lua\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="NILookAtController.cpp">
+      <Filter>Source Files\DataAdapters\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="NIBillboardNode.cpp">
+      <Filter>Source Files\Lua\Bindings\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaPotionBrewSkillCheckEvent.cpp">
+      <Filter>Source Files\Lua\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="NITriangle.cpp">
+      <Filter>Source Files\DataAdapters\NI</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaExecutor.cpp">
+      <Filter>Source Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaSpellMagickaUseEvent.cpp">
+      <Filter>Source Files\Lua\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="UTF8Convert.cpp">
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

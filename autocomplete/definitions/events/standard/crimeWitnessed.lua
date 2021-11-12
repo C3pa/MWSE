@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "This event fires when a crime is witnessed by an actor.",
 	eventData = {
 		["type"] = {
@@ -7,7 +8,7 @@ return {
 			description = "The type of crime that was committed.",
 		},
 		["position"] = {
-			type = "tes3vector",
+			type = "tes3vector3",
 			readOnly = true,
 			description = "The position that the crime ocurred at.",
 		},

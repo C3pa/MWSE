@@ -12,7 +12,7 @@ namespace mwse {
 			auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
 			sol::state& state = stateHandle.state;
 
-			// Start our usertype. We must finish this with state.set_usertype.
+			// Start our usertype.
 			auto usertypeDefinition = state.new_usertype<NI::Camera>("niCamera");
 			usertypeDefinition["new"] = sol::no_constructor;
 
@@ -30,6 +30,7 @@ namespace mwse {
 			usertypeDefinition["worldRight"] = &NI::Camera::worldRight;
 			usertypeDefinition["worldToCamera"] = &NI::Camera::worldToCamera;
 			usertypeDefinition["worldUp"] = &NI::Camera::worldUp;
+			usertypeDefinition["cullingPlanes"] = sol::readonly_property(&NI::Camera::getCullingPlanes_lua);
 
 			// Basic function binding.
 			usertypeDefinition["click"] = &NI::Camera::click_lua;

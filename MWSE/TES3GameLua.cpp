@@ -15,7 +15,7 @@ namespace mwse {
 			auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
 			sol::state& state = stateHandle.state;
 
-			// Start our usertype. We must finish this with state.set_usertype.
+			// Start our usertype.
 			auto usertypeDefinition = state.new_usertype<TES3::Game>("tes3game");
 			usertypeDefinition["new"] = sol::no_constructor;
 
@@ -46,6 +46,7 @@ namespace mwse {
 			usertypeDefinition["worldRoot"] = sol::readonly_property(&TES3::Game::worldRoot);
 
 			// Basic function binding.
+			usertypeDefinition["clearTarget"] = &TES3::Game::clearTarget;
 			usertypeDefinition["setGamma"] = &TES3::Game::setGamma;
 
 			// Deprecated bindings.

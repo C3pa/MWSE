@@ -12,29 +12,29 @@ timer = {}
 
 --- Creates a timer that will finish the next frame. It defaults to the next simulation frame.
 --- @param callback function The callback function that will execute when the timer expires.
---- @param type number Type of the timer. This value can be timer.simulate, timer.game or timer.real.
+--- @param type number *Default*: `timer.simulate`. Type of the timer. This value can be timer.simulate, timer.game or timer.real.
 --- @return mwseTimer timer No description yet available.
 function timer.delayOneFrame(callback, type) end
 
 --- Creates a timer.
 ---
---- [Examples available in online documentation](https://mwse.readthedocs.io/en/latest/lua/api/timer/start.html).
+--- [Examples available in online documentation](https://mwse.github.io/MWSE/types/timer/#timerstart).
 --- @param params timer.start.params This table accepts the following values:
 --- 
---- ``type``: number — Type of the timer. This value can be timer.simulate, timer.game or timer.real.
+--- `type`: number — *Default*: `timer.simulate`. Type of the timer. This value can be timer.simulate, timer.game or timer.real.
 --- 
---- ``duration``: number — Duration of the timer. The method of time passing depends on the timer type.
+--- `duration`: number — Duration of the timer. The method of time passing depends on the timer type.
 --- 
---- ``callback``: function — The callback function that will execute when the timer expires.
+--- `callback`: function — The callback function that will execute when the timer expires.
 --- 
---- ``iterations``: number — The number of iterations to run. Use ``-1`` for infinite looping.
+--- `iterations`: number — *Default*: `1`. The number of iterations to run. Use `-1` for infinite looping.
 --- @return mwseTimer timer No description yet available.
 function timer.start(params) end
 
----Table parameter definitions for ``timer.start``.
+---Table parameter definitions for `timer.start`.
 --- @class timer.start.params
---- @field type number Type of the timer. This value can be timer.simulate, timer.game or timer.real.
+--- @field type number *Default*: `timer.simulate`. Type of the timer. This value can be timer.simulate, timer.game or timer.real.
 --- @field duration number Duration of the timer. The method of time passing depends on the timer type.
 --- @field callback function The callback function that will execute when the timer expires.
---- @field iterations number The number of iterations to run. Use ``-1`` for infinite looping.
+--- @field iterations number *Default*: `1`. The number of iterations to run. Use `-1` for infinite looping.
 

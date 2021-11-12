@@ -1,5 +1,7 @@
 return {
+	type = "event",
 	description = "This event is triggered just before a spell cast is resolved, at the end of the casting animation. It can control the success chance of the spell cast.",
+	related = { "spellCast", "spellCasted", "spellCastedFailure" },
 	eventData = {
 		["caster"] = {
 			type = "tes3reference",

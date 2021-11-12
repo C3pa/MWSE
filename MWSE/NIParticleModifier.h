@@ -6,7 +6,7 @@
 
 namespace NI {
 	struct ParticleModifier : Object {
-		ParticleModifier* nextModifier; // 0x8
+		Pointer<ParticleModifier> nextModifier; // 0x8
 		Object* controller; // 0xC
 	};
 	static_assert(sizeof(ParticleModifier) == 0x10, "NI::ParticleModifier failed size validation");
@@ -48,32 +48,6 @@ namespace NI {
 	};
 	static_assert(sizeof(ParticleBomb) == 0x40, "NI::ParticleBomb failed size validation");
 
-	struct ParticleCollider : ParticleModifier {
-		float restitution; // 0x10
-		bool spawnOnCollide; // 0x14
-		bool dieOnCollide; // 0x15
-		TES3::Vector3 collisionPoint; // 0x18
-		float collisionTime; // 0x24
-	};
-	static_assert(sizeof(ParticleCollider) == 0x28, "NI::ParticleCollider failed size validation");
-
-	struct PlanarCollider : ParticleCollider {
-		float width; // 0x28
-		float length; // 0x2C
-		TES3::Vector4 planeEquation; // 0x30
-		TES3::Vector3 center; // 0x40
-		TES3::Vector3 lengthAxis; // 0x4C
-		TES3::Vector3 widthAxis; // 0x58
-	};
-	static_assert(sizeof(PlanarCollider) == 0x64, "NI::PlanarCollider failed size validation");
-
-	struct SphericalCollider : ParticleCollider {
-		float radius; // 0x28
-		float radiusSquared; // 0x2C
-		TES3::Vector3 position; // 0x30
-	};
-	static_assert(sizeof(SphericalCollider) == 0x3C, "NI::SphericalCollider failed size validation");
-
 	struct ParticleColorModifier : ParticleModifier {
 		Pointer<Object> colorData; // 0x10
 	};
@@ -91,4 +65,49 @@ namespace NI {
 		float rotationSpeed; // 0x20
 	};
 	static_assert(sizeof(ParticleRotation) == 0x24, "NI::ParticleRotation failed size validation");
+
+	struct ParticleCollider : ParticleModifier {
+		float restitution; // 0x10
+		bool spawnOnCollide; // 0x14
+		bool dieOnCollide; // 0x15
+		TES3::Vector3 collisionPoint; // 0x18
+		float collisionTime; // 0x24
+	};
+	static_assert(sizeof(ParticleCollider) == 0x28, "NI::ParticleCollider failed size validation");
+
+	struct PlanarCollider : ParticleCollider {
+		float height; // 0x28
+		float width; // 0x2C
+		TES3::Vector4 planeEquation; // 0x30
+		TES3::Vector3 position; // 0x40
+		TES3::Vector3 xAxis; // 0x4C
+		TES3::Vector3 yAxis; // 0x58
+	};
+	static_assert(sizeof(PlanarCollider) == 0x64, "NI::PlanarCollider failed size validation");
+
+	struct SphericalCollider : ParticleCollider {
+		float radius; // 0x28
+		float radiusSquared; // 0x2C
+		TES3::Vector3 position; // 0x30
+
+		float getRadius() const {
+			return radius;
+		}
+		void setRadius(float r) {
+			radius = r;
+			radiusSquared = r * r;
+		}
+	};
+	static_assert(sizeof(SphericalCollider) == 0x3C, "NI::SphericalCollider failed size validation");
 }
+
+MWSE_SOL_CUSTOMIZED_PUSHER_DECLARE_NI(NI::ParticleModifier)
+MWSE_SOL_CUSTOMIZED_PUSHER_DECLARE_NI(NI::Gravity)
+MWSE_SOL_CUSTOMIZED_PUSHER_DECLARE_NI(NI::ParticleBomb)
+MWSE_SOL_CUSTOMIZED_PUSHER_DECLARE_NI(NI::ParticleColorModifier)
+MWSE_SOL_CUSTOMIZED_PUSHER_DECLARE_NI(NI::ParticleGrowFade)
+MWSE_SOL_CUSTOMIZED_PUSHER_DECLARE_NI(NI::ParticleRotation)
+
+MWSE_SOL_CUSTOMIZED_PUSHER_DECLARE_NI(NI::ParticleCollider)
+MWSE_SOL_CUSTOMIZED_PUSHER_DECLARE_NI(NI::PlanarCollider)
+MWSE_SOL_CUSTOMIZED_PUSHER_DECLARE_NI(NI::SphericalCollider)

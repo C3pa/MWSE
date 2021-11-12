@@ -534,6 +534,11 @@ namespace TES3 {
 		return TES3_MobileActor_isAffectedBySpell(this, spell);
 	}
 
+	const auto TES3_MobileActor_getSpellList = reinterpret_cast<SpellList * (__thiscall*)(const MobileActor*)>(0x52B3D0);
+	SpellList* MobileActor::getSpellList() {
+		return TES3_MobileActor_getSpellList(this);
+	}
+
 	const auto TES3_MobileActor_getCombatSpellList = reinterpret_cast<IteratedList<Spell*> *(__thiscall*)(const MobileActor*)>(0x52B3C0);
 	IteratedList<Spell*> * MobileActor::getCombatSpellList() {
 		return TES3_MobileActor_getCombatSpellList(this);
@@ -634,7 +639,7 @@ namespace TES3 {
 		// Select item based on best/worst condition.
 		if (selectBestCondition) {
 			// Use already equipped item if it has full condition.
-			if (equipped && ItemData::isFullyRepaired(equipped->variables, static_cast<TES3::Item*>(equipped->object))) {
+			if (equipped && ItemData::isFullyRepaired(equipped->itemData, static_cast<TES3::Item*>(equipped->object))) {
 				return true;
 			}
 
@@ -706,6 +711,106 @@ namespace TES3 {
 
 		TES3_MobileActor_wearItem(this, item, itemData, false, false);
 		return true;
+	}
+
+	bool MobileActor::equip_lua(sol::object arg) {
+		using mwse::lua::getOptionalParam;
+		using mwse::lua::getOptionalParamObject;
+
+		if (arg.is<Item>()) {
+			return equipItem(arg.as<Item*>());
+		}
+		else if (arg.is<sol::table>()) {
+			sol::table params = arg;
+
+			Item* item = getOptionalParamObject<Item>(params, "item");
+			if (item == nullptr) {
+				return false;
+			}
+
+			auto itemData = getOptionalParam<ItemData*>(params, "itemData", nullptr);
+			auto addItem = getOptionalParam<bool>(params, "addItem", false);
+			auto selectBestCondition = getOptionalParam<bool>(params, "selectBestCondition", false);
+			auto selectWorstCondition = getOptionalParam<bool>(params, "selectWorstCondition", false);
+
+			return equipItem(item, itemData, addItem, selectBestCondition, selectWorstCondition);
+		}
+
+		throw std::invalid_argument("Invalid parameter provided: must be a tes3item or table.");
+	}
+
+	bool MobileActor::unequip_lua(sol::table args) {
+		using mwse::lua::getOptionalParam;
+		using mwse::lua::getOptionalParamObject;
+
+		Actor* actor = static_cast<TES3::Actor*>(reference->baseObject);
+		EquipmentStack* s = nullptr;
+		auto item = mwse::lua::getOptionalParamObject<Item>(args, "item");
+		int type = args.get_or("type", 0);
+		int armourSlot = args.get_or("armorSlot", -1);
+		int clothingSlot = args.get_or("clothingSlot", -1);
+
+		if (item) {
+			// Match by item.
+			s = actor->getEquippedItem(item);
+		}
+		else if (armourSlot != -1) {
+			// Match by slot.
+			s = actor->getEquippedArmorBySlot(armourSlot);
+		}
+		else if (clothingSlot != -1) {
+			// Match by slot.
+			s = actor->getEquippedClothingBySlot(clothingSlot);
+		}
+		if (s) {
+			// Warning: Unequipping lights during menumode with updateGUI=true triggers a Morrowind crash.
+			// UI update has been moved to a separate function.
+			actor->unequipItem(s->object, true, this, false, s->itemData);
+			actor->postUnequipUIRefresh(this);
+			return true;
+		}
+
+		if (type) {
+			// Match all equipped items by objectType.
+			std::vector<TES3::EquipmentStack*> matches;
+			for (auto it = actor->equipment.head; it; it = it->next) {
+				if (it->data->object->objectType == type) {
+					matches.push_back(it->data);
+				}
+			}
+			// Warning: Unequipping lights during menumode with updateGUI=true triggers a Morrowind crash.
+			// UI update has been moved to a separate function.
+			for (auto it : matches) {
+				s = it;
+				actor->unequipItem(s->object, true, this, false, s->itemData);
+			}
+			actor->postUnequipUIRefresh(this);
+		}
+		return bool(s);
+	}
+
+	bool MobileActor::getWeaponReady() const {
+		return getMobileActorFlag(MobileActorFlag::WeaponDrawn) || actionData.animStateAttack == AttackAnimationState::ReadyingWeap;
+	}
+
+	void MobileActor::setWeaponReady(bool value) {
+		if (isDead()) {
+			return;
+		}
+
+		if (value && !getWeaponReady()) {
+			// Update equipped weapon, as this->readiedWeapon may have been cleared by an unequip.
+			const auto TES3_MobileActor_setReadiedWeapon = reinterpret_cast<void(__thiscall*)(MobileActor*, EquipmentStack*)>(0x52CB70);
+			auto weapon = static_cast<Actor*>(reference->baseObject)->getEquippedWeapon();
+			TES3_MobileActor_setReadiedWeapon(this, weapon);
+
+			// Start readying action.
+			actionData.animStateAttack = AttackAnimationState::ReadyingWeap;
+		}
+		else if (!value && getWeaponReady()) {
+			// Start unreadying action.
+			actionData.animStateAttack = AttackAnimationState::UnreadyWeap;
+		}
 	}
 
 	void MobileActor::updateOpacity() {
@@ -1218,9 +1323,9 @@ namespace TES3 {
 		}
 	}
 
-	sol::table MobileActor::getActiveMagicEffectsList_lua(sol::table params) {
-		sol::optional<int> effectID = params["effect"];
-		sol::optional<unsigned int> serial = params["serial"];
+	sol::table MobileActor::getActiveMagicEffectsList_lua(sol::optional<sol::table> params) {
+		auto effectID = mwse::lua::getOptionalParam<int>(params, "effect");
+		auto serial = mwse::lua::getOptionalParam<unsigned int>(params, "serial");
 
 		auto stateHandle = mwse::lua::LuaManager::getInstance().getThreadSafeStateHandle();
 		sol::table effectsList = stateHandle.state.create_table();

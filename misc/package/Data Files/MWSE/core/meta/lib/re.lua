@@ -15,7 +15,7 @@ re = {}
 --- The given string may define either an expression or a grammar. The optional defs table provides 
 --- extra Lua values to be used by the pattern.
 --- @param s string The string to compile.
---- @param defs table Extra lua values to be used by the pattern.
+--- @param defs table *Optional*. Extra lua values to be used by the pattern.
 --- @return pattern result No description yet available.
 function re.compile(s, defs) end
 
@@ -27,16 +27,16 @@ function re.compile(s, defs) end
 --- An optional numeric argument init makes the search starts at that position in the subject string.
 --- As usual in Lua libraries, a negative value counts from the end. 
 ---
---- [Examples available in online documentation](https://mwse.readthedocs.io/en/latest/lua/api/re/find.html).
+--- [Examples available in online documentation](https://mwse.github.io/MWSE/types/re/#refind).
 --- @param subject string The string to search.
 --- @param pattern string The pattern to search with.
---- @param init number Start at this position in the subject string.
+--- @param init number *Optional*. Start at this position in the subject string.
 --- @return number result No description yet available.
 function re.find(subject, pattern, init) end
 
 --- Does a global substitution, replacing all occurrences of pattern in the given subject by replacement.
 ---
---- [Examples available in online documentation](https://mwse.readthedocs.io/en/latest/lua/api/re/gsub.html).
+--- [Examples available in online documentation](https://mwse.github.io/MWSE/types/re/#regsub).
 --- @param subject string The string to search.
 --- @param pattern string The pattern to search with.
 --- @param replacement string Replace all matches with this string.
@@ -45,7 +45,7 @@ function re.gsub(subject, pattern, replacement) end
 
 --- Matches the given pattern against the given subject, returning all captures.
 ---
---- [Examples available in online documentation](https://mwse.readthedocs.io/en/latest/lua/api/re/match.html).
+--- [Examples available in online documentation](https://mwse.github.io/MWSE/types/re/#rematch).
 --- @param subject string The string to search.
 --- @param pattern string The pattern to search with.
 --- @return string result No description yet available.

@@ -1,4 +1,5 @@
 return {
+	type = "event",
 	description = "uiPreEvent is triggered through various UI events. This includes scrolling through panes, clicking buttons, selecting icons, or a host of other UI-related activities. This event fires before uiEvent, and has the additional advantage of being able to be blocked.",
 	eventData = {
 		["block"] = {
@@ -27,4 +28,5 @@ return {
 			description = "One of two undefined variables related to the event.",
 		},
 	},
+	blockable = true,
 }

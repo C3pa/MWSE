@@ -10,6 +10,7 @@
 #include "TES3UIManager.h"
 #include "TES3UIMenuController.h"
 
+#include "TES3Game.h"
 #include "TES3GameSetting.h"
 #include "TES3ItemData.h"
 #include "TES3NPC.h"
@@ -41,7 +42,7 @@ namespace TES3 {
 		const auto TES3_ui_onMenuUnfocus = reinterpret_cast<EventCallback>(0x58F790);
 		const auto TES3_ui_ScrollbarArrow_onClick = reinterpret_cast<EventCallback>(0x647A60);
 		const auto TES3_ui_requestMenuModeOn = reinterpret_cast<bool (__cdecl*)(UI_ID)>(0x595230);
-		const auto TES3_ui_requestMenuModeOff = reinterpret_cast<bool (__cdecl*)(UI_ID)>(0x595270);
+		const auto TES3_ui_requestMenuModeOff = reinterpret_cast<bool (__cdecl*)()>(0x595270);
 		const auto TES3_ui_getServiceActor = reinterpret_cast<MobileActor* (__cdecl*)()>(0x5BFEA0);
 		const auto TES3_ui_updateDialogDisposition = reinterpret_cast<void (__cdecl*)()>(0x5C0780);
 
@@ -86,6 +87,10 @@ namespace TES3 {
 				menu->createDragFrame(id, 1);
 			}
 
+			if (params.get_or("loadable", true)) {
+				menu->setProperty(Property::savable_menu, Property::boolean_true);
+			}
+
 			return menu;
 		}
 
@@ -109,8 +114,27 @@ namespace TES3 {
 			return TES3_ui_createTooltipMenu(id);
 		}
 
-		Element* createTooltipMenu_lua() {
-			return createTooltipMenu(TES3::UI::UI_ID(TES3::UI::Property::HelpMenu));
+		Element* createTooltipMenu_lua(sol::optional<sol::table> params) {
+			using mwse::lua::getOptionalParam;
+			using mwse::lua::getOptionalParamObject;
+
+			auto menu = createTooltipMenu(TES3::UI::UI_ID(TES3::UI::Property::HelpMenu));
+
+			if (!params) {
+				// Empty tooltip creation.
+				return menu;
+			}
+
+			auto item = getOptionalParamObject<TES3::Item>(params, "item");
+			if (item) {
+				auto itemData = getOptionalParam<TES3::ItemData*>(params, "itemData", nullptr);
+				auto count = itemData ? itemData->count : 0;
+
+				WorldController::get()->menuController->menuInputController->displayObjectTooltip(item, itemData, count);
+				return menu;
+			}
+
+			throw std::invalid_argument("createTooltipMenu: Could not find object matching arguments.");
 		}
 
 		void refreshTooltip() {
@@ -146,13 +170,16 @@ namespace TES3 {
 		}
 
 		bool leaveMenuMode() {
-			return TES3_ui_requestMenuModeOff(0);
+			return TES3_ui_requestMenuModeOff();
 		}
 
 		const auto TES3_ui_closeJournal = reinterpret_cast<bool(__cdecl*)()>(0x5D6A10);
 		bool closeJournal() {
-			if (!TES3_ui_closeJournal()) return false;
-			while (TES3_ui_closeJournal());
+			if (!TES3_ui_closeJournal()) {
+				return false;
+			}
+			// Loop to exit out of all sub-sections of the journal.
+			while (TES3_ui_closeJournal()) {}
 			return true;
 		}
 
@@ -218,6 +245,15 @@ namespace TES3 {
 			TES3_ui_updateDialogDisposition();
 		}
 
+		std::tuple<unsigned int, unsigned int> getViewportSize_lua() {
+			auto& viewportCameraData = TES3::WorldController::get()->menuCamera.cameraData;
+			return { viewportCameraData.viewportWidth, viewportCameraData.viewportHeight };
+		}
+
+		float getViewportScale() {
+			return float(TES3::Game::get()->windowWidth) / float(TES3::WorldController::get()->worldCamera.cameraData.viewportWidth);
+		}
+
 		const char* getInventorySelectType() {
 			const char* callbackType = "unknown";
 			auto callbackAddress = *reinterpret_cast<DWORD*>(0x7D3CA0);
@@ -239,20 +275,20 @@ namespace TES3 {
 			Element *help = TES3_ui_findHelpLayerMenu(static_cast<UI_ID>(Property::HelpMenu));
 			if (help) {
 				// Remove menu from help layer child vector.
-				Element **p = help->parent->vectorChildren.begin;
+				Element **p = help->parent->vectorChildren.begin, **end = help->parent->vectorChildren.end;
 				while (*p != help) {
 					++p;
 				}
-				for (size_t n = (help->parent->vectorChildren.end - p) + 1; n; --n) {
+				for (; p < end - 1; ++p) {
 					*p = *(p + 1);
 				}
-				help->parent->vectorChildren.end--;
 				*p = 0;
+				help->parent->vectorChildren.end--;
 
 				// Place menu in main layer.
 				help->reattachToParent(*TES3_uiMainRoot);
 
-				// Add an empty dummy menu to staisfy game code that expects the help menu.
+				// Add an empty dummy menu to satisfy game code that expects the help menu.
 				createTooltipMenu(static_cast<UI_ID>(Property::HelpMenu));
 			}
 		}
@@ -566,6 +602,15 @@ namespace TES3 {
 			{ "soulgemFilled", reinterpret_cast<EventCallback*>(0x5C6B00) },
 		};
 
+		static sol::protected_function noValidItemsCallback = sol::nil;
+		static const char* noValidItemsTextOverride = nullptr;
+		Element* __cdecl messagePlayerForNoValidItems(const char* message, const char* image = nullptr, bool showInDialog = true) {
+			if (noValidItemsCallback.valid()) {
+				noValidItemsCallback();
+			}
+			return showMessageBox(noValidItemsTextOverride ? noValidItemsTextOverride : message, image, showInDialog);
+		}
+
 		void showInventorySelectMenu_lua(sol::table params) {
 			// Get our actor.
 			TES3::Reference* actorRef = mwse::lua::getOptionalParamExecutionReference(params);
@@ -611,12 +656,8 @@ namespace TES3 {
 			}
 
 			// Allow overwriting of our "no item found" text.
-			auto sInventorySelectNoItems = TES3::DataHandler::get()->nonDynamicData->GMSTs[TES3::GMST::sInventorySelectNoItems];
-			const char* oldNoResultsText = sInventorySelectNoItems->value.asString;
-			const char* noResultsText = mwse::lua::getOptionalParam<const char*>(params, "noResultsText", nullptr);
-			if (noResultsText != nullptr) {
-				sInventorySelectNoItems->value.asString = (char*)noResultsText;
-			}
+			noValidItemsTextOverride = mwse::lua::getOptionalParam<const char*>(params, "noResultsText", nullptr);
+			noValidItemsCallback = mwse::lua::getOptionalParam<sol::protected_function>(params, "noResultsCallback", sol::nil);
 
 			// Do we close the menu after?
 			inventorySelectLuaCallbackCloseAfter = mwse::lua::getOptionalParam<bool>(params, "leaveMenuMode", !TES3::WorldController::get()->flagMenuMode);
@@ -625,10 +666,9 @@ namespace TES3 {
 			*reinterpret_cast<EventCallback**>(0x7D3CA0) = filter;
 			showSelectMenu(actor, callback, titleText);
 
-			// Restore the previous results text.
-			if (noResultsText != nullptr) {
-				sInventorySelectNoItems->value.asString = (char*)oldNoResultsText;
-			}
+			// Reset our overrides.
+			noValidItemsTextOverride = nullptr;
+			noValidItemsCallback = sol::nil;
 
 			// If the menu was successfully shown, enter menu mode.
 			auto MenuInventorySelect = *reinterpret_cast<UI_ID*>(0x7D3C14);
@@ -691,6 +731,9 @@ namespace TES3 {
 			auto patch = &Element::patchUpdateLayout_propagateFlow;
 			mwse::genCallEnforced(0x585E1E, 0x584850, *reinterpret_cast<DWORD*>(&patch));
 			mwse::genCallEnforced(0x5863AE, 0x584850, *reinterpret_cast<DWORD*>(&patch));
+
+			// Patch item selection no items message to allow callbacks and changed text.
+			mwse::genCallEnforced(0x5D37CF, 0x5F90C0, reinterpret_cast<DWORD>(messagePlayerForNoValidItems));
 
 			// Provide some UI IDs for elements that don't have them, like tooltips:
 			pushNewUIID(0x590F59, "HelpMenu_titleBlock");

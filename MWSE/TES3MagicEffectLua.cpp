@@ -4,6 +4,7 @@
 #include "TES3ObjectLua.h"
 
 #include "TES3MagicEffect.h"
+#include "TES3Sound.h"
 
 namespace mwse {
 	namespace lua {
@@ -14,7 +15,7 @@ namespace mwse {
 
 			// Binding for TES3::MagicEffect
 			{
-				// Start our usertype. We must finish this with state.set_usertype.
+				// Start our usertype.
 				auto usertypeDefinition = state.new_usertype<TES3::MagicEffect>("tes3magicEffect");
 				usertypeDefinition["new"] = sol::no_constructor;
 
@@ -26,6 +27,7 @@ namespace mwse {
 				usertypeDefinition["areaSoundEffect"] = sol::property(&TES3::MagicEffect::getAreaSoundEffect, &TES3::MagicEffect::setAreaSoundEffect);
 				usertypeDefinition["areaVisualEffect"] = &TES3::MagicEffect::areaEffect;
 				usertypeDefinition["baseMagickaCost"] = &TES3::MagicEffect::baseMagickaCost;
+				usertypeDefinition["bigIcon"] = sol::readonly_property(&TES3::MagicEffect::getBigIcon);
 				usertypeDefinition["boltSoundEffect"] = sol::property(&TES3::MagicEffect::getBoltSoundEffect, &TES3::MagicEffect::setBoltSoundEffect);
 				usertypeDefinition["boltVisualEffect"] = &TES3::MagicEffect::boltEffect;
 				usertypeDefinition["castSoundEffect"] = sol::property(&TES3::MagicEffect::getCastSoundEffect, &TES3::MagicEffect::setCastSoundEffect);
@@ -46,6 +48,7 @@ namespace mwse {
 				usertypeDefinition["sizeCap"] = &TES3::MagicEffect::sizeCap;
 				usertypeDefinition["skill"] = sol::readonly_property(&TES3::MagicEffect::getSkillForSchool);
 				usertypeDefinition["speed"] = &TES3::MagicEffect::speed;
+				usertypeDefinition["spellFailureSoundEffect"] = sol::readonly_property(&TES3::MagicEffect::getSpellFailureSoundEffect);
 
 				// Allow access to base effect flags.
 				usertypeDefinition["allowEnchanting"] = sol::property(&TES3::MagicEffect::getAllowEnchanting, &TES3::MagicEffect::setAllowEnchanting);
@@ -70,7 +73,7 @@ namespace mwse {
 
 			// Binding for TES3::Effect
 			{
-				// Start our usertype. We must finish this with state.set_usertype.
+				// Start our usertype.
 				auto usertypeDefinition = state.new_usertype<TES3::Effect>("tes3effect");
 				usertypeDefinition["new"] = sol::no_constructor;
 

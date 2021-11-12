@@ -1,8 +1,9 @@
 return {
+	type = "event",
 	description = "This event fires when an item in the barter menu is filtered.",
 	eventData = {
 		["tile"] = {
-			type = "tes3uiInventoryTile",
+			type = "tes3inventoryTile",
 			readOnly = true,
 			description = "The inventory tile being filtered.",
 		},

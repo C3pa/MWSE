@@ -19,6 +19,7 @@ local modConfigContainer = nil
 
 -- Expose the mcm API.
 mwse.mcm = require("mcm.mcm")
+mwse.mcm.i18n = mwse.loadTranslations("mcm")
 
 -- Callback for when a mod name has been clicked in the left pane.
 local function onClickModName(e)
@@ -46,13 +47,14 @@ local function onClickModName(e)
 
 	-- Change the mod config title bar to include the mod's name.
 	local menu = tes3ui.findMenu(UIID_mwse_modConfigMenu)
-	menu.text = "Mod Configuration - " .. e.source.text
+	menu.text = mwse.mcm.i18n("Mod Configuration - %s", { e.source.text })
 	menu:updateLayout()
 end
 
--- Callback for when the close button has been clicked.
+--- Callback for when the close button has been clicked.
+--- @param e keyDownEventData
 local function onClickCloseButton(e)
-	
+
 	event.unregister("keyDown", onClickCloseButton, { filter = tes3.scanCode.escape })
 	-- If we have a current mod, fire its close event.
 	if (currentModConfig and currentModConfig.onClose) then
@@ -94,7 +96,7 @@ local function onClickModConfigButton()
 	if (menu == nil) then
 		-- Create the main menu frame.
 		menu = tes3ui.createMenu({ id = UIID_mwse_modConfigMenu, dragFrame = true })
-		menu.text = "Mod Configuration"
+		menu.text = mwse.mcm.i18n("Mod Configuration")
 		menu.minWidth = 600
 		menu.minHeight = 500
 		menu.width = 1200
@@ -159,18 +161,18 @@ local function onClickModConfigButton()
 		splash.borderTop = 25
 
 		-- Create a link back to the website.
-		local site = containerPane:createLabel({ text = "mwse.readthedocs.io" })
+		local site = containerPane:createLabel({ text = "mwse.github.io/MWSE" })
 		site.absolutePosAlignX = 0.5
 		site.color = tes3ui.getPalette("link_color")
 		site:register("mouseClick", function()
 			tes3.messageBox({
-				message = "Open web browser?",
+				message = mwse.mcm.i18n("Open web browser?"),
 				buttons = { tes3.findGMST(tes3.gmst.sYes).value, tes3.findGMST(tes3.gmst.sNo).value },
 				callback = function(e)
 					if (e.button == 0) then
-						os.execute("start http://mwse.readthedocs.io")
+						os.openURL("https://mwse.github.io/MWSE")
 					end
-				end
+				end,
 			})
 		end)
 
@@ -213,20 +215,21 @@ local function getActiveModConfigCount()
 	return count
 end
 
--- Callback for when the MenuOptions element is created. We'll extend it with our new button.
+--- Callback for when the MenuOptions element is created. We'll extend it with our new button.
+--- @param e uiActivatedEventData
 local function onCreatedMenuOptions(e)
 	-- Only interested in menu creation, not updates
 	if (not e.newlyCreated) then
 		return
 	end
-	
+
 	-- Don't show the UI if we don't have any mod configs to show.
 	if (getActiveModConfigCount() == 0) then
 		return
 	end
 
 	local mainMenu = e.element
-	
+
 	local creditsButton = mainMenu:findChild(tes3ui.registerID("MenuOptions_Credits_container"))
 	local buttonContainer = creditsButton.parent
 
@@ -264,8 +267,9 @@ function mwse.registerModConfig(name, package)
 	configMods[name] = package
 end
 
--- When we've initialized, set up our UI IDs and let other mods know that we are ready to boogie.
--- Set this up to run before most other initialized callbacks.
+--- When we've initialized, set up our UI IDs and let other mods know that we are ready to boogie.
+---
+--- Set this up to run before most other initialized callbacks.
 local function onInitialized()
 	UIID_mwse_modConfigMenu = tes3ui.registerID("MWSE:ModConfigMenu")
 

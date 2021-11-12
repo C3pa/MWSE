@@ -173,8 +173,6 @@ namespace TES3 {
 		// Custom functions.
 		//
 
-		Alchemy* getMatchingAlchemyItem(const Alchemy*) const;
-
 		std::reference_wrapper<Skill[27]> getSkills();
 
 		sol::table getMagicEffects_lua(sol::this_state ts);
@@ -348,6 +346,7 @@ namespace TES3 {
 		NI::Pointer<NI::SourceTexture> loadSourceTexture(const char* path);
 
 		void updateLightingForReference(Reference * reference);
+		void updateLightingForExteriorCells();
 		void setDynamicLightingForReference(Reference* reference);
 
 		void updateCollisionGroupsForActiveCells(bool force = true, bool isResettingData = false, bool resetCollisionGroups = true);
@@ -358,6 +357,12 @@ namespace TES3 {
 		//
 
 		std::reference_wrapper<ExteriorCellData* [9]> getExteriorCellData_lua();
+
+		//
+		// Debug values.
+		//
+
+		static const char* currentlyLoadingMesh;
 
 	};
 	static_assert(sizeof(DataHandler) == 0xB558, "TES3::DataHandler failed size validation");

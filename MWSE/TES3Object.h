@@ -250,7 +250,11 @@ namespace TES3 {
 		BaseObject * getBaseObject() const;
 
 		bool isActor() const;
+		bool isItem() const;
 		const char* getSourceFilename() const;
+
+		bool getLinksResolved() const;
+		void setLinksResolved(bool value);
 
 		bool getDisabled() const;
 		bool getDeleted() const;
@@ -344,6 +348,8 @@ namespace TES3 {
 		void setScale(float value, bool cap = false);
 
 		bool getIsLocationMarker() const;
+
+		bool getSupportsLuaData() const;
 
 		NI::Node * getSceneGraphNode();
 

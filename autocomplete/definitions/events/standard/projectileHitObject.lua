@@ -1,5 +1,7 @@
 return {
+	type = "event",
 	description = "The projectileHitObject event fires when a projectile collides with an object.",
+	related = { "projectileHitActor", "projectileHitObject", "projectileHitTerrain", "projectileExpire" },
 	eventData = {
 		["mobile"] = {
 			type = "tes3mobileProjectile",

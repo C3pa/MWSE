@@ -16,7 +16,7 @@ namespace mwse::lua {
 
 		// Bind NI::GeometryData
 		{
-			// Start our usertype. We must finish this with state.set_usertype.
+			// Start our usertype.
 			auto usertypeDefinition = state.new_usertype<NI::GeometryData>("niGeometryData");
 			usertypeDefinition[sol::base_classes] = sol::bases<NI::Object>();
 			usertypeDefinition["new"] = sol::no_constructor;
@@ -27,7 +27,7 @@ namespace mwse::lua {
 
 		// Bind NI::TriBasedGeometryData
 		{
-			// Start our usertype. We must finish this with state.set_usertype.
+			// Start our usertype.
 			auto usertypeDefinition = state.new_usertype<NI::TriBasedGeometryData>("niTriBasedGeometryData");
 			usertypeDefinition[sol::base_classes] = sol::bases<NI::Object, NI::GeometryData>();
 			usertypeDefinition["new"] = sol::no_constructor;
@@ -36,12 +36,13 @@ namespace mwse::lua {
 			setUserdataForNIGeometryData(usertypeDefinition);
 
 			// Functions exposed as properties.
-			usertypeDefinition["triangleCount"] = sol::readonly_property(&NI::TriBasedGeometryData::getTriangleCount);
+			usertypeDefinition["activeTriangleCount"] = sol::property(&NI::TriBasedGeometryData::getActiveTriangleCount, &NI::TriBasedGeometryData::setActiveTriangleCount);
+			usertypeDefinition["triangleCount"] = sol::readonly_property(&NI::TriBasedGeometryData::triangleCount);
 		}
 
 		// Bind NI::TriShapeData
 		{
-			// Start our usertype. We must finish this with state.set_usertype.
+			// Start our usertype.
 			auto usertypeDefinition = state.new_usertype<NI::TriShapeData>("niTriShapeData");
 			usertypeDefinition[sol::base_classes] = sol::bases<NI::Object, NI::GeometryData, NI::TriBasedGeometryData>();
 			usertypeDefinition["new"] = sol::no_constructor;
@@ -50,10 +51,22 @@ namespace mwse::lua {
 			setUserdataForNIGeometryData(usertypeDefinition);
 
 			// Functions exposed as properties.
-			usertypeDefinition["triangleCount"] = sol::readonly_property(&NI::TriShapeData::getTriangleCount);
+			usertypeDefinition["activeTriangleCount"] = sol::property(&NI::TriShapeData::getActiveTriangleCount, &NI::TriShapeData::setActiveTriangleCount);
+			usertypeDefinition["triangleCount"] = sol::readonly_property(&NI::TriShapeData::triangleCount);
+			usertypeDefinition["triangles"] = sol::readonly_property(&NI::TriShapeData::getTriangles);
 
 			// Basic function binding.
 			usertypeDefinition["copy"] = &NI::TriShapeData::copyData;
+		}
+
+		// Binding for NI::Triangle.
+		{
+			// Start our usertype.
+			auto usertypeDefinition = state.new_usertype<NI::Triangle>("niTriangle");
+			usertypeDefinition["new"] = sol::no_constructor;
+
+			// Basic bindings.
+			usertypeDefinition["vertices"] = sol::readonly_property(&NI::Triangle::getVertices);
 		}
 	}
 }

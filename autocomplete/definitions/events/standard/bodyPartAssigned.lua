@@ -1,5 +1,7 @@
 return {
+	type = "event",
     description = "",
+	related = { "bodyPartAssigned", "bodyPartsUpdated" },
     eventData = {
         ["manager"] = {
             type = "tes3bodyPartManager",
@@ -31,4 +33,5 @@ return {
             description = "",
         },
     },
+	blockable = true,
 }

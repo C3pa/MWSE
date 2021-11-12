@@ -2,6 +2,7 @@
 
 #include "LuaManager.h"
 
+#include "LuaAbsorbedMagicEvent.h"
 #include "LuaActivateEvent.h"
 #include "LuaActivationTargetChangedEvent.h"
 #include "LuaAddSoundEvent.h"
@@ -45,6 +46,7 @@
 #include "LuaDetermineActionEvent.h"
 #include "LuaDeterminedActionEvent.h"
 #include "LuaDisarmTrapEvent.h"
+#include "LuaEnchantChargeUseEvent.h"
 #include "LuaEnchantedItemCreatedEvent.h"
 #include "LuaEnchantedItemCreateFailedEvent.h"
 #include "LuaEquipEvent.h"
@@ -96,6 +98,7 @@
 #include "LuaPostInfoResponseEvent.h"
 #include "LuaPotionBrewedEvent.h"
 #include "LuaPotionBrewFailedEvent.h"
+#include "LuaPotionBrewSkillCheckEvent.h"
 #include "LuaPowerRechargedEvent.h"
 #include "LuaPreLevelUpEvent.h"
 #include "LuaPreventRestEvent.h"
@@ -114,6 +117,7 @@
 #include "LuaSpellCastedEvent.h"
 #include "LuaSpellCastEvent.h"
 #include "LuaSpellCreatedEvent.h"
+#include "LuaSpellMagickaUseEvent.h"
 #include "LuaSpellResistEvent.h"
 #include "LuaSpellTickEvent.h"
 #include "LuaUiObjectTooltipEvent.h"
@@ -135,11 +139,12 @@ namespace mwse {
 				auto stateHandle = LuaManager::getInstance().getThreadSafeStateHandle();
 				sol::state& state = stateHandle.state;
 
-				// Start our usertype. We must finish this with state.set_usertype.
+				// Start our usertype.
 				auto usertypeDefinition = state.new_usertype<DisableableEventManager>("mwseDisableableEventManager");
 				usertypeDefinition["new"] = sol::no_constructor;
 
 				// Give access to the enabled state.
+				usertypeDefinition["absorbedMagic"] = sol::property(&AbsorbedMagicEvent::getEventEnabled, &AbsorbedMagicEvent::setEventEnabled);
 				usertypeDefinition["activate"] = sol::property(&ActivateEvent::getEventEnabled, &ActivateEvent::setEventEnabled);
 				usertypeDefinition["activationTargetChanged"] = sol::property(&ActivationTargetChangedEvent::getEventEnabled, &ActivationTargetChangedEvent::setEventEnabled);
 				usertypeDefinition["addSound"] = sol::property(&AddSoundEvent::getEventEnabled, &AddSoundEvent::setEventEnabled);
@@ -188,6 +193,7 @@ namespace mwse {
 				usertypeDefinition["detectSneak"] = sol::property(&DetectSneakEvent::getEventEnabled, &DetectSneakEvent::setEventEnabled);
 				usertypeDefinition["determineAction"] = sol::property(&DetermineActionEvent::getEventEnabled, &DetermineActionEvent::setEventEnabled);
 				usertypeDefinition["determinedAction"] = sol::property(&DeterminedActionEvent::getEventEnabled, &DeterminedActionEvent::setEventEnabled);
+				usertypeDefinition["enchantChargeUse"] = sol::property(&EnchantChargeUseEvent::getEventEnabled, &EnchantChargeUseEvent::setEventEnabled);
 				usertypeDefinition["enchantedItemCreated"] = sol::property(&EnchantedItemCreatedEvent::getEventEnabled, &EnchantedItemCreatedEvent::setEventEnabled);
 				usertypeDefinition["enchantedItemCreateFailed"] = sol::property(&EnchantedItemCreateFailedEvent::getEventEnabled, &EnchantedItemCreateFailedEvent::setEventEnabled);
 				usertypeDefinition["enterFrame"] = sol::property(&FrameEvent::getEventEnabled, &FrameEvent::setEventEnabled);
@@ -232,6 +238,7 @@ namespace mwse {
 				usertypeDefinition["postInfoResponse"] = sol::property(&PostInfoResponseEvent::getEventEnabled, &PostInfoResponseEvent::setEventEnabled);
 				usertypeDefinition["potionBrewed"] = sol::property(&PotionBrewedEvent::getEventEnabled, &PotionBrewedEvent::setEventEnabled);
 				usertypeDefinition["potionBrewFailed"] = sol::property(&PotionBrewFailedEvent::getEventEnabled, &PotionBrewFailedEvent::setEventEnabled);
+				usertypeDefinition["potionBrewSkillCheck"] = sol::property(&PotionBrewSkillCheckEvent::getEventEnabled, &PotionBrewSkillCheckEvent::setEventEnabled);
 				usertypeDefinition["powerRecharged"] = sol::property(&PowerRechargedEvent::getEventEnabled, &PowerRechargedEvent::setEventEnabled);
 				usertypeDefinition["preLevelUp"] = sol::property(&PreLevelUpEvent::getEventEnabled, &PreLevelUpEvent::setEventEnabled);
 				usertypeDefinition["preventRest"] = sol::property(&PreventRestEvent::getEventEnabled, &PreventRestEvent::setEventEnabled);
@@ -253,6 +260,7 @@ namespace mwse {
 				usertypeDefinition["spellCastedFailure"] = sol::property(&SpellCastedEvent::getEventEnabled, &SpellCastedEvent::setEventEnabled);
 				usertypeDefinition["spellCreated"] = sol::property(&SpellCreatedEvent::getEventEnabled, &SpellCreatedEvent::setEventEnabled);
 				usertypeDefinition["spellResist"] = sol::property(&SpellResistEvent::getEventEnabled, &SpellResistEvent::setEventEnabled);
+				usertypeDefinition["spellMagickaUse"] = sol::property(&SpellMagickaUseEvent::getEventEnabled, &SpellMagickaUseEvent::setEventEnabled);
 				usertypeDefinition["spellTick"] = sol::property(&SpellTickEvent::getEventEnabled, &SpellTickEvent::setEventEnabled);
 				usertypeDefinition["topicAdded"] = sol::property(&AddTopicEvent::getEventEnabled, &AddTopicEvent::setEventEnabled);
 				usertypeDefinition["trapDisarm"] = sol::property(&DisarmTrapEvent::getEventEnabled, &DisarmTrapEvent::setEventEnabled);
