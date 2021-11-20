@@ -46,7 +46,7 @@
 --- @field menuAlpha number A value in the range [0, 1]. The alpha value of the black background of menus. Corresponds to the "Menu transparency" option in the Options menu.
 --- @field menuCamera tes3worldControllerRenderCamera *Read-only*. 
 --- @field menuClickSound tes3sound The sound played when a UI button or other control is clicked.
---- @field menuController tes3menuController *Read-only*. The controller responsible for the menu system.
+--- @field menuController tes3uiMenuController *Read-only*. The controller responsible for the menu system.
 --- @field menuSizeSound tes3sound Unused sound. Not used when a menu is resized.
 --- @field missSound tes3sound The sound played when a weapon fails its to-hit check.
 --- @field mobController tes3mobController *Read-only*. The controller responsible for mobile objects and collision.
@@ -68,6 +68,7 @@
 --- @field shadowCamera tes3worldControllerRenderCamera *Read-only*. 
 --- @field shadows number An integer in the range [0,6]. Controls the amount of actor shadows drawn. Corresponds to the "Real-time shadows" option in the Options menu.
 --- @field showSubtitles boolean If subtitles are shown. Corresponds to the "Subtitles" option in the Options menu.
+--- @field splashController tes3splashController *Read-only*. Access to the splash controller.
 --- @field splashscreenCamera tes3worldControllerRenderCamera *Read-only*. 
 --- @field stopGameLoop boolean When true, the game simulation loop will stop. Not normally used, and may have other unknown effects.
 --- @field sunglareFader tes3fader *Read-only*. Screen overlay fader for sunglare.

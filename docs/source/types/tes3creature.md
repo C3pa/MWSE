@@ -21,7 +21,7 @@ This type inherits the following: [tes3actor](../../types/tes3actor), [tes3physi
 
 **Returns**:
 
-* `result` (tes3aiConfig)
+* `result` ([tes3aiConfig](../../types/tes3aiConfig))
 
 ***
 
@@ -401,7 +401,7 @@ The script that runs on the object.
 
 **Returns**:
 
-* `result` (tes3script)
+* `result` ([tes3script](../../types/tes3script))
 
 ***
 
@@ -497,7 +497,7 @@ Access to the creature's swims flag.
 
 ### `type`
 
-The type of the creature, represented by a number for normal, daedra, undead, or humanoid.
+The type of the creature. Maps to tes3.creatureType.* constants.
 
 **Returns**:
 
@@ -538,6 +538,26 @@ local string = tes3baseObject:__tojson()
 **Returns**:
 
 * `string` (string)
+
+***
+
+### `hasItemEquipped`
+
+Checks if the actor has provided item equipped.
+
+```lua
+local result = tes3actor:hasItemEquipped({ item = ..., itemData = ... })
+```
+
+**Parameters**:
+
+* `params` (table)
+	* `item` ([tes3item](../../types/tes3item), string): The item to perform a check for.
+	* `itemData` ([tes3itemData](../../types/tes3itemData)): *Optional*.
+
+**Returns**:
+
+* `result` (boolean)
 
 ***
 

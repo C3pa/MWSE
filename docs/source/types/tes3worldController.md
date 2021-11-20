@@ -40,7 +40,7 @@ A value in the range [0, 1]. The (relative) maximum distance setting for AI simu
 
 **Returns**:
 
-* `result` (tes3audioController)
+* `result` ([tes3audioController](../../types/tes3audioController))
 
 ***
 
@@ -450,7 +450,7 @@ The sound played when a UI button or other control is clicked.
 
 **Returns**:
 
-* `result` (tes3menuController)
+* `result` ([tes3uiMenuController](../../types/tes3uiMenuController))
 
 ***
 
@@ -480,7 +480,7 @@ The sound played when a weapon fails its to-hit check.
 
 **Returns**:
 
-* `result` (tes3mobController)
+* `result` ([tes3mobController](../../types/tes3mobController))
 
 ***
 
@@ -634,6 +634,16 @@ If subtitles are shown. Corresponds to the "Subtitles" option in the Options men
 **Returns**:
 
 * `result` (boolean)
+
+***
+
+### `splashController`
+
+*Read-only*. Access to the splash controller.
+
+**Returns**:
+
+* `result` ([tes3splashController](../../types/tes3splashController))
 
 ***
 
