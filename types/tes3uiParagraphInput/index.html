@@ -1,0 +1,2691 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.2.3, mkdocs-material-8.2.5" name="generator"/>
+<title>tes3uiParagraphInput - Morrowind Script Extender</title>
+<link href="../../assets/stylesheets/main.2d9f7617.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.e6a45f82.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../../assets/mwse.css" rel="stylesheet"/>
+<script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="" data-md-color-primary="" data-md-color-scheme="default" dir="ltr">
+<script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#tes3uiparagraphinput">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Morrowind Script Extender" class="md-header__button md-logo" data-md-component="logo" href="../.." title="Morrowind Script Extender">
+<img alt="logo" src="../../assets/images/logo.png"/>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Morrowind Script Extender
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              tes3uiParagraphInput
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3z"></path></svg>
+</label>
+</form>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<a aria-label="Share" class="md-search__icon md-icon" data-clipboard="" data-clipboard-text="" data-md-component="search-share" href="javascript:void(0)" tabindex="-1">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08z"></path></svg>
+</a>
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/MWSE/MWSE" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zM277.3 415.7c-8.4 1.5-11.5-3.7-11.5-8 0-5.4.2-33 .2-55.3 0-15.6-5.2-25.5-11.3-30.7 37-4.1 76-9.2 76-73.1 0-18.2-6.5-27.3-17.1-39 1.7-4.3 7.4-22-1.7-45-13.9-4.3-45.7 17.9-45.7 17.9-13.2-3.7-27.5-5.6-41.6-5.6-14.1 0-28.4 1.9-41.6 5.6 0 0-31.8-22.2-45.7-17.9-9.1 22.9-3.5 40.6-1.7 45-10.6 11.7-15.6 20.8-15.6 39 0 63.6 37.3 69 74.3 73.1-4.8 4.3-9.1 11.7-10.6 22.3-9.5 4.3-33.8 11.7-48.3-13.9-9.1-15.8-25.5-17.1-25.5-17.1-16.2-.2-1.1 10.2-1.1 10.2 10.8 5 18.4 24.2 18.4 24.2 9.7 29.7 56.1 19.7 56.1 19.7 0 13.9.2 36.5.2 40.6 0 4.3-3 9.5-11.5 8-66-22.1-112.2-84.9-112.2-158.3 0-91.8 70.2-161.5 162-161.5S388 165.6 388 257.4c.1 73.4-44.7 136.3-110.7 158.3zm-98.1-61.1c-1.9.4-3.7-.4-3.9-1.7-.2-1.5 1.1-2.8 3-3.2 1.9-.2 3.7.6 3.9 1.9.3 1.3-1 2.6-3 3zm-9.5-.9c0 1.3-1.5 2.4-3.5 2.4-2.2.2-3.7-.9-3.7-2.4 0-1.3 1.5-2.4 3.5-2.4 1.9-.2 3.7.9 3.7 2.4zm-13.7-1.1c-.4 1.3-2.4 1.9-4.1 1.3-1.9-.4-3.2-1.9-2.8-3.2.4-1.3 2.4-1.9 4.1-1.5 2 .6 3.3 2.1 2.8 3.4zm-12.3-5.4c-.9 1.1-2.8.9-4.3-.6-1.5-1.3-1.9-3.2-.9-4.1.9-1.1 2.8-.9 4.3.6 1.3 1.3 1.8 3.3.9 4.1zm-9.1-9.1c-.9.6-2.6 0-3.7-1.5s-1.1-3.2 0-3.9c1.1-.9 2.8-.2 3.7 1.3 1.1 1.5 1.1 3.3 0 4.1zm-6.5-9.7c-.9.9-2.4.4-3.5-.6-1.1-1.3-1.3-2.8-.4-3.5.9-.9 2.4-.4 3.5.6 1.1 1.3 1.3 2.8.4 3.5zm-6.7-7.4c-.4.9-1.7 1.1-2.8.4-1.3-.6-1.9-1.7-1.5-2.6.4-.6 1.5-.9 2.8-.4 1.3.7 1.9 1.8 1.5 2.6z"></path></svg>
+</div>
+<div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-tabs__inner md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../..">
+      About
+    </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../guides/introduction/">
+        Guides
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../references/action-flags/">
+        References
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../apis/debug/">
+        APIs
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link md-tabs__link--active" href="../ioFile/">
+        Types
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../events/absorbedMagic/">
+        Events
+      </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Morrowind Script Extender" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="Morrowind Script Extender">
+<img alt="logo" src="../../assets/images/logo.png"/>
+</a>
+    Morrowind Script Extender
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/MWSE/MWSE" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zM277.3 415.7c-8.4 1.5-11.5-3.7-11.5-8 0-5.4.2-33 .2-55.3 0-15.6-5.2-25.5-11.3-30.7 37-4.1 76-9.2 76-73.1 0-18.2-6.5-27.3-17.1-39 1.7-4.3 7.4-22-1.7-45-13.9-4.3-45.7 17.9-45.7 17.9-13.2-3.7-27.5-5.6-41.6-5.6-14.1 0-28.4 1.9-41.6 5.6 0 0-31.8-22.2-45.7-17.9-9.1 22.9-3.5 40.6-1.7 45-10.6 11.7-15.6 20.8-15.6 39 0 63.6 37.3 69 74.3 73.1-4.8 4.3-9.1 11.7-10.6 22.3-9.5 4.3-33.8 11.7-48.3-13.9-9.1-15.8-25.5-17.1-25.5-17.1-16.2-.2-1.1 10.2-1.1 10.2 10.8 5 18.4 24.2 18.4 24.2 9.7 29.7 56.1 19.7 56.1 19.7 0 13.9.2 36.5.2 40.6 0 4.3-3 9.5-11.5 8-66-22.1-112.2-84.9-112.2-158.3 0-91.8 70.2-161.5 162-161.5S388 165.6 388 257.4c.1 73.4-44.7 136.3-110.7 158.3zm-98.1-61.1c-1.9.4-3.7-.4-3.9-1.7-.2-1.5 1.1-2.8 3-3.2 1.9-.2 3.7.6 3.9 1.9.3 1.3-1 2.6-3 3zm-9.5-.9c0 1.3-1.5 2.4-3.5 2.4-2.2.2-3.7-.9-3.7-2.4 0-1.3 1.5-2.4 3.5-2.4 1.9-.2 3.7.9 3.7 2.4zm-13.7-1.1c-.4 1.3-2.4 1.9-4.1 1.3-1.9-.4-3.2-1.9-2.8-3.2.4-1.3 2.4-1.9 4.1-1.5 2 .6 3.3 2.1 2.8 3.4zm-12.3-5.4c-.9 1.1-2.8.9-4.3-.6-1.5-1.3-1.9-3.2-.9-4.1.9-1.1 2.8-.9 4.3.6 1.3 1.3 1.8 3.3.9 4.1zm-9.1-9.1c-.9.6-2.6 0-3.7-1.5s-1.1-3.2 0-3.9c1.1-.9 2.8-.2 3.7 1.3 1.1 1.5 1.1 3.3 0 4.1zm-6.5-9.7c-.9.9-2.4.4-3.5-.6-1.1-1.3-1.3-2.8-.4-3.5.9-.9 2.4-.4 3.5.6 1.1 1.3 1.3 2.8.4 3.5zm-6.7-7.4c-.4.9-1.7 1.1-2.8.4-1.3-.6-1.9-1.7-1.5-2.6.4-.6 1.5-.9 2.8-.4 1.3.7 1.9 1.8 1.5 2.6z"></path></svg>
+</div>
+<div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../..">
+        About
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2">
+          Guides
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Guides" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+          Guides
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/introduction/">
+        Introduction
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/introduction-to-lua/">
+        Introduction to Lua
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/introduction-to-event-based-programming/">
+        Introduction to Event Based Programming
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/development-workflows/">
+        Development Workflows
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/creating-a-mod/">
+        Creating a Mod
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/logging/">
+        Logging
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/mod-config/">
+        Mod Configuration Menu
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/mod-translations/">
+        Mod Translations
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/tes3ui-events/">
+        TES3 UI Events Guide
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/tes3ui/">
+        TES3 UI Example
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/timers/">
+        Timers
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3">
+          References
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="References" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+          References
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/action-flags/">
+        Action Flags
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/active-body-part-layers/">
+        Active Body Part Layers
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/active-body-parts/">
+        Active Body Parts
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/actor-types/">
+        Actor Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/ai-behavior-states/">
+        AI Behavior States
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/ai-packages/">
+        AI Packages
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/animation-groups/">
+        Animation Groups
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/animation-start-flags/">
+        Animation Start Flags
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/animation-states/">
+        Animation States
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/apparatus-types/">
+        Apparatus Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/armor-slots/">
+        Armor Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/armor-weight-classes/">
+        Armor Weight Classes
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/attachment-types/">
+        Attachment Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/attributes/">
+        Attributes
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/body-part-attachments/">
+        Body Part Attachments
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/book-types/">
+        Book Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/clothing-slots/">
+        Clothing Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/code-patch-features/">
+        Code Patch Features
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/content-types/">
+        Content Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/creature-types/">
+        Creature Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/crime-types/">
+        Crime Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/damage-sources/">
+        Damage Sources
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/dialogue-pages/">
+        Dialogue Pages
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/dialogue-types/">
+        Dialogue Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/dynamic-effect-types/">
+        Dynamic Effect Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/effect-attributes/">
+        Effect Attributes
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/effect-event-types/">
+        Effect Event Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/effect-ranges/">
+        Effect Ranges
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/enchantment-types/">
+        Enchantment Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/events/">
+        Events
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/flow-directions/">
+        Flow Directions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/gmst/">
+        Game Settings (GMSTs)
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/inventory-tile-types/">
+        Inventory Tile Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/justify-text/">
+        Justify Text
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/key-transitions/">
+        Key Transitions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/keybinds/">
+        Keybinds
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/language/">
+        Language
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/magic-effect-flags/">
+        Magic Effect Flags
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/magic-effects/">
+        Magic Effects
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/magic-schools/">
+        Magic Schools
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/magic-source-types/">
+        Magic Source Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/merchant-service-types/">
+        Merchant Service Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/music-situations/">
+        Music Situations
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/niTypes/">
+        niTypes
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/object-types/">
+        Object Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/part-indices/">
+        Part Indices
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/physical-attack-types/">
+        Physical Attack Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/quick-key-types/">
+        Quick Key Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/scan-codes/">
+        Scan Codes
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/skill-raise-sources/">
+        Skill Raise Sources
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/skill-types/">
+        Skill Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/skills/">
+        Skills
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/sound-generator-types/">
+        Sound Generator Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/sound-mix-types/">
+        Sound Mix Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/specialization-types/">
+        Specialization Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/spell-origins/">
+        Spell Origins
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/spell-sources/">
+        Spell Sources
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/spell-states/">
+        Spell States
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/spell-types/">
+        Spell Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/texturing-properties/">
+        Texturing Properties
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/ui-events/">
+        UI Events
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/ui-properties/">
+        UI Properties
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/ui-states/">
+        UI States
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/voiceovers/">
+        Voiceovers
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/weapon-types/">
+        Weapon Types
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/weather-types/">
+        Weather Types
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_67" id="__nav_3_67" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_67">
+          MWSE-mwscript
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="MWSE-mwscript" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_67">
+<span class="md-nav__icon md-icon"></span>
+          MWSE-mwscript
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/actor/">
+        Actor Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/array/">
+        Array Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/file/">
+        File Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/iteration/">
+        Iteration Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/logic/">
+        Logic Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/lua/">
+        Lua Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/magic/">
+        Magic Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/math/">
+        Math Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/player/">
+        Player Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/reference/">
+        Reference Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/string/">
+        String Functions
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/mwse-mwscript/utility/">
+        Utility Functions
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_68" id="__nav_3_68" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_68">
+          Other
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Other" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_68">
+<span class="md-nav__icon md-icon"></span>
+          Other
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../references/other/patches/">
+        Patches
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4">
+          APIs
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="APIs" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+          APIs
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/debug/">
+        debug
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/dofile/">
+        dofile
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/event/">
+        event
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/include/">
+        include
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/json/">
+        json
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/lfs/">
+        lfs
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/lpeg/">
+        lpeg
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/math/">
+        math
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/mge/">
+        mge
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/mwscript/">
+        mwscript
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/mwse/">
+        mwse
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/mwse.stack/">
+        mwse.stack
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/mwse.string/">
+        mwse.string
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/os/">
+        os
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/re/">
+        re
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/string/">
+        string
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/table/">
+        table
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/tes3/">
+        tes3
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/tes3ui/">
+        tes3ui
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/timer.frame/">
+        timer.frame
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../apis/timer/">
+        timer
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5">
+          Types
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Types" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+          Types
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ioFile/">
+        ioFile
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../lfsLock/">
+        lfsLock
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../mwseLuaExecutor/">
+        mwseLuaExecutor
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../mwseTimer/">
+        mwseTimer
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../mwseTimerController/">
+        mwseTimerController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niAVObject/">
+        niAVObject
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niAlphaProperty/">
+        niAlphaProperty
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niAmbientLight/">
+        niAmbientLight
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niBillboardNode/">
+        niBillboardNode
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niCamera/">
+        niCamera
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niCollisionSwitch/">
+        niCollisionSwitch
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niColor/">
+        niColor
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niColorA/">
+        niColorA
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niDirectionalLight/">
+        niDirectionalLight
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niDynamicEffect/">
+        niDynamicEffect
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niDynamicEffectLinkedList/">
+        niDynamicEffectLinkedList
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niFogProperty/">
+        niFogProperty
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niFormatPrefs/">
+        niFormatPrefs
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niGeometry/">
+        niGeometry
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niGeometryData/">
+        niGeometryData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niLight/">
+        niLight
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niLookAtController/">
+        niLookAtController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niMaterialProperty/">
+        niMaterialProperty
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niNode/">
+        niNode
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niObject/">
+        niObject
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niObjectNET/">
+        niObjectNET
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niPackedColor/">
+        niPackedColor
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niPick/">
+        niPick
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niPickRecord/">
+        niPickRecord
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niPixelData/">
+        niPixelData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niPointLight/">
+        niPointLight
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niProperty/">
+        niProperty
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niPropertyLinkedList/">
+        niPropertyLinkedList
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niQuaternion/">
+        niQuaternion
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niRTTI/">
+        niRTTI
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niSourceTexture/">
+        niSourceTexture
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niSpotLight/">
+        niSpotLight
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niStencilProperty/">
+        niStencilProperty
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niSwitchNode/">
+        niSwitchNode
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niTexturingProperty/">
+        niTexturingProperty
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niTexturingPropertyMap/">
+        niTexturingPropertyMap
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niTimeController/">
+        niTimeController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niTriBasedGeometry/">
+        niTriBasedGeometry
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niTriBasedGeometryData/">
+        niTriBasedGeometryData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niTriShape/">
+        niTriShape
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niTriShapeData/">
+        niTriShapeData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../niVertexColorProperty/">
+        niVertexColorProperty
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3actionData/">
+        tes3actionData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3activator/">
+        tes3activator
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3activeMagicEffect/">
+        tes3activeMagicEffect
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3actor/">
+        tes3actor
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3actorAnimationController/">
+        tes3actorAnimationController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3aiConfig/">
+        tes3aiConfig
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3aiPackage/">
+        tes3aiPackage
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3aiPackageActivate/">
+        tes3aiPackageActivate
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3aiPackageEscort/">
+        tes3aiPackageEscort
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3aiPackageFollow/">
+        tes3aiPackageFollow
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3aiPackageTravel/">
+        tes3aiPackageTravel
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3aiPackageWander/">
+        tes3aiPackageWander
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3aiPackageWanderIdleNode/">
+        tes3aiPackageWanderIdleNode
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3aiPlanner/">
+        tes3aiPlanner
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3alchemy/">
+        tes3alchemy
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3apparatus/">
+        tes3apparatus
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3armor/">
+        tes3armor
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3audioController/">
+        tes3audioController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3baseObject/">
+        tes3baseObject
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3birthsign/">
+        tes3birthsign
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3bodyPart/">
+        tes3bodyPart
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3bodyPartManager/">
+        tes3bodyPartManager
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3bodyPartManagerActiveBodyPart/">
+        tes3bodyPartManagerActiveBodyPart
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3bodyPartManagerAttachNode/">
+        tes3bodyPartManagerAttachNode
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3book/">
+        tes3book
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3boundingBox/">
+        tes3boundingBox
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3cell/">
+        tes3cell
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3cellExteriorData/">
+        tes3cellExteriorData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3class/">
+        tes3class
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3clothing/">
+        tes3clothing
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3combatSession/">
+        tes3combatSession
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3container/">
+        tes3container
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3containerInstance/">
+        tes3containerInstance
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3creature/">
+        tes3creature
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3creatureInstance/">
+        tes3creatureInstance
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3dataHandler/">
+        tes3dataHandler
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3dialogue/">
+        tes3dialogue
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3dialogueInfo/">
+        tes3dialogueInfo
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3directInputMouseState/">
+        tes3directInputMouseState
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3door/">
+        tes3door
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3effect/">
+        tes3effect
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3enchantment/">
+        tes3enchantment
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3equipmentStack/">
+        tes3equipmentStack
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3faction/">
+        tes3faction
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3factionRank/">
+        tes3factionRank
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3factionReaction/">
+        tes3factionReaction
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3fader/">
+        tes3fader
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3game/">
+        tes3game
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3gameFile/">
+        tes3gameFile
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3gameSetting/">
+        tes3gameSetting
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3globalScript/">
+        tes3globalScript
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3globalVariable/">
+        tes3globalVariable
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3ingredient/">
+        tes3ingredient
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3inputConfig/">
+        tes3inputConfig
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3inputController/">
+        tes3inputController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3inventory/">
+        tes3inventory
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3inventoryTile/">
+        tes3inventoryTile
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3item/">
+        tes3item
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3itemData/">
+        tes3itemData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3itemStack/">
+        tes3itemStack
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3iterator/">
+        tes3iterator
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3iteratorNode/">
+        tes3iteratorNode
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3leveledCreature/">
+        tes3leveledCreature
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3leveledItem/">
+        tes3leveledItem
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3leveledListNode/">
+        tes3leveledListNode
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3light/">
+        tes3light
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3lightNode/">
+        tes3lightNode
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3lockNode/">
+        tes3lockNode
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3lockpick/">
+        tes3lockpick
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3magicEffect/">
+        tes3magicEffect
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3magicEffectInstance/">
+        tes3magicEffectInstance
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3magicSourceInstance/">
+        tes3magicSourceInstance
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3markData/">
+        tes3markData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3matrix33/">
+        tes3matrix33
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3matrix44/">
+        tes3matrix44
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3misc/">
+        tes3misc
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3mobController/">
+        tes3mobController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3mobileActor/">
+        tes3mobileActor
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3mobileCreature/">
+        tes3mobileCreature
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3mobileNPC/">
+        tes3mobileNPC
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3mobileObject/">
+        tes3mobileObject
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3mobilePlayer/">
+        tes3mobilePlayer
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3mobileProjectile/">
+        tes3mobileProjectile
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3mobileSpellProjectile/">
+        tes3mobileSpellProjectile
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3moon/">
+        tes3moon
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3nonDynamicData/">
+        tes3nonDynamicData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3npc/">
+        tes3npc
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3npcInstance/">
+        tes3npcInstance
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3object/">
+        tes3object
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3packedColor/">
+        tes3packedColor
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3physicalObject/">
+        tes3physicalObject
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3playerAnimationController/">
+        tes3playerAnimationController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3probe/">
+        tes3probe
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3processManager/">
+        tes3processManager
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3projectileController/">
+        tes3projectileController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3quest/">
+        tes3quest
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3quickKey/">
+        tes3quickKey
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3race/">
+        tes3race
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3raceBaseAttribute/">
+        tes3raceBaseAttribute
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3raceBodyParts/">
+        tes3raceBodyParts
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3raceHeightWeight/">
+        tes3raceHeightWeight
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3raceSkillBonus/">
+        tes3raceSkillBonus
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3rangeInt/">
+        tes3rangeInt
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3rechargingItem/">
+        tes3rechargingItem
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3reference/">
+        tes3reference
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3referenceList/">
+        tes3referenceList
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3region/">
+        tes3region
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3regionSound/">
+        tes3regionSound
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3repairTool/">
+        tes3repairTool
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3script/">
+        tes3script
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3scriptContext/">
+        tes3scriptContext
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3skill/">
+        tes3skill
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3soulGemData/">
+        tes3soulGemData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3sound/">
+        tes3sound
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3soundGenerator/">
+        tes3soundGenerator
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3spell/">
+        tes3spell
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3spellList/">
+        tes3spellList
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3splashController/">
+        tes3splashController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3splashControllerActiveSplash/">
+        tes3splashControllerActiveSplash
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3startScript/">
+        tes3startScript
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3static/">
+        tes3static
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3statistic/">
+        tes3statistic
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3statisticSkill/">
+        tes3statisticSkill
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3transform/">
+        tes3transform
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3travelDestinationNode/">
+        tes3travelDestinationNode
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiButton/">
+        tes3uiButton
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiElement/">
+        tes3uiElement
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiEventData/">
+        tes3uiEventData
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiFillBar/">
+        tes3uiFillBar
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiFontColor/">
+        tes3uiFontColor
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiMenuController/">
+        tes3uiMenuController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiMenuInputController/">
+        tes3uiMenuInputController
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+          tes3uiParagraphInput
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+        tes3uiParagraphInput
+      </a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#properties">
+    Properties
+  </a>
+<nav aria-label="Properties" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#lengthlimit">
+    lengthLimit
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiProperty/">
+        tes3uiProperty
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiScrollPane/">
+        tes3uiScrollPane
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiSlider/">
+        tes3uiSlider
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiTextInput/">
+        tes3uiTextInput
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3uiTextSelect/">
+        tes3uiTextSelect
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3vector2/">
+        tes3vector2
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3vector3/">
+        tes3vector3
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3vector4/">
+        tes3vector4
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weapon/">
+        tes3weapon
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3wearablePart/">
+        tes3wearablePart
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weather/">
+        tes3weather
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherAsh/">
+        tes3weatherAsh
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherBlight/">
+        tes3weatherBlight
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherBlizzard/">
+        tes3weatherBlizzard
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherClear/">
+        tes3weatherClear
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherCloudy/">
+        tes3weatherCloudy
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherController/">
+        tes3weatherController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherFoggy/">
+        tes3weatherFoggy
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherOvercast/">
+        tes3weatherOvercast
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherRain/">
+        tes3weatherRain
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherSnow/">
+        tes3weatherSnow
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3weatherThunder/">
+        tes3weatherThunder
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3worldController/">
+        tes3worldController
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3worldControllerRenderCamera/">
+        tes3worldControllerRenderCamera
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../tes3worldControllerRenderCameraData/">
+        tes3worldControllerRenderCameraData
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6">
+          Events
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="Events" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+          Events
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/absorbedMagic/">
+        absorbedMagic
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/activate/">
+        activate
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/activationTargetChanged/">
+        activationTargetChanged
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/addSound/">
+        addSound
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/addTempSound/">
+        addTempSound
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/attack/">
+        attack
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/attackStart/">
+        attackStart
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/barterOffer/">
+        barterOffer
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/bodyPartAssigned/">
+        bodyPartAssigned
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/bodyPartsUpdated/">
+        bodyPartsUpdated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/bookGetText/">
+        bookGetText
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/buttonPressed/">
+        buttonPressed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcArmorPieceHit/">
+        calcArmorPieceHit
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcArmorRating/">
+        calcArmorRating
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcBarterPrice/">
+        calcBarterPrice
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcFlySpeed/">
+        calcFlySpeed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcHitChance/">
+        calcHitChance
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcMoveSpeed/">
+        calcMoveSpeed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcRepairPrice/">
+        calcRepairPrice
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcRestInterrupt/">
+        calcRestInterrupt
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcRunSpeed/">
+        calcRunSpeed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcSoulValue/">
+        calcSoulValue
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcSpellPrice/">
+        calcSpellPrice
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcSunDamageScalar/">
+        calcSunDamageScalar
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcSwimRunSpeed/">
+        calcSwimRunSpeed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcSwimSpeed/">
+        calcSwimSpeed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcTrainingPrice/">
+        calcTrainingPrice
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcTravelPrice/">
+        calcTravelPrice
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/calcWalkSpeed/">
+        calcWalkSpeed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/cellActivated/">
+        cellActivated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/cellChanged/">
+        cellChanged
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/cellDeactivated/">
+        cellDeactivated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/collideWater/">
+        collideWater
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/collision/">
+        collision
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/combatStart/">
+        combatStart
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/combatStarted/">
+        combatStarted
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/combatStop/">
+        combatStop
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/combatStopped/">
+        combatStopped
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/containerClosed/">
+        containerClosed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/convertReferenceToItem/">
+        convertReferenceToItem
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/crimeWitnessed/">
+        crimeWitnessed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/damage/">
+        damage
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/damageHandToHand/">
+        damageHandToHand
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/damaged/">
+        damaged
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/damagedHandToHand/">
+        damagedHandToHand
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/death/">
+        death
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/detectSneak/">
+        detectSneak
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/determineAction/">
+        determineAction
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/determinedAction/">
+        determinedAction
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/enchantChargeUse/">
+        enchantChargeUse
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/enterFrame/">
+        enterFrame
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/equip/">
+        equip
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/equipmentReevaluated/">
+        equipmentReevaluated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/equipped/">
+        equipped
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/exerciseSkill/">
+        exerciseSkill
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/filterBarterMenu/">
+        filterBarterMenu
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/filterContentsMenu/">
+        filterContentsMenu
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/filterInventory/">
+        filterInventory
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/filterInventorySelect/">
+        filterInventorySelect
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/filterSoulGemTarget/">
+        filterSoulGemTarget
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/infoFilter/">
+        infoFilter
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/infoGetText/">
+        infoGetText
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/infoLinkResolve/">
+        infoLinkResolve
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/infoResponse/">
+        infoResponse
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/initialized/">
+        initialized
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/isGuard/">
+        isGuard
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/itemDropped/">
+        itemDropped
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/itemTileUpdated/">
+        itemTileUpdated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/journal/">
+        journal
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/key/">
+        key
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/keyDown/">
+        keyDown
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/keyUp/">
+        keyUp
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/keyframesLoad/">
+        keyframesLoad
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/levelUp/">
+        levelUp
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/leveledCreaturePicked/">
+        leveledCreaturePicked
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/leveledItemPicked/">
+        leveledItemPicked
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/load/">
+        load
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/loaded/">
+        loaded
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/lockPick/">
+        lockPick
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/magicCasted/">
+        magicCasted
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/magicEffectsResolved/">
+        magicEffectsResolved
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/menuEnter/">
+        menuEnter
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/menuExit/">
+        menuExit
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/meshLoad/">
+        meshLoad
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/meshLoaded/">
+        meshLoaded
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/mobileActivated/">
+        mobileActivated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/mobileDeactivated/">
+        mobileDeactivated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/modConfigReady/">
+        modConfigReady
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/mouseAxis/">
+        mouseAxis
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/mouseButtonDown/">
+        mouseButtonDown
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/mouseButtonUp/">
+        mouseButtonUp
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/mouseWheel/">
+        mouseWheel
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/musicSelectTrack/">
+        musicSelectTrack
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/objectInvalidated/">
+        objectInvalidated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/playGroup/">
+        playGroup
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/playItemSound/">
+        playItemSound
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/postInfoResponse/">
+        postInfoResponse
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/potionBrewFailed/">
+        potionBrewFailed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/potionBrewSkillCheck/">
+        potionBrewSkillCheck
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/potionBrewed/">
+        potionBrewed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/powerRecharged/">
+        powerRecharged
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/preLevelUp/">
+        preLevelUp
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/preventRest/">
+        preventRest
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/projectileExpire/">
+        projectileExpire
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/projectileHitActor/">
+        projectileHitActor
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/projectileHitObject/">
+        projectileHitObject
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/projectileHitTerrain/">
+        projectileHitTerrain
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/referenceActivated/">
+        referenceActivated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/referenceDeactivated/">
+        referenceDeactivated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/referenceSceneNodeCreated/">
+        referenceSceneNodeCreated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/restInterrupt/">
+        restInterrupt
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/save/">
+        save
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/saved/">
+        saved
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/simulate/">
+        simulate
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/skillRaised/">
+        skillRaised
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/soundObjectPlay/">
+        soundObjectPlay
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/spellCast/">
+        spellCast
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/spellCasted/">
+        spellCasted
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/spellCastedFailure/">
+        spellCastedFailure
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/spellCreated/">
+        spellCreated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/spellMagickaUse/">
+        spellMagickaUse
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/spellResist/">
+        spellResist
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/spellTick/">
+        spellTick
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/topicAdded/">
+        topicAdded
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/trapDisarm/">
+        trapDisarm
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/uiActivated/">
+        uiActivated
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/uiEvent/">
+        uiEvent
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/uiObjectTooltip/">
+        uiObjectTooltip
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/uiPreEvent/">
+        uiPreEvent
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/uiRefreshed/">
+        uiRefreshed
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/uiShowRestMenu/">
+        uiShowRestMenu
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/uiSpellTooltip/">
+        uiSpellTooltip
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/unequipped/">
+        unequipped
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/weaponReadied/">
+        weaponReadied
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/weaponUnreadied/">
+        weaponUnreadied
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/weatherChangedImmediate/">
+        weatherChangedImmediate
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/weatherCycled/">
+        weatherCycled
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/weatherTransitionFinished/">
+        weatherTransitionFinished
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/weatherTransitionImmediate/">
+        weatherTransitionImmediate
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../events/weatherTransitionStarted/">
+        weatherTransitionStarted
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#properties">
+    Properties
+  </a>
+<nav aria-label="Properties" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#lengthlimit">
+    lengthLimit
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="tes3uiparagraphinput">tes3uiParagraphInput<a class="headerlink" href="#tes3uiparagraphinput" title="Permanent link">⚓︎</a></h1>
+<p>A structure containing properties specific to paragraph inputs.</p>
+<h2 id="properties">Properties<a class="headerlink" href="#properties" title="Permanent link">⚓︎</a></h2>
+<h3 id="lengthlimit"><code>lengthLimit</code><a class="headerlink" href="#lengthlimit" title="Permanent link">⚓︎</a></h3>
+<p><em>Default</em>: <code>1023</code>. The character limit. Inputting additional characters will not be possible if this limit has been reached.</p>
+<p><strong>Returns</strong>:</p>
+<ul>
+<li><code>result</code> (number)</li>
+</ul>
+<hr/>
+</article>
+</div>
+</div>
+<a class="md-top md-icon" data-md-component="top" data-md-state="hidden" href="#">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path></svg>
+            Back to top
+          </a>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: tes3uiMenuInputController" class="md-footer__link md-footer__link--prev" href="../tes3uiMenuInputController/" rel="prev">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</div>
+<div class="md-footer__title">
+<div class="md-ellipsis">
+<span class="md-footer__direction">
+                Previous
+              </span>
+              tes3uiMenuInputController
+            </div>
+</div>
+</a>
+<a aria-label="Next: tes3uiProperty" class="md-footer__link md-footer__link--next" href="../tes3uiProperty/" rel="next">
+<div class="md-footer__title">
+<div class="md-ellipsis">
+<span class="md-footer__direction">
+                Next
+              </span>
+              tes3uiProperty
+            </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotate", "content.tabs.link", "navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+<script src="../../assets/javascripts/bundle.467223ff.min.js"></script>
+<script src="../../assets/js/reloadMermaidPagesOnPaletteSwitch.js"></script>
+</body>
+</html>
