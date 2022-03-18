@@ -14,7 +14,7 @@ The movement event flow is described below:
 --- @param e calcMoveSpeedEventData
 local function calcMoveSpeedCallback(e)
 end
-event.register("calcMoveSpeed", calcMoveSpeedCallback)
+event.register(tes3.event.calcMoveSpeed, calcMoveSpeedCallback)
 ```
 
 !!! tip
@@ -33,9 +33,9 @@ event.register("calcMoveSpeed", calcMoveSpeedCallback)
 
 	```lua
 	local function onCalcMoveSpeed(e)
-	    if (e.reference == tes3.player) then
-	        e.speed = e.speed * 1.2
-	    end
+		if (e.reference == tes3.player) then
+			e.speed = e.speed * 1.2
+		end
 	end
 	event.register(tes3.event.calcMoveSpeed, onCalcMoveSpeed)
 

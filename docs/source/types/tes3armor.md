@@ -187,7 +187,7 @@ The next object in parent collection's list.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -207,7 +207,7 @@ The collection responsible for holding this object.
 
 ### `parts`
 
-*Read-only*. An array-style table of the tes3wearablePart data on the object.
+*Read-only*. An array-style table of the [`tes3wearablePart`](https://mwse.github.io/MWSE/types/tes3wearablePart/) data on the object.
 
 **Returns**:
 
@@ -287,7 +287,7 @@ The script that runs on the object.
 
 ### `slot`
 
-The slot used by the armor.
+The slot used by the armor. Maps to [`tes3.armorSlot`](https://mwse.github.io/MWSE/references/armor-slots/) namespace.
 
 **Returns**:
 
@@ -367,7 +367,7 @@ The weight of the object.
 
 ### `weightClass`
 
-*Read-only*. The weight class of the armor. This value maps to tes3.armorWeightClass.* constants.
+*Read-only*. The weight class of the armor. This value maps to [`tes3.armorWeightClass`](https://mwse.github.io/MWSE/references/armor-weight-classes/) constants.
 
 **Returns**:
 

@@ -1,12 +1,12 @@
 # damageHandToHand
 
-The damageHandToHand event triggers before an actor takes fatigue damage from hand-to-hand combat. It does not trigger on health damage, but the 'damage' event will. The fatigueDamage value can be modified, or can be prevented completely by blocking the event. The player as attacker will gain hand-to-hand experience only if fatigueDamage is greater than zero.
+The damageHandToHand event triggers before an actor takes fatigue damage from hand-to-hand combat. It does not trigger on health damage, but the `damage` event will. The `fatigueDamage` value can be modified, or can be prevented completely by blocking the event. The player as attacker will gain hand-to-hand experience only if `fatigueDamage` is greater than zero.
 
 ```lua
 --- @param e damageHandToHandEventData
 local function damageHandToHandCallback(e)
 end
-event.register("damageHandToHand", damageHandToHandCallback)
+event.register(tes3.event.damageHandToHand, damageHandToHandCallback)
 ```
 
 !!! tip

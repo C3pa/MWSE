@@ -4,7 +4,7 @@
 
 namespace TES3 {
 	struct Statistic_vTable {
-		float (__thiscall * getCurrentValue)(Statistic*);
+		float (__thiscall * getCurrentValue)(const Statistic*);
 	};
 
 	struct Statistic {
@@ -16,15 +16,15 @@ namespace TES3 {
 		// Virtual table function wrappers.
 		//
 
-		float getCurrent();
+		float getCurrent() const;
 
 		//
 		// Other related this-call functions.
 		//
 
-		float getBase();
-		float getCurrentRaw();
-		float getNormalized();
+		float getBase() const;
+		float getCurrentRaw() const;
+		float getNormalized() const;
 
 		void modBaseCapped(float delta, bool capAt0, bool capAt100);
 		void modCurrentCapped(float delta, bool capAt0, bool capAtBase, bool capAt100);
@@ -45,7 +45,7 @@ namespace TES3 {
 
 
 	struct SkillStatistic : Statistic {
-		unsigned int type; // 0xC // Not specialization?
+		unsigned int type; // 0xC // Values from TES3::SkillType::SkillType enumeration
 
 		//
 		// Other related this-call functions.

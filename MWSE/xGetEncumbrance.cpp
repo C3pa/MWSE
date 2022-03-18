@@ -1,24 +1,3 @@
-/************************************************************************
-
-	xGetEncumbrance.cpp - Copyright (c) 2008 The MWSE Project
-	https://github.com/MWSE/MWSE/
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-**************************************************************************/
-
 #include "VMExecuteInterface.h"
 #include "Stack.h"
 #include "InstructionInterface.h"
@@ -29,16 +8,11 @@
 #include "TES3Reference.h"
 #include "TES3WorldController.h"
 
-using namespace mwse;
-
-namespace mwse
-{
-	class xGetEncumbrance : mwse::InstructionInterface_t
-	{
+namespace mwse {
+	class xGetEncumbrance : InstructionInterface_t {
 	public:
 		xGetEncumbrance();
-		virtual float execute(VMExecuteInterface &virtualMachine);
-		virtual void loadParameters(VMExecuteInterface &virtualMachine);
+		virtual float execute(VMExecuteInterface& virtualMachine);
 
 		enum EncumbranceQueryType {
 			CurrentEncumbrance = 0,
@@ -51,10 +25,7 @@ namespace mwse
 
 	xGetEncumbrance::xGetEncumbrance() : mwse::InstructionInterface_t(OpCode::xGetEncumbrance) {}
 
-	void xGetEncumbrance::loadParameters(mwse::VMExecuteInterface &virtualMachine) {}
-
-	float xGetEncumbrance::execute(mwse::VMExecuteInterface &virtualMachine)
-	{
+	float xGetEncumbrance::execute(mwse::VMExecuteInterface& virtualMachine) {
 		// Get parameters.
 		EncumbranceQueryType queryType = static_cast<EncumbranceQueryType>(mwse::Stack::getInstance().popLong());
 		bool roundResult = mwse::Stack::getInstance().popLong();
@@ -62,9 +33,9 @@ namespace mwse
 		// Get reference to target.
 		TES3::Reference* reference = virtualMachine.getReference();
 		if (reference == NULL) {
-#if _DEBUG
-			mwse::log::getLog() << "xGetEncumbrance: No reference provided." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xGetEncumbrance: No reference provided." << std::endl;
+			}
 			mwse::Stack::getInstance().pushFloat(0.0f);
 			return 0.0f;
 		}
@@ -72,18 +43,18 @@ namespace mwse
 		// Get record for reference.
 		TES3::BaseObject* record = reference->baseObject;
 		if (record == NULL) {
-#if _DEBUG
-			mwse::log::getLog() << "xGetEncumbrance: No record found for reference." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xGetEncumbrance: No record found for reference." << std::endl;
+			}
 			mwse::Stack::getInstance().pushFloat(0.0f);
 			return 0.0f;
 		}
 
 		// This function only supports creatures and NPCs.
 		if (record->objectType != TES3::ObjectType::NPC && record->objectType != TES3::ObjectType::Creature) {
-#if _DEBUG
-			mwse::log::getLog() << "xGetEncumbrance: Called on unsupported record type " << record->objectType << "." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xGetEncumbrance: Called on unsupported record type " << record->objectType << "." << std::endl;
+			}
 			mwse::Stack::getInstance().pushFloat(0.0f);
 			return 0.0f;
 		}
@@ -93,9 +64,9 @@ namespace mwse
 		// Get associated MACP node.
 		auto mobileObject = reference->getAttachedMobileActor();
 		if (mobileObject == NULL) {
-#if _DEBUG
-			mwse::log::getLog() << "xGetEncumbrance: No associated macp record found for reference." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xGetEncumbrance: No associated macp record found for reference." << std::endl;
+			}
 			mwse::Stack::getInstance().pushFloat(0.0f);
 			return 0.0f;
 		}

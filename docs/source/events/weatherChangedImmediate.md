@@ -1,12 +1,12 @@
 # weatherChangedImmediate
 
-The weatherChangedImmediate event occurs when the currently simulated weather is changed without transition. This can occur when going from an interior to an exterior in a new region, or while resting. This can interrupt weather transitions, which means the weatherTransitionFinished event will not be triggered.
+The weatherChangedImmediate event occurs when the currently simulated weather is changed without transition. This can occur when going from an interior to an exterior in a new region, or while resting. This can interrupt weather transitions, which means the `weatherTransitionFinished` event will not be triggered.
 
 ```lua
 --- @param e weatherChangedImmediateEventData
 local function weatherChangedImmediateCallback(e)
 end
-event.register("weatherChangedImmediate", weatherChangedImmediateCallback)
+event.register(tes3.event.weatherChangedImmediate, weatherChangedImmediateCallback)
 ```
 
 !!! tip

@@ -77,7 +77,7 @@ Access to the raw damage that this projectile will inflict.
 
 ### `expire`
 
-A flag that causes the projectile to expire when set to 1.
+A flag that causes the projectile to expire when set to `1`.
 
 **Returns**:
 
@@ -167,7 +167,7 @@ Access to the root mobile object movement flags, represented as an integer. Shou
 
 ### `objectType`
 
-*Read-only*. The type of mobile object. Maps to values in tes3.objectType.
+*Read-only*. The type of mobile object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/) namespace.
 
 **Returns**:
 
@@ -227,11 +227,21 @@ The angular speed that the projectile rotates around its local Y axis.
 
 ### `spellInstance`
 
-A quick access to tes3magicSourceInstance object of this tes3mobileProjectile if aplicable.
+Access to the magic source instance of the object.
 
 **Returns**:
 
 * `result` ([tes3magicSourceInstance](../../types/tes3magicSourceInstance))
+
+***
+
+### `spellInstanceSerial`
+
+Unique indentifier for just this magic source.
+
+**Returns**:
+
+* `result` (number)
 
 ***
 

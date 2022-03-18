@@ -6,7 +6,7 @@ This event is called after any leveled item list is resolved.
 --- @param e leveledItemPickedEventData
 local function leveledItemPickedCallback(e)
 end
-event.register("leveledItemPicked", leveledItemPickedCallback)
+event.register(tes3.event.leveledItemPicked, leveledItemPickedCallback)
 ```
 
 !!! tip
@@ -22,4 +22,5 @@ event.register("leveledItemPicked", leveledItemPickedCallback)
 
 * `list` ([tes3leveledItem](../../types/tes3leveledItem)): *Read-only*. The list responsible for creating a pick.
 * `pick` ([tes3item](../../types/tes3item)): The result of the pick by vanilla mechanism.
+* `spawner` ([tes3reference](../../types/tes3reference), nil): The reference for the inventory that the item is being picked in. In many cases this may be `nil`.
 

@@ -44,3 +44,7 @@ build/dist/
 /packages/
 misc/package/Data Files/MWSE/core/lpeg.dll
 /docs/site/
+#Keep the lua deps for building docs
+!/autocomplete/lua/**.*
+#Keep definitions for debug library extensions
+!/autocomplete/definitions/global/**

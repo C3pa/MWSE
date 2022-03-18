@@ -6,7 +6,7 @@ This event fires when a lock is being picked.
 --- @param e lockPickEventData
 local function lockPickCallback(e)
 end
-event.register("lockPick", lockPickCallback)
+event.register(tes3.event.lockPick, lockPickCallback)
 ```
 
 !!! tip
@@ -18,9 +18,9 @@ event.register("lockPick", lockPickCallback)
 ## Event Data
 
 * `chance` (number): *Read-only*. The chance the lockpick will be successful.
-* `lockData` (tes3lockAttachmentNode): *Read-only*. The lock data of the reference.
+* `lockData` ([tes3lockNode](../../types/tes3lockNode)): *Read-only*. The lock data of the reference.
 * `lockPresent` (boolean): *Read-only*. Indicates if a lock is present on the reference.
-* `picker` (tes3mobileNpc): *Read-only*. The Mobile NPC doing the disarming.
+* `picker` ([tes3mobileNPC](../../types/tes3mobileNPC)): *Read-only*. The Mobile NPC doing the disarming.
 * `reference` ([tes3reference](../../types/tes3reference)): *Read-only*. The reference that triggered the event (container, door, etc.).
 * `tool` ([tes3item](../../types/tes3item)): *Read-only*. The item the picker is using to pick the lock.
 * `toolItemData` ([tes3itemData](../../types/tes3itemData)): *Read-only*. The item data for the tool.

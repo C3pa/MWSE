@@ -6,7 +6,7 @@ This event is invoked whenever an actor makes an attack with their fists or a we
 --- @param e attackEventData
 local function attackCallback(e)
 end
-event.register("attack", attackCallback)
+event.register(tes3.event.attack, attackCallback)
 ```
 
 !!! tip
@@ -28,17 +28,17 @@ event.register("attack", attackCallback)
 
 	```lua
 	local function myOnAttackCallback(e)
-	    -- Someone other than the player is attacking.
-	    if (e.reference ~= tes3.player) then
-	        return
-	    end
+		-- Someone other than the player is attacking.
+		if (e.reference ~= tes3.player) then
+			return
+		end
 	
-	    -- We hit someone!
-	    if (e.targetReference ~= nil) then
-	        tes3.messageBox("You hit %s!", e.targetReference.object.name or e.targetReference.object.id)
-	    end
+		-- We hit someone!
+		if (e.targetReference ~= nil) then
+			tes3.messageBox("You hit %s!", e.targetReference.object.name or e.targetReference.object.id)
+		end
 	end
-	event.register("attack", myOnAttackCallback)
+	event.register(tes3.event.attack, myOnAttackCallback)
 
 	```
 

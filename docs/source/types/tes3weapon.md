@@ -277,7 +277,7 @@ The next object in parent collection's list.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -317,7 +317,7 @@ The previous object in parent collection's list.
 
 ### `reach`
 
-The weapon's relative reach. A value of 1.0 is the standard reach. It is multiplied by the GMST fCombatDistance to find the attack reach in world units.
+The weapon's relative reach. A value of `1.0` is the standard reach. It is multiplied by the GMST `fCombatDistance` to find the attack reach in world units.
 
 **Returns**:
 
@@ -387,11 +387,28 @@ Gets the skill data for the attack skill used by the weapon.
 
 ### `skillId`
 
-Gets the skill ID for the attack skill used by the weapon.
+Gets the skill ID for the attack skill used by the weapon. Maps to values in [`tes3.skill`](https://mwse.github.io/MWSE/references/skills/) namespace.
 
 **Returns**:
 
 * `result` (number)
+
+??? example "Example: Print the name of the skill the attacker's weapon uses"
+
+	```lua
+	
+	local function showMessage(e)
+		if e.mobile.readiedWeapon then
+			local id = e.mobile.readiedWeapon.object.skillId
+			local name = tes3.getSkillName(id)
+	
+			tes3.messageBox(name)
+		end
+	end
+	
+	event.register(tes3.event.attackStart, showMessage)
+
+	```
 
 ***
 
@@ -437,7 +454,7 @@ The soruceless flag of the object.
 
 ### `speed`
 
-The relative attack speed of the weapon. Controls attack timing and animation speed. Standard speed is 1.0.
+The relative attack speed of the weapon. Controls attack timing and animation speed. Standard speed is `1.0`.
 
 **Returns**:
 
@@ -487,7 +504,7 @@ Thrust damage inflicted at minimum weapon swing.
 
 ### `type`
 
-*Read-only*. A number representing the weapon type. Matches values from the tes3.weaponType table.
+*Read-only*. A number representing the weapon type. Matches values from the [`tes3.weaponType`](https://mwse.github.io/MWSE/references/weapon-types/) table.
 
 **Returns**:
 

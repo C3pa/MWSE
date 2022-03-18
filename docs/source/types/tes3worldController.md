@@ -16,7 +16,7 @@ A value in the range [0, 1]. The (relative) maximum distance setting for AI simu
 
 ### `allMobileActors`
 
-*Read-only*. The list of all active mobile actors (`tes3mobileActor`). Mobile actors expire after 72 hours if they have not been in a loaded cell.
+*Read-only*. The list of all active mobile actors ([`tes3mobileActor`](https://mwse.github.io/MWSE/types/tes3mobileActor/)). Mobile actors expire after 72 hours if they have not been in a loaded cell.
 
 **Returns**:
 
@@ -26,11 +26,11 @@ A value in the range [0, 1]. The (relative) maximum distance setting for AI simu
 
 ### `armCamera`
 
-*Read-only*. 
+*Read-only*. The access to the first person arms camera.
 
 **Returns**:
 
-* `result` (tes3worldControllerRenderCamera)
+* `result` ([tes3worldControllerRenderCamera](../../types/tes3worldControllerRenderCamera))
 
 ***
 
@@ -70,7 +70,7 @@ A value in the range [0, 1]. The (relative) maximum distance setting for AI simu
 
 **Returns**:
 
-* `result` (tes3global)
+* `result` ([tes3globalVariable](../../types/tes3globalVariable))
 
 ***
 
@@ -120,7 +120,7 @@ If the target crosshair is disabled. Corresponds to the "Crosshair" option in th
 
 **Returns**:
 
-* `result` (tes3global)
+* `result` ([tes3globalVariable](../../types/tes3globalVariable))
 
 ***
 
@@ -130,7 +130,7 @@ If the target crosshair is disabled. Corresponds to the "Crosshair" option in th
 
 **Returns**:
 
-* `result` (tes3global)
+* `result` ([tes3globalVariable](../../types/tes3globalVariable))
 
 ***
 
@@ -266,7 +266,7 @@ If teleporting is disabled.
 
 ### `handToHandHit2Sound`
 
-A sound played when a hand to hand attack hits. For each attack, handToHandHitSound or handToHandHitSound2 are randomly chosen.
+A sound played when a hand to hand attack hits. For each attack, `handToHandHitSound` or `handToHandHitSound2` are randomly chosen.
 
 **Returns**:
 
@@ -276,7 +276,7 @@ A sound played when a hand to hand attack hits. For each attack, handToHandHitSo
 
 ### `handToHandHitSound`
 
-A sound played when a hand to hand attack hits. For each attack, handToHandHitSound or handToHandHitSound2 are randomly chosen.
+A sound played when a hand to hand attack hits. For each attack, `handToHandHitSound` or `handToHandHitSound2` are randomly chosen.
 
 **Returns**:
 
@@ -330,7 +330,7 @@ A number in the range [0, 2]. The delay in seconds before a tooltip appears. Cor
 
 **Returns**:
 
-* `result` (tes3global)
+* `result` ([tes3globalVariable](../../types/tes3globalVariable))
 
 ***
 
@@ -351,6 +351,16 @@ No known effect.
 **Returns**:
 
 * `result` ([tes3inputController](../../types/tes3inputController))
+
+***
+
+### `instance`
+
+*Read-only*. 
+
+**Returns**:
+
+* `result` (HINSTANCE)
 
 ***
 
@@ -426,11 +436,11 @@ A value in the range [0, 1]. The alpha value of the black background of menus. C
 
 ### `menuCamera`
 
-*Read-only*. 
+*Read-only*. The access to the camera used to render menus.
 
 **Returns**:
 
-* `result` (tes3worldControllerRenderCamera)
+* `result` ([tes3worldControllerRenderCamera](../../types/tes3worldControllerRenderCamera))
 
 ***
 
@@ -490,7 +500,7 @@ The sound played when a weapon fails its to-hit check.
 
 **Returns**:
 
-* `result` (tes3global)
+* `result` ([tes3globalVariable](../../types/tes3globalVariable))
 
 ***
 
@@ -500,7 +510,7 @@ The sound played when a weapon fails its to-hit check.
 
 **Returns**:
 
-* `result` (tes3global)
+* `result` ([tes3globalVariable](../../types/tes3globalVariable))
 
 ***
 
@@ -531,6 +541,8 @@ The kind of music being played. Only updates when music is not muted.
 `1` Combat music
 `2` Main menu music
 
+Note: These values are available as [`tes3.musicSituation`](https://mwse.github.io/MWSE/references/music-situations/) constants
+
 **Returns**:
 
 * `result` (number)
@@ -547,6 +559,16 @@ The kind of music being played. Only updates when music is not muted.
 
 ***
 
+### `parentWindowHandle`
+
+*Read-only*. Handle to the parent window.
+
+**Returns**:
+
+* `result` (HWND)
+
+***
+
 ### `projectionDistance`
 
 
@@ -559,7 +581,7 @@ The kind of music being played. Only updates when music is not muted.
 
 ### `quests`
 
-*Read-only*. A list of all available `tes3quest`s.
+*Read-only*. A list of all available [`tes3quest`](https://mwse.github.io/MWSE/types/tes3quest/)s.
 
 **Returns**:
 
@@ -579,7 +601,7 @@ Controls if auto-save on resting or waiting is enabled. Corresponds to the "Auto
 
 ### `rechargingItems`
 
-*Read-only*. A list of enchanted items that are recharging (type `tes3rechargingItem`). Items in the list may not all belong to the player.
+*Read-only*. A list of enchanted items that are recharging (type [`tes3rechargingItem`](https://mwse.github.io/MWSE/types/tes3rechargingItem/)). Items in the list may not all belong to the player.
 
 **Returns**:
 
@@ -609,11 +631,11 @@ Period between reflection updates for pixel shader water. Not functional with MG
 
 ### `shadowCamera`
 
-*Read-only*. 
+*Read-only*. The access to the camera used for shadows rendering.
 
 **Returns**:
 
-* `result` (tes3worldControllerRenderCamera)
+* `result` ([tes3worldControllerRenderCamera](../../types/tes3worldControllerRenderCamera))
 
 ***
 
@@ -637,6 +659,16 @@ If subtitles are shown. Corresponds to the "Subtitles" option in the Options men
 
 ***
 
+### `simulationTimeScalar`
+
+A scalar used for simulation time. At the start of every frame, the `deltaTime` is multiplied by this value. Doing this here is safer than doing it in another event.
+
+**Returns**:
+
+* `result` (number)
+
+***
+
 ### `splashController`
 
 *Read-only*. Access to the splash controller.
@@ -649,11 +681,11 @@ If subtitles are shown. Corresponds to the "Subtitles" option in the Options men
 
 ### `splashscreenCamera`
 
-*Read-only*. 
+*Read-only*. The access to the camera used to render splashscreens.
 
 **Returns**:
 
-* `result` (tes3worldControllerRenderCamera)
+* `result` ([tes3worldControllerRenderCamera](../../types/tes3worldControllerRenderCamera))
 
 ***
 
@@ -693,7 +725,7 @@ When true, the game simulation loop will stop. Not normally used, and may have o
 
 **Returns**:
 
-* `result` (tes3global)
+* `result` ([tes3globalVariable](../../types/tes3globalVariable))
 
 ***
 
@@ -703,7 +735,7 @@ When true, the game simulation loop will stop. Not normally used, and may have o
 
 **Returns**:
 
-* `result` (object)
+* `result` ([tes3fader](../../types/tes3fader))
 
 ***
 
@@ -719,7 +751,7 @@ Automatically choose the best attack direction for attacks. Corresponds to the "
 
 ### `viewHeight`
 
-*Read-only*. The height of the UI viewport in pixels. Affected by UI scaling. For screen resolution, use `tes3.getViewportSize`.
+*Read-only*. The height of the UI viewport in pixels. Affected by UI scaling. For screen resolution, use [`tes3.getViewportSize()`](https://mwse.github.io/MWSE/apis/tes3/#tes3getviewportsize).
 
 **Returns**:
 
@@ -729,7 +761,7 @@ Automatically choose the best attack direction for attacks. Corresponds to the "
 
 ### `viewWidth`
 
-*Read-only*. The width of the UI viewport in pixels. Affected by UI scaling. For screen resolution, use `tes3.getViewportSize`.
+*Read-only*. The width of the UI viewport in pixels. Affected by UI scaling. For screen resolution, use [`tes3.getViewportSize()`](https://mwse.github.io/MWSE/apis/tes3/#tes3getviewportsize).
 
 **Returns**:
 
@@ -779,11 +811,11 @@ The camera FOV when the player is a werewolf.
 
 ### `worldCamera`
 
-*Read-only*. 
+*Read-only*. The access to the world camera.
 
 **Returns**:
 
-* `result` (tes3worldControllerRenderCamera)
+* `result` ([tes3worldControllerRenderCamera](../../types/tes3worldControllerRenderCamera))
 
 ***
 
@@ -793,7 +825,29 @@ The camera FOV when the player is a werewolf.
 
 **Returns**:
 
-* `result` (tes3global)
+* `result` ([tes3globalVariable](../../types/tes3globalVariable))
+
+***
+
+## Functions
+
+### `applyEnchantEffect`
+
+This function applies an enchantment's effects to a scene node.
+
+```lua
+local result = tes3worldController.applyEnchantEffect({ node = ..., enchantment = ... })
+```
+
+**Parameters**:
+
+* `params` (table)
+	* `node` ([niNode](../../types/niNode)): A scene node to which to apply the enchantment's effects.
+	* `enchantment` ([tes3enchantment](../../types/tes3enchantment)): The enchantment's effects to apply.
+
+**Returns**:
+
+* `result` (boolean)
 
 ***
 

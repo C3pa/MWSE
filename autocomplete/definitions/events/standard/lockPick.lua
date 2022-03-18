@@ -8,12 +8,12 @@ return {
 			description = "The reference that triggered the event (container, door, etc.).",
 		},
 		["lockData"] = {
-			type = "tes3lockAttachmentNode",
+			type = "tes3lockNode",
 			readOnly = true,
 			description = "The lock data of the reference.",
 		},
 		["picker"] = {
-			type = "tes3mobileNpc",
+			type = "tes3mobileNPC",
 			readOnly = true,
 			description = "The Mobile NPC doing the disarming.",
 		},

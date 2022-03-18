@@ -1,12 +1,12 @@
 # buttonPressed
 
-The buttonPressed event is unique in that it is invoked only when using tes3.messageBox to present buttons to the player.
+The buttonPressed event is unique in that it is invoked only when using `tes3.messageBox` to present buttons to the player.
 
 ```lua
 --- @param e buttonPressedEventData
 local function buttonPressedCallback(e)
 end
-event.register("buttonPressed", buttonPressedCallback)
+event.register(tes3.event.buttonPressed, buttonPressedCallback)
 ```
 
 !!! tip

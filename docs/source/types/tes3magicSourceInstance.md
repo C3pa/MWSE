@@ -35,6 +35,16 @@ No description yet available.
 
 ***
 
+### `corprusHoursSinceLastWorsen`
+
+The number of hours passed since the player's corprus state last worsened.
+
+**Returns**:
+
+* `result` (number)
+
+***
+
 ### `deleted`
 
 *Read-only*. The deleted state of the object.
@@ -127,7 +137,7 @@ The modification state of the object since the last save.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -207,7 +217,7 @@ The soruceless flag of the object.
 
 ### `sourceType`
 
-*Read-only*. The type of this magic source. Maps to tes3.magicSourceType.* constants.
+*Read-only*. The type of this magic source. Maps to [`tes3.magicSourceType`](https://mwse.github.io/MWSE/references/magic-source-types/) constants.
 
 **Returns**:
 
@@ -217,7 +227,7 @@ The soruceless flag of the object.
 
 ### `state`
 
-Shows if the state is pre-cast, cast, beginning, working, ending, retired, etc.
+Shows if the state is pre-cast, cast, beginning, working, ending, retired, etc. Maps to [`tes3.spellState`](https://mwse.github.io/MWSE/references/spell-states/) constants.
 
 **Returns**:
 
@@ -281,7 +291,7 @@ local result = tes3magicSourceInstance:getEffectInstance(index, target)
 
 **Parameters**:
 
-* `index` (number): The index in the effect list to fetch, between 0 and 7.
+* `index` (number): The index in the effect list to fetch, between `0` and `7`.
 * `target` ([tes3reference](../../types/tes3reference)): The target actor for the effect.
 
 **Returns**:
@@ -300,7 +310,7 @@ local result = tes3magicSourceInstance:getMagnitudeForIndex(index)
 
 **Parameters**:
 
-* `index` (number): The index in the effect list to fetch, between 0 and 7.
+* `index` (number): The index in the effect list to fetch, between `0` and `7`.
 
 **Returns**:
 
@@ -310,11 +320,46 @@ local result = tes3magicSourceInstance:getMagnitudeForIndex(index)
 
 ### `playVisualEffect`
 
-This function plays an effect from tes3magicSourceInstance of a given index.
+This function plays an animation for an effect from the `tes3magicSourceInstance` object.
 
 ```lua
-tes3magicSourceInstance:playVisualEffect()
+tes3magicSourceInstance:playVisualEffect({ effectIndex = ..., position = ..., visual = ..., scale = ..., reference = ... })
 ```
+
+**Parameters**:
+
+* `params` (table)
+	* `effectIndex` (number): The index in the effect whose visual will be played, a number in range [0, 7].
+	* `position` ([tes3vector3](../../types/tes3vector3), table): A table or a `tes3vector3` holding `x`, `y` and `z` coordinates at which the visual effect will be played.
+	* `visual` ([tes3physicalObject](../../types/tes3physicalObject), string): The visual effect to be played.
+	* `scale` (number): *Default*: `1`. The scale of the effect. Only applies to effects that are designed to be scaled.
+	* `reference` ([tes3reference](../../types/tes3reference), string): A reference on which the visual effect will be played.
+
+??? example "Example: Plays the soul trap effect if the player kills a target that is affected by vampirism."
+
+	```lua
+	local function onDamaged(e)
+		-- Check if we killed our target with this damage.
+		if e.killingBlow then
+			-- Iterate through the killed target's active magic effects.
+			for _, activeMagicEffect in pairs(e.mobile.activeMagicEffectList) do
+				-- Check if the target is a vampire.
+				if activeMagicEffect.effectId == tes3.effect.vampirism then
+					-- Play the soul trap visual effect at the position of the target.
+					activeMagicEffect.instance:playVisualEffect{
+						effectIndex = 0,
+						position = e.mobile.position,
+						visual = "VFX_Soul_Trap"
+					}
+					break
+				end
+			end
+		end
+	end
+	
+	event.register("damaged", onDamaged)
+
+	```
 
 ***
 

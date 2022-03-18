@@ -38,7 +38,7 @@ tes3fader:deactivate()
 
 ### `fadeIn`
 
-Transitions the fader to a value of 1 over a given duration.
+Transitions the fader to a value of `1` over a given duration.
 
 ```lua
 tes3fader:fadeIn({ duration = ... })
@@ -53,7 +53,7 @@ tes3fader:fadeIn({ duration = ... })
 
 ### `fadeOut`
 
-Transitions the fader to a value of 0 over a given duration.
+Transitions the fader to a value of `0` over a given duration.
 
 ```lua
 tes3fader:fadeOut({ duration = ... })
@@ -104,7 +104,7 @@ local result = tes3fader:setColor({ color = ..., flag = ... })
 
 ### `setTexture`
 
-Updates the fader for the current frame.
+This method allows changing the texture of the fader.
 
 ```lua
 tes3fader:setTexture(path)

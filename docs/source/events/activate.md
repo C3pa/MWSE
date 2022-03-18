@@ -14,7 +14,7 @@ Some examples of when the activate event fires includes:
 --- @param e activateEventData
 local function activateCallback(e)
 end
-event.register("activate", activateCallback)
+event.register(tes3.event.activate, activateCallback)
 ```
 
 !!! tip
@@ -48,7 +48,7 @@ event.register("activate", activateCallback)
 			return false
 		end
 	end
-	event.register("activate", myOnActivateCallback)
+	event.register(tes3.event.activate, myOnActivateCallback)
 
 	```
 
@@ -61,7 +61,7 @@ event.register("activate", activateCallback)
 			tes3.messageBox({ message = "Activated " .. e.target.object.id })
 		end
 	end
-	event.register("activate", myOnActivateCallback)
+	event.register(tes3.event.activate, myOnActivateCallback)
 
 	```
 

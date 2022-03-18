@@ -6,7 +6,7 @@ This event is raised when a book's text is about to be displayed. By providing y
 --- @param e bookGetTextEventData
 local function bookGetTextCallback(e)
 end
-event.register("bookGetText", bookGetTextCallback)
+event.register(tes3.event.bookGetText, bookGetTextCallback)
 ```
 
 !!! tip
@@ -18,5 +18,25 @@ event.register("bookGetText", bookGetTextCallback)
 ## Event Data
 
 * `book` ([tes3book](../../types/tes3book)): *Read-only*. The book whose text is being retrieved.
-* `text` (string): If set, the book's text will be overwritten with this value.
+* `text` (string): If set, the book's text will be overwritten with this value. It needs to follow book text conventions as in the Construction Set. In essence, it uses HTML syntax. Important: every book needs to end with a `<BR>` statement to be displayed properly.
+
+## Examples
+
+!!! example "Example: Change the text of a book"
+
+	```lua
+	
+	local newText = [[
+	<DIV ALIGN="LEFT"><FONT COLOR="000000" SIZE="3" FACE="Magic Cards"><BR>
+	Sweetroll
+	<BR>
+	]]
+	
+	local function example(e)
+		e.text = newText
+	end
+	
+	event.register(tes3.event.bookGetText, example)
+
+	```
 

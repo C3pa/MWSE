@@ -57,7 +57,7 @@ The modification state of the object since the last save.
 
 ### `name`
 
-The region's name. Must be a string less than 32 characters.
+The region's name. It must be a string less than 32 characters long.
 
 **Returns**:
 
@@ -77,7 +77,7 @@ The region's name. Must be a string less than 32 characters.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -107,7 +107,7 @@ The persistent flag of the object.
 
 ### `sounds`
 
-*Read-only*. Array-style table for the different region sounds. Each object in the table is a tes3regionSound.
+*Read-only*. Array-style table for the different region sounds. Each object in the table is a [`tes3regionSound`](https://mwse.github.io/MWSE/types/tes3regionSound/).
 
 **Returns**:
 
@@ -291,7 +291,7 @@ tes3region:changeWeather(weatherId)
 
 **Parameters**:
 
-* `weatherId` (number)
+* `weatherId` (number): Maps to values in [`tes3.weather`](https://mwse.github.io/MWSE/references/weather-types/) namespace.
 
 ***
 

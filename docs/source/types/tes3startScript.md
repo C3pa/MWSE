@@ -1,6 +1,6 @@
 # tes3startScript
 
-A start script object.
+An object representing a script which autostarts at the game load.
 
 This type inherits the following: [tes3baseObject](../../types/tes3baseObject)
 ## Properties
@@ -67,7 +67,7 @@ The modification state of the object since the last save.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -87,7 +87,7 @@ The persistent flag of the object.
 
 ### `script`
 
-*Read-only*. A script which is set to start at game start with this tes3startScript object.
+*Read-only*. A script which is set to start at game start with this `tes3startScript` object.
 
 **Returns**:
 

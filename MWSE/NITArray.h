@@ -1,7 +1,5 @@
 #pragma once
 
-#define USE_STL 1
-
 namespace NI {
 	template <typename T>
 	class TArray {
@@ -148,7 +146,7 @@ namespace NI {
 #endif
 		}
 
-		TArray<T>& TArray::operator= (const TArray<T>& other) {
+		TArray<T>& operator= (const TArray<T>& other) {
 			// Clear current data.
 			clear();
 

@@ -164,10 +164,16 @@ namespace TES3 {
 		std::tuple<Matrix33, bool> invert_lua() const;
 
 		void fromEulerXYZ(float x, float y, float z);
+		bool toEulerXYZ(Vector3* vector) const;
 		bool toEulerXYZ(float* x, float* y, float* z) const;
 		std::tuple<Vector3, bool> toEulerXYZ_lua() const;
+
+		bool toEulerZYX(Vector3* vector) const;
 		bool toEulerZYX(float* x, float* y, float* z) const;
 		std::tuple<Vector3, bool> toEulerZYX_lua() const;
+
+		void fromQuaternion(const NI::Quaternion* q);
+		NI::Quaternion toQuaternion();
 
 		bool reorthogonalize();
 

@@ -99,20 +99,8 @@ namespace TES3 {
 		int unknown_0x44;
 		int unknown_0x48;
 		int unknown_0x4C;
-		int unknown_0x50;
-		int unknown_0x54;
-		int unknown_0x58;
-		int unknown_0x5C;
-		int unknown_0x60;
-		int unknown_0x64;
-		int unknown_0x68;
-		int unknown_0x6C;
-		int unknown_0x70;
-		int unknown_0x74;
-		int unknown_0x78;
-		int unknown_0x7C;
 	};
-	static_assert(sizeof(MouseController) == 0x80, "TES3::MouseController failed size validation");
+	static_assert(sizeof(MouseController) == 0x50, "TES3::MouseController failed size validation");
 
 #define MWSE_CUSTOM_KILLCOUNTER true
 	struct KillCounter {
@@ -165,6 +153,8 @@ namespace TES3 {
 
 		_declspec(dllexport) void clearIcons(int type);
 		_declspec(dllexport) void addInventoryItems(Inventory* inventory, int type);
+		_declspec(dllexport) UI::InventoryTile* findTile(Item* item, ItemData* itemData, int type);
+		_declspec(dllexport) void mergeTile(UI::InventoryTile* tile);
 
 	};
 	static_assert(sizeof(InventoryData) == 0x24, "TES3::InventoryData failed size validation");
@@ -390,6 +380,12 @@ namespace TES3 {
 
 		_declspec(dllexport) void tickClock();
 		_declspec(dllexport) void checkForDayWrapping();
+
+		//
+		// Helpful static variables.
+		//
+
+		static float simulationTimeScalar;
 
 	};
 	static_assert(sizeof(WorldController) == 0x374, "TES3::WorldController failed size validation");

@@ -157,7 +157,7 @@ The next object in parent collection's list.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -177,7 +177,7 @@ The collection responsible for holding this object.
 
 ### `parts`
 
-An array-style table of the tes3wearablePart data on the object.
+An array-style table of the [`tes3wearablePart`](https://mwse.github.io/MWSE/types/tes3wearablePart/) data on the object.
 
 **Returns**:
 
@@ -257,7 +257,7 @@ The script that runs on the object.
 
 ### `slot`
 
-The slot used by the armor.
+The slot used by the clothing object. Maps to values in [`tes3.clothingSlot`](https://mwse.github.io/MWSE/references/clothing-slots/) namespace.
 
 **Returns**:
 
@@ -267,7 +267,7 @@ The slot used by the armor.
 
 ### `slotName`
 
-The name of the slot used by the armor.
+The name of the slot used by the clothing object.
 
 **Returns**:
 

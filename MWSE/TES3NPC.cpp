@@ -8,6 +8,9 @@
 #include "TES3UIElement.h"
 
 #include "LuaManager.h"
+
+#include "LuaCalcSoulValueEvent.h"
+#include "LuaEquipmentReevaluatedEvent.h"
 #include "LuaIsGuardEvent.h"
 
 #define TES3_UI_ID_MenuDialog 0x7D3442
@@ -81,6 +84,19 @@ namespace TES3 {
 		return std::ref(skills);
 	}
 
+	sol::optional<int> NPC::getSoulValue() {
+		// Allow lua to determine the soul's value.
+		if (mwse::lua::event::CalculateSoulValueEvent::getEventEnabled()) {
+			auto& luaManager = mwse::lua::LuaManager::getInstance();
+			auto stateHandle = luaManager.getThreadSafeStateHandle();
+			sol::table payload = stateHandle.triggerEvent(new mwse::lua::event::CalculateSoulValueEvent(this));
+			if (payload.valid()) {
+				return payload["value"];
+			}
+		}
+
+		return {};
+	}
 	//
 	// NPC Instance
 	//
@@ -88,6 +104,22 @@ namespace TES3 {
 	const auto TES3_NPCInstance_calculateDisposition = reinterpret_cast<int (__thiscall*)(const NPCInstance*, bool)>(0x4DA330);
 	int NPCInstance::getDisposition(bool clamp) {
 		return TES3_NPCInstance_calculateDisposition(this, clamp);
+	}
+
+	const auto TES3_NPCInstance_reevaluateEquipment = reinterpret_cast<void(__thiscall*)(NPCInstance*)>(0x4D9A20);
+	void NPCInstance::reevaluateEquipment() {
+		if (!BIT_TEST(inventory.flags, 0)) {
+			return;
+		}
+
+		// Call original function.
+		TES3_NPCInstance_reevaluateEquipment(this);
+
+		// Fire off event to let people know equipment has been reevaluated so custom slots can be equipped.
+		if (mwse::lua::event::EquipmentReevaluatedEvent::getEventEnabled()) {
+			auto stateHandle = mwse::lua::LuaManager::getInstance().getThreadSafeStateHandle();
+			stateHandle.triggerEvent(new mwse::lua::event::EquipmentReevaluatedEvent(this));
+		}
 	}
 
 	unsigned char NPCInstance::getReputation() {
@@ -128,6 +160,10 @@ namespace TES3 {
 	
 	std::reference_wrapper<unsigned char[27]> NPCInstance::getSkills() {
 		return baseNPC->getSkills();
+	}
+
+	sol::optional<int> NPCInstance::getBaseSoulValue() {
+		return baseNPC->getSoulValue();
 	}
 
 	Class* NPCInstance::getBaseClass() {

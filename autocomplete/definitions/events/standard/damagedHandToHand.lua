@@ -1,6 +1,6 @@
 return {
 	type = "event",
-	description = "The damagedHandToHand event triggers after an actor takes fatigue damage from hand-to-hand combat. It does not trigger on health damage, but the 'damaged' event will.",
+	description = "The damagedHandToHand event triggers after an actor takes fatigue damage from hand-to-hand combat. It does not trigger on health damage, but the `damaged` event will.",
 	related = { "damage", "damaged", "damageHandToHand", "damagedHandToHand" },
 	eventData = {
 		fatigueDamage = {
@@ -18,7 +18,7 @@ return {
 			readOnly = true,
 			description = "The mobile’s associated reference.",
 		},
-        attacker = {
+		attacker = {
 			type = "tes3mobileActor",
 			readOnly = true,
 			description = "The mobile actor dealing the damage. Can be nil.",

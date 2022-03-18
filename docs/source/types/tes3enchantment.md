@@ -17,7 +17,7 @@ The blocked state of the object.
 
 ### `castType`
 
-The enchantment's cast type. Maps to tes3.enchantmentType.* constants.
+The enchantment's cast type. Maps to [`tes3.enchantmentType`](https://mwse.github.io/MWSE/references/enchantment-types/) constants.
 
 **Returns**:
 
@@ -57,7 +57,7 @@ The cost of using the enchantment.
 
 ### `effects`
 
-*Read-only*. An array-style table of the tes3effect data on the object.
+*Read-only*. An array-style table of the [`tes3effect`](https://mwse.github.io/MWSE/types/tes3effect/) data on the object.
 
 **Returns**:
 
@@ -137,7 +137,7 @@ The next object in parent collection's list.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -263,7 +263,7 @@ local string = tes3baseObject:__tojson()
 
 ### `getActiveEffectCount`
 
-Returns the amount of effects the tes3enchantment object has.
+Returns the amount of effects the `tes3enchantment` object has.
 
 ```lua
 local count = tes3enchantment:getActiveEffectCount()
@@ -277,7 +277,7 @@ local count = tes3enchantment:getActiveEffectCount()
 
 ### `getFirstIndexOfEffect`
 
-Returns the index of a first effect of a given effectId in the parent tes3enchantment object.
+Returns the index of a first effect of a given effectId in the parent `tes3enchantment` object.
 
 ```lua
 local index = tes3enchantment:getFirstIndexOfEffect(effectId)
@@ -285,7 +285,7 @@ local index = tes3enchantment:getFirstIndexOfEffect(effectId)
 
 **Parameters**:
 
-* `effectId` (number): The effectID to perform a check for. Maps to tes3.effect.* constants.
+* `effectId` (number): The effectId to perform a check for. Maps to [`tes3.effect`](https://mwse.github.io/MWSE/references/magic-effects/) constants, including magic effects added with [`tes3.addMagicEffect()`](https://mwse.github.io/MWSE/apis/tes3/#tes3addmagiceffect).
 
 **Returns**:
 

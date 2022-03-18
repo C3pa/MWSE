@@ -26,7 +26,7 @@ Access to the flag that determines if this effect can be used with spellmaking.
 
 ### `appliesOnce`
 
-Access to the base flag that determines if this effect can be used in enchanting.
+Access to the base flag that determines if this effect is applied only once.
 
 **Returns**:
 
@@ -46,7 +46,7 @@ The sound effect that plays on area of effect impacts. Can be set to ``nil`` to 
 
 ### `areaVisualEffect`
 
-No description yet available.
+The visual played when a spell with this effect, with area of effect hits something.
 
 **Returns**:
 
@@ -96,7 +96,7 @@ The sound effect that plays for magic projectiles. Can be set to ``nil`` to use 
 
 ### `boltVisualEffect`
 
-No description yet available.
+The visual played when a spell with this effect is in flight.
 
 **Returns**:
 
@@ -156,7 +156,7 @@ The sound effect that plays when casting. Can be set to ``nil`` to use the defau
 
 ### `castVisualEffect`
 
-No description yet available.
+The visual played when a spell with this effect is cast.
 
 **Returns**:
 
@@ -226,7 +226,7 @@ The sound effect that plays when the effect hits a target. Can be set to ``nil``
 
 ### `hitVisualEffect`
 
-No description yet available.
+The visual played when a spell with this effect hits something.
 
 **Returns**:
 
@@ -241,6 +241,16 @@ The path to the icon to use for the effect.
 **Returns**:
 
 * `result` (string)
+
+***
+
+### `id`
+
+*Read-only*. The unique identifier for the magic effect. Maps to values in [`tes3.effect`](https://mwse.github.io/MWSE/references/magic-effects/). Values not defined in `tes3.effect` are also possible for magic effects added by mods that don't use [`tes3.claimSpellEffectId()`](https://mwse.github.io/MWSE/apis/tes3/#tes3claimspelleffectid) to register their id.
+
+**Returns**:
+
+* `result` (number)
 
 ***
 
@@ -326,7 +336,7 @@ Access to the base flag that determines if this effect can be refreshed by recas
 
 ### `school`
 
-The school that the effect is associated with.
+The school that the effect is associated with. Maps to [`tes3.magicSchool`](https://mwse.github.io/MWSE/references/magic-schools/) constants.
 
 **Returns**:
 
@@ -336,7 +346,7 @@ The school that the effect is associated with.
 
 ### `size`
 
-No description yet available.
+The size scale for the spells containing this magic effect.
 
 **Returns**:
 
@@ -346,7 +356,7 @@ No description yet available.
 
 ### `sizeCap`
 
-No description yet available.
+The maximum possible size of the spell projectile with this effect.
 
 **Returns**:
 

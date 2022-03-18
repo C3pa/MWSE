@@ -38,13 +38,13 @@ tes3ui.captureMouseDrag(capture)
 
 	```lua
 	element:register("mouseDown", function(e)
-	    -- Capture must be inside a mouse event.
-	    tes3ui.captureMouseDrag(true)
+		-- Capture must be inside a mouse event.
+		tes3ui.captureMouseDrag(true)
 	end)
 	
 	element:register("mouseRelease", function(e)
-	    -- Release may be anywhere.
-	    tes3ui.captureMouseDrag(false)
+		-- Release may be anywhere.
+		tes3ui.captureMouseDrag(false)
 	end)
 
 	```
@@ -80,7 +80,7 @@ local result = tes3ui.createHelpLayerMenu({ id = ... })
 **Parameters**:
 
 * `params` (table)
-	* `id` (number): The menu’s ID. The menu can be later accessed by tes3ui.findHelpLayerMenu(id).
+	* `id` (string, number): The menu’s ID. The menu can be later accessed by tes3ui.findHelpLayerMenu(id).
 
 **Returns**:
 
@@ -99,7 +99,7 @@ local result = tes3ui.createMenu({ id = ..., dragFrame = ..., fixedFrame = ..., 
 **Parameters**:
 
 * `params` (table)
-	* `id` (number): The menu’s ID. The menu can be later accessed by tes3ui.findMenu(id).
+	* `id` (string, number): The menu’s ID. The menu can be later accessed by tes3ui.findMenu(id).
 	* `dragFrame` (boolean): Constructs a draggable and resizeable frame and background for the menu. It is similar to the stats, inventory, magic and map menus in the standard UI. After construction, position and minimum dimensions should be set.
 	* `fixedFrame` (boolean): Constructs a fixed (non-draggable) frame and background for the menu. The layout system should automatically centre and size it to fit whatever is added to the menu.
 	* `loadable` (boolean): *Default*: `true`. If set to false, calls to loadMenuPosition will fail.
@@ -153,7 +153,7 @@ local result = tes3ui.enterMenuMode(id)
 
 **Parameters**:
 
-* `id` (number)
+* `id` (string, number)
 
 **Returns**:
 
@@ -171,7 +171,7 @@ local result = tes3ui.findHelpLayerMenu(id)
 
 **Parameters**:
 
-* `id` (number)
+* `id` (string, number)
 
 **Returns**:
 
@@ -189,7 +189,7 @@ local result = tes3ui.findMenu(id)
 
 **Parameters**:
 
-* `id` (number): The ID of the menu to locate.
+* `id` (string, number): The ID of the menu to locate.
 
 **Returns**:
 
@@ -285,7 +285,7 @@ local scale = tes3ui.getViewportScale()
 
 ### `tes3ui.getViewportSize`
 
-Returns both the viewport width and the viewport height. Note that this value is not necessarily the real resolution of the screen. For that value, see the same-named function in the tes3 namespace. To get the scale used, check getViewportScale.
+Returns both the viewport width and the viewport height. Note that this value is not necessarily the real resolution of the screen. For that value, see the [`same-named function`](https://mwse.github.io/MWSE/apis/tes3/#tes3getviewportsize) in the tes3 namespace. To get the scale used, check `getViewportScale`.
 
 ```lua
 local width, height = tes3ui.getViewportSize()
@@ -303,16 +303,53 @@ local width, height = tes3ui.getViewportSize()
 Requests menu mode be deactivated on a menu with a given id.
 
 ```lua
-local result = tes3ui.leaveMenuMode(id)
+local result = tes3ui.leaveMenuMode()
 ```
-
-**Parameters**:
-
-* `id` (number)
 
 **Returns**:
 
 * `result` (boolean)
+
+***
+
+### `tes3ui.log`
+
+Logs a message to the console. The message accepts formatting and additional parameters matching string.format's usage.
+
+```lua
+tes3ui.log(message, formatValues)
+```
+
+**Parameters**:
+
+* `message` (string)
+* `formatValues` (variadic): *Optional*.
+
+??? example "Example: Print the type of each of the player's skills to the console"
+
+	```lua
+	
+	local function printNames(e)
+		local skillTypeNames = {
+			[0] = "Major",
+			[1] = "Minor",
+			[2] = "Miscellaneous"
+		}
+	
+		for _, skillId in pairs(tes3.skill) do
+			local skillStat = tes3.mobilePlayer:getSkillStatistic(skillId)
+			local name = tes3.getSkillName(skillId)
+			local typeName = skillTypeNames[skillStat.type]
+	
+			tes3ui.log("%s, type: %s skill", name, typeName)
+		end
+	
+		tes3.messageBox("Done! Open the console to see the result.")
+	end
+	
+	event.register(tes3.event.keyDown, printNames, { filter = tes3.scanCode.u })
+
+	```
 
 ***
 
@@ -327,7 +364,28 @@ tes3ui.logToConsole(text, isCommand)
 **Parameters**:
 
 * `text` (string)
-* `isCommand` (boolean)
+* `isCommand` (boolean): Passing `true` will make the text in the console selectable by using up arrow key. If it is a valid command, then pressing enter will call it.
+
+??? example "Example: This example describes how this function behaves with isCommand = true."
+
+	```lua
+	
+	local function example()
+		-- This will make "player->ModStrength 10" appear in the console coloured brown.
+		-- It can't be selected by using up arrow key.
+		tes3ui.logToConsole("player->ModStrength 10", false)
+	
+		-- This will make "player->ModWillpower 10" appear in the console coloured blue.
+		-- It CAN be selected by using up arrow key, and when the enter is pressed,
+		-- it will call that function.
+		tes3ui.logToConsole("player->ModWillpower 10", true)
+	
+		tes3.messageBox("Done! Open the console to see the result.")
+	end
+	
+	event.register(tes3.event.keyDown, example, { filter = tes3.scanCode.u })
+
+	```
 
 ***
 
@@ -415,7 +473,7 @@ local result = tes3ui.registerProperty(s)
 
 ### `tes3ui.showBookMenu`
 
-Displays the book menu with arbitrary text. Paging is automatically handled.
+Displays the book menu with arbitrary text. Paging is automatically handled. It needs to follow book text conventions as in the Construction Set. In essence, it uses HTML syntax. Important: every book needs to end with a `<BR>` statement to be displayed properly. See [`bookGetText`](https://mwse.github.io/MWSE/events/bookGetText/#examples) for an example of properly formatted book text.
 
 ```lua
 tes3ui.showBookMenu(text)
@@ -467,7 +525,7 @@ tes3ui.showInventorySelectMenu({ actorRef = ..., callback = ..., filter = ..., t
 
 ### `tes3ui.showScrollMenu`
 
-Displays the scroll menu with arbitrary text.
+Displays the scroll menu with arbitrary text. It needs to follow book text conventions as in the Construction Set. In essence, it uses HTML syntax. Important: every book needs to end with a `<BR>` statement to be displayed properly. See [`bookGetText`](https://mwse.github.io/MWSE/events/bookGetText/#examples) for an example of properly formatted scroll text.
 
 ```lua
 tes3ui.showScrollMenu(text)

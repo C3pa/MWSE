@@ -1,12 +1,12 @@
 # meshLoaded
 
-
+This event is triggered when a mesh is loaded.
 
 ```lua
 --- @param e meshLoadedEventData
 local function meshLoadedCallback(e)
 end
-event.register("meshLoaded", meshLoadedCallback)
+event.register(tes3.event.meshLoaded, meshLoadedCallback)
 ```
 
 !!! tip
@@ -17,6 +17,6 @@ event.register("meshLoaded", meshLoadedCallback)
 
 ## Event Data
 
-* `node` ([niAVObject](../../types/niAVObject)): 
+* `node` ([niAVObject](../../types/niAVObject)): The niAVObject-derived object of the loaded mesh.
 * `path` (string): The path to the mesh, relative to Data Files\Meshes
 

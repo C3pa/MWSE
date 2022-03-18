@@ -1,4 +1,3 @@
-
 local function saveConfig()
 	local values = {}
 	for k, _ in pairs(mwseConfig.getDefaults()) do
@@ -39,6 +38,16 @@ local config = {
 				},
 				{
 					class = "OnOffButton",
+					label = i18n("letterboxMovies.label"),
+					description = i18n("letterboxMovies.description"),
+					variable = {
+						id = "LetterboxMovies",
+						class = "TableVariable",
+						table = mwseConfig,
+					},
+				},
+				{
+					class = "OnOffButton",
 					label = i18n("patchNiFlipController.label"),
 					description = i18n("patchNiFlipController.description"),
 					variable = {
@@ -67,6 +76,16 @@ local config = {
 						table = mwseConfig,
 					},
 				},
+				{
+					class = "OnOffButton",
+					label = i18n("enableLogColors.label"),
+					description = i18n("enableLogColors.description"),
+					variable = {
+						id = "EnableLogColors",
+						class = "TableVariable",
+						table = mwseConfig,
+					},
+				}
 			},
 			sidebarComponents = {
 				{

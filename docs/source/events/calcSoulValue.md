@@ -6,7 +6,7 @@ This event is raised when determining the value of a soul, unmodified by GMSTs. 
 --- @param e calcSoulValueEventData
 local function calcSoulValueCallback(e)
 end
-event.register("calcSoulValue", calcSoulValueCallback)
+event.register(tes3.event.calcSoulValue, calcSoulValueCallback)
 ```
 
 !!! tip
@@ -15,5 +15,5 @@ event.register("calcSoulValue", calcSoulValueCallback)
 ## Event Data
 
 * `actor` ([tes3creature](../../types/tes3creature), [tes3npc](../../types/tes3npc)): *Read-only*. The actor whose soul is being evaluated.
-* `value` (number): The value of the actor's soul.
+* `value` (number, nil): The value of the actor's soul. This may be `nil` for NPCs.
 

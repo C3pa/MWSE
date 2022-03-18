@@ -23,6 +23,10 @@
 --- @field reference tes3reference *Read-only*. The reference that the object is represented by.
 --- @field script tes3script *Read-only*. Quick access to the base NPC's script.
 --- @field skills table Quick access to the base NPC's skills.
---- @field spells tes3spellList *Read-only*. Quick access to the base NPC's spell list. It is a tes3spellList, which is a list wrapper with helper functions. The actual list is accessed with .iterator. e.g. for _, spell in pairs(npc.spells.iterator) do print(spell.name) end
+--- @field soul number|nil The soul value for this NPC's base object. This is typically `nil`, unless the `calcSouLValue` event provides one for the base actor.
+--- @field spells tes3spellList *Read-only*. Quick access to the base NPC's spell list. It is a `tes3spellList`, which is a list wrapper with helper functions. The actual list is accessed with `.iterator`. e.g. `for _, spell in pairs(npc.spells.iterator) do print(spell.name) end`
 tes3npcInstance = {}
+
+--- Causes the NPC to reevaluate his/hers equipment choices and equip the best available.
+function tes3npcInstance:reevaluateEquipment() end
 

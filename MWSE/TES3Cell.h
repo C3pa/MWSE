@@ -131,7 +131,6 @@ namespace TES3 {
 
 		Reference * getFirstObjectOfType(ObjectType::ObjectType, bool) const;
 
-		bool isInterior() const;
 		int getGridX() const;
 		void setGridX(int x);
 		int getGridY() const;
@@ -141,7 +140,10 @@ namespace TES3 {
 
 		void addMapNote(Vector2* position, float unknown, const char* text);
 
+		void addReference(Reference* reference);
 		void insertReference(Reference* reference);
+
+		NI::Node* getOrCreateActivatorsNode();
 
 		//
 		// Other getter/setter functions.
@@ -176,6 +178,10 @@ namespace TES3 {
 		bool getSleepingIsIllegal() const;
 		void setSleepingIsIllegal(bool value);
 
+		bool getIsLoaded() const;
+
+		bool getIsOrBehavesAsExterior() const;
+
 		//
 		// Custom functions.
 		//
@@ -183,6 +189,8 @@ namespace TES3 {
 		void setCellActive();
 		void setCellInactive();
 		bool getCellActive() const;
+
+		bool getHasCellMarker() const;
 
 		const char* getDisplayName() const;
 		std::string getEditorName() const;

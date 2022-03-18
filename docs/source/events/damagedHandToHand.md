@@ -1,12 +1,12 @@
 # damagedHandToHand
 
-The damagedHandToHand event triggers after an actor takes fatigue damage from hand-to-hand combat. It does not trigger on health damage, but the 'damaged' event will.
+The damagedHandToHand event triggers after an actor takes fatigue damage from hand-to-hand combat. It does not trigger on health damage, but the `damaged` event will.
 
 ```lua
 --- @param e damagedHandToHandEventData
 local function damagedHandToHandCallback(e)
 end
-event.register("damagedHandToHand", damagedHandToHandCallback)
+event.register(tes3.event.damagedHandToHand, damagedHandToHandCallback)
 ```
 
 !!! tip

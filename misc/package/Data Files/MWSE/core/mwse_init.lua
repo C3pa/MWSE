@@ -2,7 +2,9 @@
 package.path = ".\\Data Files\\MWSE\\core\\?.lua;.\\Data Files\\MWSE\\core\\?\\init.lua;"
 package.cpath = "?.dll;.\\Data Files\\MWSE\\core\\?.dll;"
 
--- Next, look in the library folder.
+-- Next, look in the library folders.
+package.path = package.path .. ".\\Data Files\\MWSE\\core\\lib\\?.lua;.\\Data Files\\MWSE\\core\\lib\\?\\init.lua;"
+package.cpath = package.cpath .. ".\\Data Files\\MWSE\\core\\lib\\?.dll;"
 package.path = package.path .. ".\\Data Files\\MWSE\\lib\\?.lua;.\\Data Files\\MWSE\\lib\\?\\init.lua;"
 package.cpath = package.cpath .. ".\\Data Files\\MWSE\\lib\\?.dll;"
 
@@ -14,37 +16,101 @@ package.cpath = package.cpath .. ".\\Data Files\\MWSE\\mods\\?.dll;"
 package.path = package.path .. ".\\Data Files\\MWSE\\lua\\?.lua;.\\Data Files\\MWSE\\lua\\?\\init.lua;"
 package.cpath = package.cpath .. ".\\Data Files\\MWSE\\lua\\?.dll;"
 
-local originalRequire = require
-
--- Allow users to try to include files that may not exist.
-function include(moduleName)
-	-- First try to load the lowercase module.
-	local status, result = pcall(originalRequire, moduleName:gsub("[/\\]", "."):lower())
-	if (status) then
-		return result
-	end
-
-	-- Then try to load the original path.
-	local status, result = pcall(originalRequire, moduleName)
-	if (status) then
-		return result
+--- Converts a given module name into a standard format, and ensures that it is lowercase.
+--- @param s string
+--- @return string
+local function convertModuleName(s)
+	local t = type(s)
+	if t == "string" then
+		return s:gsub("[/\\]", "."):lower()
+	elseif t == "number" then
+		return tostring(s):gsub("[/\\]", "."):lower()
+	else
+		error("bad argument #1 to 'require' (string expected, got "..t..")", 3)
 	end
 end
 
--- Try to return a lowercased module first, fall back to regular require.
-function require(moduleName)
-	-- First try to load the lowercase module.
-	local lower = moduleName:gsub("[/\\]", "."):lower()
-	local status, result = pcall(originalRequire, lower)
-	if (status) then
-		return result
-	elseif (moduleName == lower) then
-		-- If this was an unchanged call, and we got an actual error, return it rather than consuming it.
-		error(result)
+--- A tweaked version of pygy/require.lua (https://github.com/pygy/require.lua)
+--- to make all module names lowercased.
+--- @param name string
+--- @return any
+function require(name)
+	name = convertModuleName(name)
+	local module = package.loaded[name]
+	if module then return module end
+
+	local msg = {}
+	local loader, param
+	for _, searcher in ipairs(package.searchers) do
+		loader, param = searcher(name)
+		if type(loader) == "function" then break end
+		if type(loader) == "string" then
+			-- `loader` is actually an error message
+			msg[#msg + 1] = loader
+		end
+		loader = nil
 	end
 
-	-- Fall back to trying to load the normal path.
-	return originalRequire(moduleName)
+	if loader == nil then
+		error("module '" .. name .. "' not found: " .. table.concat(msg), 2)
+	end
+
+	local res = loader(name, param)
+	if res ~= nil then
+		module = res
+	elseif not package.loaded[name] then
+		module = true
+	else
+		module = package.loaded[name]
+	end
+
+	package.loaded[name] = module
+	return module
+end
+
+--- A dictionary keeping track of what files have already tried to be included.
+--- @type <string, boolean>
+package.noinclude = {}
+
+--- A tweaked version of pygy/require.lua (https://github.com/pygy/require.lua)
+--- to make all module names lowercased. Instead of erroring when a module
+--- isn't found, return nil.
+--- @param name string
+--- @return any
+function include(name)
+	name = convertModuleName(name)
+	local module = package.loaded[name]
+	if module then return module end
+	if package.noinclude[name] then return end
+
+	local msg = {}
+	local loader, param
+	for _, searcher in ipairs(package.searchers) do
+		loader, param = searcher(name)
+		if type(loader) == "function" then break end
+		if type(loader) == "string" then
+			-- `loader` is actually an error message
+			msg[#msg + 1] = loader
+		end
+		loader = nil
+	end
+
+	if loader == nil then
+		package.noinclude[name] = true
+		return
+	end
+
+	local res = loader(name, param)
+	if res ~= nil then
+		module = res
+	elseif not package.loaded[name] then
+		module = true
+	else
+		module = package.loaded[name]
+	end
+
+	package.loaded[name] = module
+	return module
 end
 
 -- Custom dofile that respects package pathing and supports lua's dot notation for paths.
@@ -192,6 +258,12 @@ end
 function math.round(value, digits)
 	local mult = 10 ^ (digits or 0)
 	return math.floor(value * mult + 0.5) / mult
+end
+
+function math.isclose(a, b, absoluteTolerance, relativeTolerance)
+	absoluteTolerance = absoluteTolerance or math.epsilon
+	relativeTolerance = relativeTolerance or 1e-9
+	return math.abs(a-b) <= math.max(relativeTolerance * math.max(math.abs(a), math.abs(b)), absoluteTolerance)
 end
 
 
@@ -584,6 +656,25 @@ function lfs.directoryexists(filepath)
 	return lfs.attributes(filepath, "mode") == "directory"
 end
 
+-- Visit all files in a directory tree (recursively).
+function lfs.walkdir(root)
+    local function iter(dir)
+        dir = dir or root
+        for name in lfs.dir(dir) do
+            if not name:find("%.$") then
+                local path = dir .. name
+                local mode = lfs.attributes(path, "mode")
+                if mode == "file" then
+                    coroutine.yield(path, dir, name)
+                elseif mode == "directory" then
+                    iter(path .. "\\")
+                end
+            end
+        end
+    end
+    return coroutine.wrap(iter)
+end
+
 
 -------------------------------------------------
 -- Extend our base API: json
@@ -841,7 +932,7 @@ if (targetDebugger == "vscode-debuggee") then
 
 	-- Poll every frame.
 	event.register("enterFrame", debuggee.poll, { priority = 9001 })
-	
+
 	-- Start the debugger.
 	local startResult, breakerType = debuggee.start(json, { onError = onError, luaStyleLog = true })
 	mwse.log("[MWSE-Lua] vscode-debuggee start -> Result: %s, Type: %s", startResult, breakerType)

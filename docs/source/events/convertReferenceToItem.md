@@ -1,12 +1,12 @@
 # convertReferenceToItem
 
-This event is raised when an in-world tes3reference for an item is about to be converted to fit into a tes3itemStack.
+This event is raised when an in-world `tes3reference` for an item is about to be converted to fit into a `tes3itemStack`.
 
 ```lua
 --- @param e convertReferenceToItemEventData
 local function convertReferenceToItemCallback(e)
 end
-event.register("convertReferenceToItem", convertReferenceToItemCallback)
+event.register(tes3.event.convertReferenceToItem, convertReferenceToItemCallback)
 ```
 
 !!! tip

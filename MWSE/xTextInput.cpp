@@ -1,38 +1,15 @@
-/************************************************************************
-
-	xTextInput.cpp - Copyright (c) 2008 The MWSE Project
-	https://github.com/MWSE/MWSE/
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-**************************************************************************/
-
 #include "VMExecuteInterface.h"
 #include "Stack.h"
 #include "InstructionInterface.h"
 #include "TES3Util.h"
 #include "StringUtil.h"
 
-using namespace mwse;
 
 namespace mwse {
-	class xTextInput : mwse::InstructionInterface_t {
+	class xTextInput : InstructionInterface_t {
 	public:
 		xTextInput();
-		virtual float execute(VMExecuteInterface &virtualMachine);
-		virtual void loadParameters(VMExecuteInterface &virtualMachine);
+		virtual float execute(VMExecuteInterface& virtualMachine);
 
 	private:
 		bool GetKeyIsPressed(int VK_key);
@@ -42,19 +19,17 @@ namespace mwse {
 
 	xTextInput::xTextInput() : mwse::InstructionInterface_t(OpCode::xTextInput) {}
 
-	void xTextInput::loadParameters(mwse::VMExecuteInterface &virtualMachine) {}
-
 	static std::map<int, char> keyCharMap;
 
 	bool xTextInput::GetKeyIsPressed(int VK_key) {
 		return (GetAsyncKeyState(VK_key) & 0x8001) == 0x8001;
 	}
 
-	float xTextInput::execute(mwse::VMExecuteInterface &virtualMachine) {
+	float xTextInput::execute(mwse::VMExecuteInterface& virtualMachine) {
 		// 1st parameter: Message Id.
 		mwseString& message = virtualMachine.getString(mwse::Stack::getInstance().popLong());
 
-		// 2nd parameter: Key to use to end the input stream. 
+		// 2nd parameter: Key to use to end the input stream.
 		long endCode = mwse::Stack::getInstance().popLong();
 
 		// The default endcode is return.

@@ -16,7 +16,7 @@ A data structure, off of the world controller, that handles input.
 
 ### `inputMaps`
 
-*Read-only*. The array-style access to input bindings.
+*Read-only*. The array-style access to input bindings ([tes3inputConfig](https://mwse.github.io/MWSE/types/tes3inputConfig/) objects).
 
 **Returns**:
 
@@ -118,7 +118,7 @@ local result = tes3inputController:isKeyDown(key)
 
 **Parameters**:
 
-* `key` (number): The scan code to test. Constants available through `tes3.scanCode`.
+* `key` (number): The scan code to test. Constants available through [`tes3.scanCode`](https://mwse.github.io/MWSE/references/scan-codes/).
 
 **Returns**:
 
@@ -136,7 +136,7 @@ local result = tes3inputController:isKeyPressedThisFrame(key)
 
 **Parameters**:
 
-* `key` (number): The scan code to test. Constants available through `tes3.scanCode`.
+* `key` (number): The scan code to test. Constants available through [`tes3.scanCode`](https://mwse.github.io/MWSE/references/scan-codes/).
 
 **Returns**:
 
@@ -154,7 +154,7 @@ local result = tes3inputController:isKeyReleasedThisFrame(key)
 
 **Parameters**:
 
-* `key` (number): The scan code to test. Constants available through `tes3.scanCode`.
+* `key` (number): The scan code to test. Constants available through [`tes3.scanCode`](https://mwse.github.io/MWSE/references/scan-codes/).
 
 **Returns**:
 
@@ -172,7 +172,7 @@ local result = tes3inputController:isMouseButtonDown(button)
 
 **Parameters**:
 
-* `button` (number): The mouse button to test. Must be between 0 and 7.
+* `button` (number): The mouse button to test. Must be between `0` and `7`.
 
 **Returns**:
 
@@ -190,7 +190,7 @@ local result = tes3inputController:isMouseButtonPressedThisFrame(button)
 
 **Parameters**:
 
-* `button` (number): The mouse button to test. Must be between 0 and 7.
+* `button` (number): The mouse button to test. Must be between `0` and `7`.
 
 **Returns**:
 
@@ -208,7 +208,7 @@ local result = tes3inputController:isMouseButtonReleasedThisFrame(button)
 
 **Parameters**:
 
-* `button` (number): The mouse button to test. Must be between 0 and 7.
+* `button` (number): The mouse button to test. Must be between `0` and `7`.
 
 **Returns**:
 
@@ -254,8 +254,8 @@ local result = tes3inputController:keybindTest(key, transition)
 
 **Parameters**:
 
-* `key` (number): The keybind to test. Constants available through `tes3.keybind`.
-* `transition` (number): *Optional*. Transition state, e.g. down, or up. Constants available through `tes3.keyTransition`.
+* `key` (number): The keybind to test. Constants available through [`tes3.keybind`](https://mwse.github.io/MWSE/references/keybinds/).
+* `transition` (number): *Optional*. Transition state, e.g. down, or up. Constants available through [`tes3.keyTransition`](https://mwse.github.io/MWSE/references/key-transitions/).
 
 **Returns**:
 

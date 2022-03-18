@@ -21,13 +21,6 @@
 
 #include "LuaManager.h"
 
-#define TES3_WorldController_mainLoopBeforeInput 0x40F610
-#define TES3_WorldController_getMobilePlayer 0x40FF20
-#define TES3_WorldController_getSimulationTimestamp 0x411000
-
-#define TES3_Data_daysInMonth 0x775E40
-#define TES3_Data_cumulativeDaysForMonth 0x775E58
-
 namespace TES3 {
 
 	//
@@ -126,7 +119,7 @@ namespace TES3 {
 
 		// Increment werewolf kills if the player is wolfing out.
 		auto worldController = TES3::WorldController::get();
-		if (werewolfKills > 0 && actor->objectType == TES3::ObjectType::NPC && worldController->getMobilePlayer()->getMobileActorFlag(TES3::MobileActorFlag::Werewolf)) {
+		if (werewolfKills > 0 && actor->objectType == TES3::ObjectType::NPC && worldController->getMobilePlayer()->getFlagWerewolf()) {
 			werewolfKills--;
 		}
 
@@ -335,6 +328,16 @@ namespace TES3 {
 		TES3_InventoryData_AddInventoryItems(this, inventory, type);
 	}
 
+	const auto TES3_InventoryData_findTile = reinterpret_cast<UI::InventoryTile * (__thiscall*)(InventoryData*, Item*, ItemData*, int)>(0x633E40);
+	UI::InventoryTile* InventoryData::findTile(Item* item, ItemData* itemData, int type) {
+		return TES3_InventoryData_findTile(this, item, itemData, type);
+	}
+
+	const auto TES3_InventoryData_mergeTile = reinterpret_cast<void(__thiscall*)(InventoryData*, UI::InventoryTile*)>(0x632FC0);
+	void InventoryData::mergeTile(UI::InventoryTile* tile) {
+		TES3_InventoryData_mergeTile(this, tile);
+	}
+
 	//
 	// JournalHTML
 	//
@@ -423,16 +426,20 @@ namespace TES3 {
 	// WorldController
 	//
 
+	float WorldController::simulationTimeScalar = 1.0f;
+
 	WorldController * WorldController::get() {
 		return *reinterpret_cast<TES3::WorldController**>(0x7C67DC);
 	}
 
+	const auto TES3_WorldController_mainLoopBeforeInput = reinterpret_cast<void(__thiscall*)(WorldController*)>(0x40F610);
 	void WorldController::mainLoopBeforeInput() {
-		reinterpret_cast<void(__thiscall *)(WorldController*)>(TES3_WorldController_mainLoopBeforeInput)(this);
+		TES3_WorldController_mainLoopBeforeInput(this);
 	}
 
+	const auto TES3_WorldController_getMobilePlayer = reinterpret_cast<MobilePlayer * (__thiscall*)(WorldController*)>(0x40FF20);
 	MobilePlayer* WorldController::getMobilePlayer() {
-		return reinterpret_cast<MobilePlayer*(__thiscall *)(WorldController*)>(TES3_WorldController_getMobilePlayer)(this);
+		return TES3_WorldController_getMobilePlayer(this);
 	}
 
 	const auto TES3_WorldController_playItemUpDownSound = reinterpret_cast<void(__thiscall*)(WorldController*, BaseObject*, ItemSoundState, Reference*)>(0x411050);
@@ -450,8 +457,9 @@ namespace TES3 {
 		TES3_WorldController_playItemUpDownSound(this, item, state, reference);
 	}
 
+	const auto TES3_WorldController_getSimulationTimestamp = reinterpret_cast<float(__thiscall *)(WorldController*)>(0x411000);
 	float WorldController::getSimulationTimestamp() {
-		return reinterpret_cast<float(__thiscall *)(WorldController*)>(TES3_WorldController_getSimulationTimestamp)(this);
+		return TES3_WorldController_getSimulationTimestamp(this);
 	}
 
 	const auto TES3_WorldController_processGlobalScripts = reinterpret_cast<void(__thiscall*)(WorldController*)>(0x40FBE0);
@@ -459,18 +467,20 @@ namespace TES3 {
 		TES3_WorldController_processGlobalScripts(this);
 	}
 
+	const auto TES3_Data_daysInMonth = reinterpret_cast<unsigned short*>(0x775E40);
 	unsigned short WorldController::getDaysInMonth(int month) {
 		if (month < 0 || month > 11) {
 			return -1;
 		}
-		return reinterpret_cast<unsigned short*>(TES3_Data_daysInMonth)[month];
+		return TES3_Data_daysInMonth[month];
 	}
 
+	const auto TES3_Data_cumulativeDaysForMonth = reinterpret_cast<unsigned short*>(0x775E58);
 	unsigned short WorldController::getCumulativeDaysForMonth(int month) {
 		if (month < 0 || month > 11) {
 			return -1;
 		}
-		return reinterpret_cast<unsigned short*>(TES3_Data_cumulativeDaysForMonth)[month];
+		return TES3_Data_cumulativeDaysForMonth[month];
 	}
 
 	const auto TES3_MonthNameGMSTs = reinterpret_cast<int*>(0x79449C);

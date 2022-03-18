@@ -97,7 +97,7 @@ The modification state of the object since the last save.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -182,9 +182,9 @@ local results = tes3script:getVariableData()
 **Returns**:
 
 * `results` (table): The table with all of script's variable names as keys. Each entry has the following fields:
-	1. type - 's', 'f' or 'l', which stand for short, float, and long
-	2. index - the order of occurrence of the variable in the script, starting from 0
-	3. value - this can have nil value
+	1. type - `s`, `f` or `l`, which stand for `short`, `float`, and `long`
+	2. index - the order of occurrence of the variable in the script, starting from `0`
+	3. value - this can have `nil` value
 
 ***
 

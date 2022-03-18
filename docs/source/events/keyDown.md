@@ -6,7 +6,7 @@ The key event fires when a key is pressed.
 --- @param e keyDownEventData
 local function keyDownCallback(e)
 end
-event.register("keyDown", keyDownCallback)
+event.register(tes3.event.keyDown, keyDownCallback)
 ```
 
 !!! tip
@@ -28,14 +28,14 @@ event.register("keyDown", keyDownCallback)
 !!! example "Example: Show a Message when Ctrl-Z is Pressed"
 
 	```lua
-	function myOnKeyCallback(e)
-	    if( e.isControlDown ) then
-	        tes3.messageBox({ message = "You pressed Ctrl-Z, but you can't undo all your mistakes." })
-	    end
+	local function myOnKeyCallback(e)
+		if( e.isControlDown ) then
+			tes3.messageBox({ message = "You pressed Ctrl-Z, but you can't undo all your mistakes." })
+		end
 	end
 	
 	-- Filter by the scan code to get Z key presses only.
-	event.register("key", myOnKeyCallback, { filter = tes3.scanCode.z } )
+	event.register(tes3.event.key, myOnKeyCallback, { filter = tes3.scanCode.z } )
 
 	```
 

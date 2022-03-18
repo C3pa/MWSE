@@ -23,6 +23,10 @@ function tes3matrix33:fromEulerXYZ(x, y, z) end
 --- @param x number No description yet available.
 function tes3matrix33:fromEulerZYX(z, y, x) end
 
+--- Fill the matrix by converting a quaternion.
+--- @param quaternion niQuaternion No description yet available.
+function tes3matrix33:fromQuaternion(quaternion) end
+
 --- Inverts the matrix.
 --- @return tes3matrix33 matrix No description yet available.
 --- @return boolean valid No description yet available.
@@ -32,8 +36,22 @@ function tes3matrix33:invert() end
 --- @return boolean result No description yet available.
 function tes3matrix33:reorthogonalize() end
 
+--- Converts the matrix to a vector with 3 Euler angles.
+--- @return boolean isUnique No description yet available.
+--- @return tes3vector3 vector3 No description yet available.
+function tes3matrix33:toEulerXYZ() end
+
+--- Converts the matrix to a vector with 3 Euler angles.
+--- @return boolean isUnique No description yet available.
+--- @return tes3vector3 vector3 No description yet available.
+function tes3matrix33:toEulerZYX() end
+
 --- Converts the matrix to the identity matrix's values.
 function tes3matrix33:toIdentity() end
+
+--- Convert the matrix into a quaternion.
+--- @return niQuaternion result No description yet available.
+function tes3matrix33:toQuaternion() end
 
 --- No description yet available.
 --- @param angle number No description yet available.

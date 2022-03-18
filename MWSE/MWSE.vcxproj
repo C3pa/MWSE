@@ -14,6 +14,15 @@
     <ClInclude Include="ArrayUtil.h" />
     <ClInclude Include="BitUtil.h" />
     <ClInclude Include="BSAnimationManager.h" />
+    <ClInclude Include="LuaEquipmentReevaluatedEvent.h" />
+    <ClInclude Include="LuaKeyframesLoadEvent.h" />
+    <ClInclude Include="LuaMeshLoadEvent.h" />
+    <ClInclude Include="NIQuaternion.h" />
+    <ClInclude Include="NIQuaternionLua.h" />
+    <ClInclude Include="NIScreenPolygon.h" />
+    <ClInclude Include="TES3AnimationDataLua.h" />
+    <ClInclude Include="TES3CutscenePlayer.h" />
+    <ClInclude Include="TES3LoadScreenManager.h" />
     <ClInclude Include="LuaAbsorbedMagicEvent.h" />
     <ClInclude Include="LuaAttackStartEvent.h" />
     <ClInclude Include="LuaDamagedHandToHandEvent.h" />
@@ -522,6 +531,7 @@
     <ClCompile Include="LuaEnchantChargeUseEvent.cpp" />
     <ClCompile Include="LuaEquipEvent.cpp" />
     <ClCompile Include="LuaBodyPartsUpdatedEvent.cpp" />
+    <ClCompile Include="LuaEquipmentReevaluatedEvent.cpp" />
     <ClCompile Include="LuaEquippedEvent.cpp" />
     <ClCompile Include="LuaExecutor.cpp" />
     <ClCompile Include="LuaFilterBarterMenuEvent.cpp" />
@@ -544,6 +554,7 @@
     <ClCompile Include="LuaJournalEvent.cpp" />
     <ClCompile Include="LuaKeyDownEvent.cpp" />
     <ClCompile Include="LuaKeyEvent.cpp" />
+    <ClCompile Include="LuaKeyframesLoadEvent.cpp" />
     <ClCompile Include="LuaKeyUpEvent.cpp" />
     <ClCompile Include="LuaLeveledCreaturePickedEvent.cpp" />
     <ClCompile Include="LuaLeveledItemPickedEvent.cpp" />
@@ -553,6 +564,7 @@
     <ClCompile Include="LuaMagicCastedEvent.cpp" />
     <ClCompile Include="LuaMenuStateEvent.cpp" />
     <ClCompile Include="LuaMeshLoadedEvent.cpp" />
+    <ClCompile Include="LuaMeshLoadEvent.cpp" />
     <ClCompile Include="LuaMobileActorActivatedEvent.cpp" />
     <ClCompile Include="LuaMobileActorDeactivatedEvent.cpp" />
     <ClCompile Include="LuaMobileObjectWaterImpactEvent.cpp" />
@@ -636,6 +648,8 @@
     <ClCompile Include="NIParticlesLua.cpp" />
     <ClCompile Include="NIParticleSystemController.cpp" />
     <ClCompile Include="NIProperty.cpp" />
+    <ClCompile Include="NIQuaternion.cpp" />
+    <ClCompile Include="NIQuaternionLua.cpp" />
     <ClCompile Include="NIRenderedTexture.cpp" />
     <ClCompile Include="NIRenderer.cpp" />
     <ClCompile Include="NISkinInstance.cpp" />
@@ -658,8 +672,10 @@
     </ClCompile>
     <ClCompile Include="TES3Activator.cpp" />
     <ClCompile Include="TES3ActorAnimationControllerLua.cpp" />
+    <ClCompile Include="TES3AnimationDataLua.cpp" />
     <ClCompile Include="TES3AnimationGroup.cpp" />
     <ClCompile Include="TES3Apparatus.cpp" />
+    <ClCompile Include="TES3Archive.cpp" />
     <ClCompile Include="TES3Attachment.cpp" />
     <ClCompile Include="TES3AIConfig.cpp" />
     <ClCompile Include="TES3Birthsign.cpp" />

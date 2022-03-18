@@ -1,24 +1,3 @@
-/************************************************************************
-	
-	xAddEffect.cpp - Copyright (c) 2008 The MWSE Project
-	https://github.com/MWSE/MWSE/
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-**************************************************************************/
-
 #include "VMExecuteInterface.h"
 #include "Stack.h"
 #include "InstructionInterface.h"
@@ -29,26 +8,18 @@
 #include "TES3Enchantment.h"
 #include "TES3Spell.h"
 
-using namespace mwse;
-
-namespace mwse
-{
-	class xAddEffect : mwse::InstructionInterface_t
-	{
+namespace mwse {
+	class xAddEffect : InstructionInterface_t {
 	public:
 		xAddEffect();
-		virtual float execute(VMExecuteInterface &virtualMachine);
-		virtual void loadParameters(VMExecuteInterface &virtualMachine);
+		virtual float execute(VMExecuteInterface& virtualMachine);
 	};
 
 	static xAddEffect xAddEffectInstance;
 
 	xAddEffect::xAddEffect() : mwse::InstructionInterface_t(OpCode::xAddEffect) {}
 
-	void xAddEffect::loadParameters(mwse::VMExecuteInterface &virtualMachine) {}
-
-	float xAddEffect::execute(mwse::VMExecuteInterface &virtualMachine)
-	{
+	float xAddEffect::execute(mwse::VMExecuteInterface& virtualMachine) {
 		// Get parameters.
 		long type = mwse::Stack::getInstance().popLong();
 		mwseString& id = virtualMachine.getString(mwse::Stack::getInstance().popLong());
@@ -70,9 +41,9 @@ namespace mwse
 				effectCount = spell->getActiveEffectCount();
 			}
 			else {
-#if _DEBUG
-				mwse::log::getLog() << "xAddEffect: No spell found with id '" << id << "'." << std::endl;
-#endif
+				if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+					mwse::log::getLog() << "xAddEffect: No spell found with id '" << id << "'." << std::endl;
+				}
 				mwse::Stack::getInstance().pushLong(false);
 				return 0.0f;
 			}
@@ -84,9 +55,9 @@ namespace mwse
 				effectCount = enchant->getActiveEffectCount();
 			}
 			else {
-#if _DEBUG
-				mwse::log::getLog() << "xAddEffect: No spell found with id '" << id << "'." << std::endl;
-#endif
+				if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+					mwse::log::getLog() << "xAddEffect: No spell found with id '" << id << "'." << std::endl;
+				}
 				mwse::Stack::getInstance().pushLong(false);
 				return 0.0f;
 			}
@@ -98,26 +69,26 @@ namespace mwse
 				effectCount = alchemy->getActiveEffectCount();
 			}
 			else {
-#if _DEBUG
-				mwse::log::getLog() << "xAddEffect: No alchemy record found with id '" << id << "'." << std::endl;
-#endif
+				if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+					mwse::log::getLog() << "xAddEffect: No alchemy record found with id '" << id << "'." << std::endl;
+				}
 				mwse::Stack::getInstance().pushLong(false);
 				return 0.0f;
 			}
 		}
 		else {
-#if _DEBUG
-			mwse::log::getLog() << "xAddEffect: Record type of " << type << " is not supported." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xAddEffect: Record type of " << type << " is not supported." << std::endl;
+			}
 			mwse::Stack::getInstance().pushLong(false);
 			return 0.0f;
 		}
 
 		// Get effect count.
 		if (effectCount == 8) {
-#if _DEBUG
-			mwse::log::getLog() << "xAddEffect: Record already contains 8 effects." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xAddEffect: Record already contains 8 effects." << std::endl;
+			}
 			mwse::Stack::getInstance().pushLong(false);
 			return 0.0f;
 		}

@@ -3,7 +3,7 @@
 --- An alchemy game object.
 --- @class tes3alchemy : tes3item, tes3physicalObject, tes3object, tes3baseObject
 --- @field autoCalc boolean If set, the value of the object is automatically calculated.
---- @field effects table *Read-only*. An array-style table of the tes3effect data on the object.
+--- @field effects table *Read-only*. An array-style table of the [`tes3effect`](https://mwse.github.io/MWSE/types/tes3effect/) data on the object.
 --- @field flags number The alchemy item's flags.
 --- @field icon string The path to the object's icon.
 --- @field mesh string The path to the object's mesh.
@@ -55,7 +55,7 @@ function tes3alchemy.create(params) end
 function tes3alchemy:getActiveEffectCount() end
 
 --- Returns the index of a first effect of a given effectId in the parent tes3alchemy object.
---- @param effectId number The effectID to perform a check for. Maps to tes3.effect.* constants.
+--- @param effectId number The effectId to perform a check for. Maps to [`tes3.effect`](https://mwse.github.io/MWSE/references/magic-effects/) constants.
 --- @return number index No description yet available.
 function tes3alchemy:getFirstIndexOfEffect(effectId) end
 

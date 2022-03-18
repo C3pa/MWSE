@@ -6,7 +6,7 @@ The potionBrewFailed event is raised when the player fails a potion brew attempt
 --- @param e potionBrewFailedEventData
 local function potionBrewFailedCallback(e)
 end
-event.register("potionBrewFailed", potionBrewFailedCallback)
+event.register(tes3.event.potionBrewFailed, potionBrewFailedCallback)
 ```
 
 !!! tip
@@ -16,7 +16,7 @@ event.register("potionBrewFailed", potionBrewFailedCallback)
 
 * `alembic` ([tes3apparatus](../../types/tes3apparatus)): *Read-only*. The alembic apparatus used to create the potion.
 * `calcinator` ([tes3apparatus](../../types/tes3apparatus)): *Read-only*. The calcinator apparatus used to create the potion.
-* `ingredients` (table): *Read-only*. An array of up to 4 tes3ingredient objects, which were used to create the potion.
+* `ingredients` (table): *Read-only*. An array of up to 4 [`tes3ingredient`](https://mwse.github.io/MWSE/types/tes3ingredient/) objects, which were used to create the potion.
 * `mortar` ([tes3apparatus](../../types/tes3apparatus)): *Read-only*. The mortar apparatus used to create the potion.
 * `retort` ([tes3apparatus](../../types/tes3apparatus)): *Read-only*. The retort apparatus used to create the potion.
 

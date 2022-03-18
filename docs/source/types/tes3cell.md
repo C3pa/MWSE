@@ -145,6 +145,16 @@ The cell's Y grid coordinate. Only available on exterior cells.
 
 ***
 
+### `hasMapMarker`
+
+*Read-only*. If true, the cell will have be marked on the player's map. This does not take into account if the player has been to that cell.
+
+**Returns**:
+
+* `result` (boolean)
+
+***
+
 ### `hasWater`
 
 If true, the cell has water. Only applies to interior cells.
@@ -175,6 +185,16 @@ If true, the cell is an interior.
 
 ***
 
+### `isOrBehavesAsExterior`
+
+*Read-only*. `true` if the cell is not an interior or if it behaves as an exterior.
+
+**Returns**:
+
+* `result` (boolean)
+
+***
+
 ### `modified`
 
 The modification state of the object since the last save.
@@ -187,7 +207,7 @@ The modification state of the object since the last save.
 
 ### `name`
 
-The name and id of the cell. See also displayName and editorName.
+The name and id of the cell. See also `displayName` and `editorName`.
 
 **Returns**:
 
@@ -207,7 +227,7 @@ The name and id of the cell. See also displayName and editorName.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -370,7 +390,7 @@ tes3cell:iterateReferences(filter)
 
 **Parameters**:
 
-* `filter` (number): *Optional*. The TES3 object type to filter results by.
+* `filter` (number): *Optional*. The TES3 object type to filter results by. Those are stored in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/) namespace.
 
 ***
 

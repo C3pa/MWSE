@@ -7,7 +7,7 @@ This type inherits the following: [tes3baseObject](../../types/tes3baseObject)
 
 ### `attributes`
 
-*Read-only*. An array-style table holding the two attributes that govern advancement.
+*Read-only*. An array-style table holding the two attributes that govern advancement. Maps to values in [`tes3.attribute`](https://mwse.github.io/MWSE/references/attributes/) namespace.
 
 **Returns**:
 
@@ -87,7 +87,7 @@ The faction's player-facing name.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -147,7 +147,7 @@ The player's current reputation in the faction.
 
 ### `ranks`
 
-*Read-only*. An array-style table holding the ten related tes3factionRanks.
+*Read-only*. An array-style table holding the ten related [`tes3factionRank`](https://mwse.github.io/MWSE/types/tes3factionRank/)s.
 
 **Returns**:
 
@@ -157,7 +157,7 @@ The player's current reputation in the faction.
 
 ### `reactions`
 
-*Read-only*. A collection of tes3factionReactions.
+*Read-only*. A collection of [`tes3factionReaction`](https://mwse.github.io/MWSE/types/tes3factionReaction/)s.
 
 **Returns**:
 
@@ -167,7 +167,7 @@ The player's current reputation in the faction.
 
 ### `skills`
 
-*Read-only*. An array-style table holding the seven skills that govern advancement.
+*Read-only*. An array-style table holding the seven skills that govern advancement. Maps to values in [`tes3.skill`](https://mwse.github.io/MWSE/references/skills/) namespace.
 
 **Returns**:
 

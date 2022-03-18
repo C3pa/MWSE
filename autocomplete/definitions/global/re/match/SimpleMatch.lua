@@ -1,10 +1,10 @@
 local re = require("re")
 
 local function onLoaded(e)
-    
+	
 	-- returns all words in a string
 	mwse.log("%s %s %s %s", re.match("the number 423 is odd", "({%a+} / .)*"))
-	--> the    number    is    odd
+	--> the	number	is	odd
 
 	-- returns the first numeral in a string
 	mwse.log(re.match("the number 423 is odd", "s <- {%d+} / . s"))
@@ -12,4 +12,4 @@ local function onLoaded(e)
 	
 end
 
-event.register("loaded", onLoaded)
+event.register(tes3.event.loaded, onLoaded)

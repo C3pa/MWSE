@@ -1,24 +1,3 @@
-/************************************************************************
-	
-	xGetRace.cpp - Copyright (c) 2008 The MWSE Project
-	https://github.com/MWSE/MWSE/
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-**************************************************************************/
-
 #include "VMExecuteInterface.h"
 #include "Stack.h"
 #include "InstructionInterface.h"
@@ -31,16 +10,11 @@
 #include "TES3Race.h"
 #include "TES3Skill.h"
 
-using namespace mwse;
-
-namespace mwse
-{
-	class xGetRace : mwse::InstructionInterface_t
-	{
+namespace mwse {
+	class xGetRace : InstructionInterface_t {
 	public:
 		xGetRace();
-		virtual float execute(VMExecuteInterface &virtualMachine);
-		virtual void loadParameters(VMExecuteInterface &virtualMachine);
+		virtual float execute(VMExecuteInterface& virtualMachine);
 	private:
 		std::map<long, long> arrayMap;
 	};
@@ -49,31 +23,28 @@ namespace mwse
 
 	xGetRace::xGetRace() : mwse::InstructionInterface_t(OpCode::xGetRace) {}
 
-	void xGetRace::loadParameters(mwse::VMExecuteInterface &virtualMachine) {}
-
-	float xGetRace::execute(mwse::VMExecuteInterface &virtualMachine)
-	{
+	float xGetRace::execute(mwse::VMExecuteInterface& virtualMachine) {
 		// Get reference.
 		TES3::Reference* reference = virtualMachine.getReference();
 		if (reference == NULL) {
-#if _DEBUG
-			mwse::log::getLog() << "xGetRace: No reference provided." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xGetRace: No reference provided." << std::endl;
+			}
 			return 0.0f;
 		}
 
 		// Get the base record.
 		TES3::NPCInstance* object = reinterpret_cast<TES3::NPCInstance*>(reference->baseObject);
 		if (object == NULL) {
-#if _DEBUG
-			mwse::log::getLog() << "xGetRace: No record found for reference." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xGetRace: No record found for reference." << std::endl;
+			}
 			return 0.0f;
 		}
 		else if (object->objectType != TES3::ObjectType::NPC) {
-#if _DEBUG
-			mwse::log::getLog() << "xGetRace: Called on a non-NPC reference." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xGetRace: Called on a non-NPC reference." << std::endl;
+			}
 			return 0.0f;
 		}
 

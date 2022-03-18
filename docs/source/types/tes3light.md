@@ -207,7 +207,7 @@ The next object in parent collection's list.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -423,7 +423,7 @@ local string = tes3baseObject:__tojson()
 
 ### `getTimeLeft`
 
-Gets the time remaining for a light, given a tes3itemData, tes3reference, or tes3equipmentStack.
+Gets the time remaining for a light, given a `tes3itemData`, `tes3reference`, or `tes3equipmentStack`.
 
 ```lua
 local result = tes3light:getTimeLeft(data)

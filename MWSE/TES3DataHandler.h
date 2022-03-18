@@ -37,7 +37,7 @@ namespace TES3 {
 
 		// Path is relative to Data Files.
 		NI::AVObject* loadMesh(const char* path);
-		KeyframeDefinition* loadKeyFrame(const char* path, const char* animation);
+		KeyframeDefinition* loadKeyframes(const char* path, const char* animation);
 	};
 
 	template <typename OT>
@@ -351,6 +351,8 @@ namespace TES3 {
 
 		void updateCollisionGroupsForActiveCells(bool force = true, bool isResettingData = false, bool resetCollisionGroups = true);
 		void updateCollisionGroupsForActiveCells_raw(bool force = true);
+
+		bool isCellInMemory(const Cell* cell, bool unknown) const;
 
 		//
 		// Custom functions.

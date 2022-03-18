@@ -1,24 +1,3 @@
-/************************************************************************
-	
-	xSetSkillInfo.cpp - Copyright (c) 2008 The MWSE Project
-	https://github.com/MWSE/MWSE/
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-**************************************************************************/
-
 #include "VMExecuteInterface.h"
 #include "Stack.h"
 #include "InstructionInterface.h"
@@ -29,26 +8,18 @@
 #include "TES3Skill.h"
 #include "TES3WorldController.h"
 
-using namespace mwse;
-
-namespace mwse
-{
-	class xSetSkillInfo : mwse::InstructionInterface_t
-	{
+namespace mwse {
+	class xSetSkillInfo : InstructionInterface_t {
 	public:
 		xSetSkillInfo();
-		virtual float execute(VMExecuteInterface &virtualMachine);
-		virtual void loadParameters(VMExecuteInterface &virtualMachine);
+		virtual float execute(VMExecuteInterface& virtualMachine);
 	};
 
 	static xSetSkillInfo xSetSkillInfoInstance;
 
 	xSetSkillInfo::xSetSkillInfo() : mwse::InstructionInterface_t(OpCode::xSetSkillInfo) {}
 
-	void xSetSkillInfo::loadParameters(mwse::VMExecuteInterface &virtualMachine) {}
-
-	float xSetSkillInfo::execute(mwse::VMExecuteInterface &virtualMachine)
-	{
+	float xSetSkillInfo::execute(mwse::VMExecuteInterface& virtualMachine) {
 		// Get parameter.
 		long skillIndex = mwse::Stack::getInstance().popLong();
 
@@ -62,27 +33,27 @@ namespace mwse
 
 		// Validate skill index.
 		if (skillIndex < TES3::SkillID::FirstSkill || skillIndex > TES3::SkillID::LastSkill) {
-#if _DEBUG
-			mwse::log::getLog() << "xSetSkillInfo: Skill index out of range." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xSetSkillInfo: Skill index out of range." << std::endl;
+			}
 			mwse::Stack::getInstance().pushLong(false);
 			return 0.0f;
 		}
 
 		// Validate attribute.
 		if (attributeId < TES3::Attribute::FirstAttribute || attributeId > TES3::Attribute::LastAttribute) {
-#if _DEBUG
-			mwse::log::getLog() << "xSetSkillInfo: Attribute id out of range." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xSetSkillInfo: Attribute id out of range." << std::endl;
+			}
 			mwse::Stack::getInstance().pushLong(false);
 			return 0.0f;
 		}
 
 		// Validate specialization.
 		if (specialization < TES3::SkillSpecialization::FirstSpecialization || specialization > TES3::SkillSpecialization::LastSpecialization) {
-#if _DEBUG
-			mwse::log::getLog() << "xSetSkillInfo: Specialization out of range." << std::endl;
-#endif
+			if constexpr (DEBUG_MWSCRIPT_FUNCTIONS) {
+				mwse::log::getLog() << "xSetSkillInfo: Specialization out of range." << std::endl;
+			}
 			mwse::Stack::getInstance().pushLong(false);
 			return 0.0f;
 		}
@@ -103,7 +74,7 @@ namespace mwse
 
 		// If our specialization changed, check for a skill level up.
 		if (oldSpecialization != specialization) {
-			TES3::WorldController::get()->getMobilePlayer()->levelSkill(skillIndex);
+			TES3::WorldController::get()->getMobilePlayer()->progressSkillLevelIfRequirementsMet(skillIndex);
 		}
 
 		mwse::Stack::getInstance().pushLong(true);

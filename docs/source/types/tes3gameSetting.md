@@ -87,7 +87,7 @@ The modification state of the object since the last save.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -107,7 +107,7 @@ The persistent flag of the object.
 
 ### `rawValue`
 
-The base value of the game setting, as stored in memory. Prefer to use .value unless you know what you're doing.
+The base value of the game setting, as stored in memory. Prefer to use `.value` unless you know what you're doing.
 
 **Returns**:
 
@@ -147,7 +147,7 @@ If true, references of this object can store temporary or persistent lua data.
 
 ### `type`
 
-*Read-only*. The type of the variable, either 'i', 'f', or 's'.
+*Read-only*. The type of the variable, either `i`, `f`, or `s`.
 
 **Returns**:
 

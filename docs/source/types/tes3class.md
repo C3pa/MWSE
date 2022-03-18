@@ -7,7 +7,7 @@ This type inherits the following: [tes3baseObject](../../types/tes3baseObject)
 
 ### `attributes`
 
-*Read-only*. An array-style table of the two attribute IDs associated with the class.
+*Read-only*. An array-style table of the two attribute IDs associated with the class. Maps to values in [`tes3.attribute`](https://mwse.github.io/MWSE/references/attributes/) namespace.
 
 **Returns**:
 
@@ -197,7 +197,7 @@ Loads from disk and returns the description of the class.
 
 ### `majorSkills`
 
-*Read-only*. An array-style table of the 5 skills IDs associated with the class' major skills.
+*Read-only*. An array-style table of the 5 skills IDs associated with the class' major skills. Maps to values in [`tes3.skill`](https://mwse.github.io/MWSE/references/skills/) namespace.
 
 **Returns**:
 
@@ -207,7 +207,7 @@ Loads from disk and returns the description of the class.
 
 ### `minorSkills`
 
-*Read-only*. An array-style table of the 5 skills IDs associated with the class' major skills.
+*Read-only*. An array-style table of the 5 skills IDs associated with the class' minor skills. Maps to values in [`tes3.skill`](https://mwse.github.io/MWSE/references/skills/) namespace.
 
 **Returns**:
 
@@ -247,7 +247,7 @@ The player-facing name for the object.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -297,7 +297,7 @@ If true, the class will offer spell selling services.
 
 ### `offersTraining`
 
-If true, the class will offer spell training services.
+If true, the class will offer training services.
 
 **Returns**:
 
@@ -327,7 +327,7 @@ If true, the class is selectable at character generation.
 
 ### `services`
 
-The services offered by the class. This is a bit field, and its values should typically be accessed through values such as bartersAlchemy.
+The services offered by the class. This is a bit field, and its values should typically be accessed through values such as `bartersAlchemy`.
 
 **Returns**:
 
@@ -337,7 +337,7 @@ The services offered by the class. This is a bit field, and its values should ty
 
 ### `skills`
 
-*Read-only*. An array-style table of the 10 skills IDs associated with the class. For major or minor skills specifically, use the majorSkills and MinorSkills properties.
+*Read-only*. An array-style table of the 10 skills IDs associated with the class. For major or minor skills specifically, use the `majorSkills` and `minorSkills` properties. Maps to values in [`tes3.skill`](https://mwse.github.io/MWSE/references/skills/) namespace.
 
 **Returns**:
 
@@ -367,7 +367,7 @@ The soruceless flag of the object.
 
 ### `specialization`
 
-The specialization for the class. Maps to the tes3.specialization table.
+The specialization for the class. Maps to the [`tes3.specialization`](https://mwse.github.io/MWSE/references/specialization-types/) constants table.
 
 **Returns**:
 

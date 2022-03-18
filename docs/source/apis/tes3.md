@@ -4,12 +4,6 @@ The tes3 library provides the majority of the functions for interacting with the
 
 ## Properties
 
-### `tes3.animationState`
-
-Constant values relating to animation state.
-
-***
-
 ### `tes3.dataHandler`
 
 One of the core game objects.
@@ -42,23 +36,23 @@ The currently executed root Morrowind installation path.
 
 ### `tes3.magicSchoolSkill`
 
-These constants are used to convert magic schools to their respective skill. These constants map to their respective tes3.skill constants.
+This table is used to convert numerical magic school IDs to their respective skill IDs. These constants will return their respective `tes3.skill` constants.
 
 **Returns**:
 
-* `result` (tes3.skill.* constants)
+* `result` (number)
 
 ??? example "Example: Convert magic school from event data to a respective skill"
 
 	```lua
 	local function OnSpellFailed(e)
 	
-		local skill = tes3.magicSchoolSkill[e.expGainSchool] -- Note: e.expGainSchool is one of tes3.magicSchool(s)
+		local skill = tes3.magicSchoolSkill[e.expGainSchool] -- Note: e.expGainSchool is a value in tes3.magicSchool constants table
 	
 		tes3.mobilePlayer:exerciseSkill(skill, 100)
 	end
 	
-	event.register("spellCastedFailure", OnSpellFailed)
+	event.register(tes3.event.spellCastedFailure, OnSpellFailed)
 
 	```
 
@@ -139,7 +133,7 @@ tes3.addClothingSlot({ slot = ..., name = ... })
 Adds an item to a given reference's inventory or mobile's inventory.
 
 ```lua
-local addedCount = tes3.addItem({ reference = ..., item = ..., itemData = ..., soul = ..., count = ..., playSound = ..., limit = ..., updateGUI = ... })
+local addedCount = tes3.addItem({ reference = ..., item = ..., itemData = ..., soul = ..., count = ..., playSound = ..., limit = ..., reevaluateEquipment = ..., updateGUI = ... })
 ```
 
 **Parameters**:
@@ -148,11 +142,12 @@ local addedCount = tes3.addItem({ reference = ..., item = ..., itemData = ..., s
 	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): Who to give items to.
 	* `item` ([tes3item](../../types/tes3item), [tes3leveledItem](../../types/tes3leveledItem), string): The item to add. If a leveled item is passed, it will be resolved and added.
 	* `itemData` ([tes3itemData](../../types/tes3itemData)): *Optional*. The item data for the item.
-	* `soul` ([tes3creature](../../types/tes3creature)): *Optional*. For creating filled soul gems.
+	* `soul` ([tes3creature](../../types/tes3creature), [tes3npc](../../types/tes3npc)): *Optional*. For creating filled soul gems.
 	* `count` (number): *Default*: `1`. The maximum number of items to add.
 	* `playSound` (boolean): *Default*: `true`. If false, the up/down sound for the item won't be played.
 	* `limit` (boolean): If false, items can be placed into containers that shouldn't normally be allowed. This includes organic containers, and containers that are full.
-	* `updateGUI` (boolean): *Default*: `true`. If false, the function won't manually resync the player's GUI state. This can result in some optimizations, though `tes3ui.forcePlayerInventoryUpdate()` must manually be called after all inventory updates are finished.
+	* `reevaluateEquipment` (boolean): *Default*: `true`. If true, and the item added is armor, clothing, or a weapon, the actor will reevaluate its equipment choices to see if the new item is worth equipping. This does not affect the player.
+	* `updateGUI` (boolean): *Default*: `true`. If false, the function won't manually resync the player's GUI state. This can result in some optimizations, though [`tes3ui.forcePlayerInventoryUpdate()`](https://mwse.github.io/MWSE/apis/tes3ui/#tes3uiforceplayerinventoryupdate) must manually be called after all inventory updates are finished.
 
 **Returns**:
 
@@ -199,7 +194,7 @@ tes3.addJournalEntry({ text = ..., showMessage = ... })
 
 ### `tes3.addMagicEffect`
 
-This function creates a new custom magic effect. The effect can be scripted through lua.
+This function creates a new custom magic effect. The effect can be scripted through lua. This function should be used inside [`magicEffectsResolved`](https://mwse.github.io/MWSE/events/magicEffectsResolved/) event callback.
 
 ```lua
 local effect = tes3.addMagicEffect({ id = ..., name = ..., baseCost = ..., school = ..., size = ..., sizeCap = ..., speed = ..., description = ..., lighting = ..., icon = ..., particleTexture = ..., castSound = ..., boltSound = ..., hitSound = ..., areaSound = ..., castVFX = ..., boltVFX = ..., hitVFX = ..., areaVFX = ..., allowEnchanting = ..., allowSpellmaking = ..., appliesOnce = ..., canCastSelf = ..., canCastTarget = ..., canCastTouch = ..., casterLinked = ..., hasContinuousVFX = ..., hasNoDuration = ..., hasNoMagnitude = ..., illegalDaedra = ..., isHarmful = ..., nonRecastable = ..., targetsAttributes = ..., targetsSkills = ..., unreflectable = ..., usesNegativeLighting = ..., onTick = ..., onCollision = ... })
@@ -208,51 +203,206 @@ local effect = tes3.addMagicEffect({ id = ..., name = ..., baseCost = ..., schoo
 **Parameters**:
 
 * `params` (table)
-	* `id` (tes3.effect): Id of the new effect. Maps to tes3.effect.* added with tes3.claimSpellEffectId. If the effect of this id already exists, an error will be thrown.
+	* `id` (number): Id of the new effect. Maps to newly claimed `tes3.effect` constants with `tes3.claimSpellEffectId()`. If the effect of this id already exists, an error will be thrown.
 	* `name` (string): *Default*: `Unnamed Effect`. Name of the effect.
 	* `baseCost` (number): *Default*: `1`. Base magicka cost for the effect.
-	* `school` (tes3.magicSchool): *Default*: `tes3.magicSchool.alteration`. The magic school the new effect will be assigned to. Maps to tes3.magicSchool.* constants
-	* `size` (number): *Default*: `1`.
-	* `sizeCap` (number): *Default*: `1`.
+	* `school` (number): *Default*: `tes3.magicSchool.alteration`. The magic school the new effect will be assigned to. Maps to [`tes3.magicSchool`](https://mwse.github.io/MWSE/references/magic-schools/) constants.
+	* `size` (number): *Default*: `1`. The size scale for the spells containing this magic effect.
+	* `sizeCap` (number): *Default*: `1`. The maximum possible size of the projectile.
 	* `speed` (number): *Default*: `1`.
 	* `description` (string): *Default*: `No description available.`. Description for the effect.
 	* `lighting` (table): *Optional*.
 		* `x` (number): *Default*: `1`. Value of red color channel. In range of 0 - 1.
 		* `y` (number): *Default*: `1`. Value of green color channel. In range of 0 - 1.
 		* `z` (number): *Default*: `1`. Value of blue color channel. In range of 0 - 1.
-	* `icon` (string): *Optional*. Path to the effect icon. Must be a string no longer than 31 characters long.
-	* `particleTexture` (string): *Optional*. Path to the particle texture to use for the effect. Must be a string no longer than 31 characters long.
-	* `castSound` (string): *Optional*. The sound ID which will be played on casting a spell with this effect. Must be a string no longer than 31 characters long. If not specified, the default sound for the spell school will be used.
-	* `boltSound` (string): *Optional*. The sound ID which will be played when a spell with this effect is in flight. Must be a string no longer than 31 characters long. If not specified, the default sound for the spell school will be used.
-	* `hitSound` (string): *Optional*. The sound ID which will be played when a spell with this effect hits something. Must be a string no longer than 31 characters long. If not specified, the default sound for the spell school will be used.
-	* `areaSound` (string): *Optional*. The sound ID which will be played on area of effect impact. Must be a string no longer than 31 characters long. If not specified, the default sound for the spell school will be used.
-	* `castVFX` ([tes3physicalObject](../../types/tes3physicalObject)): *Optional*.
-	* `boltVFX` ([tes3physicalObject](../../types/tes3physicalObject)): *Optional*.
-	* `hitVFX` ([tes3physicalObject](../../types/tes3physicalObject)): *Optional*.
-	* `areaVFX` ([tes3physicalObject](../../types/tes3physicalObject)): *Optional*.
-	* `allowEnchanting` (boolean): *Default*: `true`. Can this effect be used in a custom enchantment?
-	* `allowSpellmaking` (boolean): *Default*: `true`. Can this effect be used in a custom spell?
-	* `appliesOnce` (boolean): *Default*: `true`.
-	* `canCastSelf` (boolean): *Default*: `true`. Can this effect used with cast on self range?
-	* `canCastTarget` (boolean): *Default*: `true`. Can this effect be used with cast on target range?
-	* `canCastTouch` (boolean): *Default*: `true`. Can this effect be used with cast on touch range?
+	* `icon` (string): Path to the effect icon. Must be a string no longer than 31 characters long. Use double \ as path separator.
+	* `particleTexture` (string): Path to the particle texture to use for the effect. Must be a string no longer than 31 characters long.
+	* `castSound` (string): The sound ID which will be played on casting a spell with this effect. Must be a string no longer than 31 characters long. If not specified, the default sound for the spell school will be used.
+	* `boltSound` (string): The sound ID which will be played when a spell with this effect is in flight. Must be a string no longer than 31 characters long. If not specified, the default sound for the spell school will be used.
+	* `hitSound` (string): The sound ID which will be played when a spell with this effect hits something. Must be a string no longer than 31 characters long. If not specified, the default sound for the spell school will be used.
+	* `areaSound` (string): The sound ID which will be played on area of effect impact. Must be a string no longer than 31 characters long. If not specified, the default sound for the spell school will be used.
+	* `castVFX` ([tes3physicalObject](../../types/tes3physicalObject)): *Optional*. The visual played when a spell with this effect is cast.
+	* `boltVFX` ([tes3physicalObject](../../types/tes3physicalObject)): *Optional*. The visual played when a spell with this effect is in flight.
+	* `hitVFX` ([tes3physicalObject](../../types/tes3physicalObject)): *Optional*. The visual played when a spell with this effect hits something.
+	* `areaVFX` ([tes3physicalObject](../../types/tes3physicalObject)): *Optional*. The visual played when a spell with this effect, with area of effect hits something.
+	* `allowEnchanting` (boolean): *Default*: `true`. A flag which controls whether this effect can be used in a custom enchantment.
+	* `allowSpellmaking` (boolean): *Default*: `true`. A flag which controls whether this effect can be used in a custom spell.
+	* `appliesOnce` (boolean): *Default*: `true`. A flag which controls whether this effect applies once or is a ticking effect.
+	* `canCastSelf` (boolean): *Default*: `true`. A flag which controls whether this effect can be used with cast on self range.
+	* `canCastTarget` (boolean): *Default*: `true`. A flag which controls whether this effect can be used with cast on target range.
+	* `canCastTouch` (boolean): *Default*: `true`. A flag which controls whether this effect can be used with cast on touch range.
 	* `casterLinked` (boolean): *Default*: `true`.
-	* `hasContinuousVFX` (boolean): *Default*: `true`. Will the effect's VFX be played during its whole duration?
-	* `hasNoDuration` (boolean): *Default*: `true`.
-	* `hasNoMagnitude` (boolean): *Default*: `true`.
-	* `illegalDaedra` (boolean): *Default*: `true`. Is this effect illegal to use in public, because it summons Daedra? Note: this mechanic is not implemented in the game. Some mods might rely on this parameter.
-	* `isHarmful` (boolean): *Default*: `true`. Is this effect considered harmful and casting it can be considered as an attack?
-	* `nonRecastable` (boolean): *Default*: `true`. Can this effect be recast while it already is in duration?
-	* `targetsAttributes` (boolean): *Default*: `true`.
-	* `targetsSkills` (boolean): *Default*: `true`.
-	* `unreflectable` (boolean): *Default*: `true`. Can the effect be reflected?
-	* `usesNegativeLighting` (boolean): *Default*: `true`.
-	* `onTick` (function): *Optional*. A function which will be called on each tick of a spell containing this effect.
+	* `hasContinuousVFX` (boolean): *Default*: `true`. A flag which controls whether the effect's visual is continuously played during the whole duration of the effect.
+	* `hasNoDuration` (boolean): *Default*: `true`. A flag which controls whether this effect doesn't have duration.
+	* `hasNoMagnitude` (boolean): *Default*: `true`. A flag which controls whether this effect doesn't have magnitude.
+	* `illegalDaedra` (boolean): *Default*: `true`. A flag which controls whether this effect is illegal to use in public, because it summons Daedra. Note: this mechanic is not implemented in the game. Some mods might rely on this parameter.
+	* `isHarmful` (boolean): *Default*: `true`. A flag which controls whether this effect is considered harmful and casting it can be considered as an attack.
+	* `nonRecastable` (boolean): *Default*: `true`. A flag which controls whether this effect can be recast while it already is in duration.
+	* `targetsAttributes` (boolean): *Default*: `true`. A flag which controls whether this effect targets a certain attribute or attributes.
+	* `targetsSkills` (boolean): *Default*: `true`. A flag which controls whether this effect targets a certain skill or skills.
+	* `unreflectable` (boolean): *Default*: `true`. A flag which controls whether this effect can be reflected.
+	* `usesNegativeLighting` (boolean): *Default*: `true`. A flag which controls whether this effect uses negative lighting.
+	* `onTick` (function): *Optional*. A function which will be called on each tick of a spell containing this effect. A table `tickParams` will be passed to the callback function. Note: `dt`(frame time) scaling is handled automatically.
+		- `tickParams` (table)
+		- `effectId` (number)
+		- `sourceInstance` ([tes3magicSourceInstance](https://mwse.github.io/MWSE/types/tes3magicSourceInstance/)): Access to the magic source of the effect instance. 
+		- `deltaTime` (number): The time passed since the last tick of the spell.
+		- `effectInstance` ([tes3magicEffectInstance](https://mwse.github.io/MWSE/types/tes3magicEffectInstance/)): Access to the magic effect instance.
+		- `effectIndex` (number): The index of the effect in the spell.
+
+		In addition, a function registerd as `onTick` can also call the following methods:
+	
+		- trigger(`triggerParams`): Allows the effect to run through the normal spell event system.
+			**Parameters:**
+			- `triggerParams` (table)
+			- `negateOnExpiry` (boolean): *Optional. Default:* `true` If this flag is `true`, the effect will be negated on expiry.
+			- `isUncapped` (boolean): *Optional.*
+			- `attribute` (number): *Optional. Default:* `tes3.effectAttribute.nonResistable` The attribute used in resistance calculations agains this effect. Maps to values in [`tes3.effectAttribute`](https://mwse.github.io/MWSE/references/effect-attributes/) namespace.
+			- `type` (number): *Optional. Default:* `tes3.effectEventType.boolean`. This flag controls how the effect behaves. For example, `tes3.effectEventType.modStatistic` will make the effect work as calling `tes3.modStatistic`. Maps to values in [`tes3.effectEventType`](https://mwse.github.io/MWSE/references/effect-event-types/) namespace.
+			- `value` (number): *Optional. Default:* `0`. The variable this effect changes.
+			- `resistanceCheck(resistParams)` (function): *Optional.* The function passed as `resistanceCheck` will be used on any of the game's spell resistance checks. For example, the only effect in vanilla Morrowind that implements this function is Water Walking. It disallows using a spell with Water Walking when the player is deep underwater, by setting it as expired. So, returning `true` from this function will set your effect to expired, and depending on your trigger code may stop processing. The function passed here must returns boolean values.
+				**Parameters**
+				- `resistParams` (table)
+				- `sourceInstance` ([tes3magicSourceInstance](https://mwse.github.io/MWSE/types/tes3magicSourceInstance/)): Access to the magic source of the effect instance. 
+				- `effectInstance` ([tes3magicEffectInstance](https://mwse.github.io/MWSE/types/tes3magicEffectInstance/)): Access to the magic effect instance.
+				- `effectIndex` (number): The index of the effect in the spell.
+
+		- triggerBoundWeapon(`id`): Performs vanilla weapon summoning logic. It will create a summoned version of the weapon with provided ID. 
+			**Parameters:**
+			- `id` (string): The ID of the weapon object to summon.
+
+		- triggerBoundArmor(`params`): Performs vanilla armor summoning logic. It can summon one or two armor objects with provided ID(s).
+			**Parameters:**
+			- `params` (table)
+			- `id` (string): The ID of the armor object to summon.
+			- `id2` (string): *Optional.* The ID of the additional armor object to summon.
+
+		- triggerSummon(`id`): Performs vanilla creature summoning logic. It will create a summoned version of a creature with provided ID.
+			**Parameters:**
+			- `id` (string): The ID of the creature object to summon.
+
 	* `onCollision` (function): *Optional*. A function which will be called when a spell containing this spell effect collides with something.
 
 **Returns**:
 
 * `effect` ([tes3effect](../../types/tes3effect))
+
+??? example "Example: Fire Damage effect"
+
+	```lua
+	-- Claiming an ID is needed before actually
+	-- creating an effect with that ID
+	tes3.claimSpellEffectId("customFireDmg", 220)
+	
+	local function onFireDmgTick(tickParams)
+		-- This will print current health for any actor our spell hit
+		tes3.messageBox("%s, health: %s", tickParams.effectInstance.target.object.id, tickParams.effectInstance.target.mobile.health.current)
+	
+		tickParams:trigger({
+			type = tes3.effectEventType.modStatistic,
+			-- The resistance attribute against Fire Damage should be Resist Fire
+			attribute = tes3.effectAttribute.resistFire,
+			value = tickParams.effectInstance.target.mobile.health,
+			negateOnExpiry = false,
+			isUncapped = true,
+		})
+	end
+	
+	event.register(tes3.event.magicEffectsResolved, function()
+		tes3.addMagicEffect({
+			-- The ID we claimed before is now available in tes3.effect namespace
+			id = tes3.effect.customFireDmg,
+	
+			-- This information if just copied from the Construction Set --
+			name = "Fire Damage",
+			description = ("This spell effect produces a manifestation of elemental fire. Upon " ..
+			"contact with an object, this manifestation explodes, causing damage."),
+			baseCost = 5,
+			school = tes3.magicSchool.destruction,
+			size = 1.25,
+			sizeCap = 50,
+			speed = 1,
+			lighting = { x = 0.99, y = 0.26, z = 0.53 },
+			usesNegativeLighting = false,
+	
+			icon = "s\\Tx_S_fire_damage.tga",
+			particleTexture = "vfx_firealpha00A.tga",
+			castSound = "destruction cast",
+			castVFX = "VFX_DestructCast",
+			boltSound = "destruction bolt",
+			boltVFX = "VFX_DestructBolt",
+			hitSound = "destruction hit",
+			hitVFX = "VFX_DestructHit",
+			areaSound = "destruction area",
+			areaVFX = "VFX_DestructArea",
+			-- --
+	
+			appliesOnce = false,
+			hasNoDuration = false,
+			hasNoMagnitude = false,
+			illegalDaedra = false,
+			unreflectable = false,
+			casterLinked = false,
+			nonRecastable = false,
+			targetsAttributes = false,
+			targetsSkills = false,
+	
+			onTick = onFireDmgTick,
+		})
+	end)
+	
+	event.register(tes3.event.loaded, function()
+		local spell1 = tes3.createObject({ objectType = tes3.objectType.spell })
+		tes3.setSourceless(spell1)
+		spell1.name = "TEST SPELL - self"
+		spell1.magickaCost = 1
+	
+		local effect = spell1.effects[1]
+		effect.id = tes3.effect.customFireDmg
+		effect.rangeType = tes3.effectRange.self
+		effect.min = 10
+		effect.max = 10
+		effect.duration = 10
+		effect.radius = 0
+		effect.skill = -1
+		effect.attribute = -1
+	
+		local spell2 = tes3.createObject({ objectType = tes3.objectType.spell })
+		tes3.setSourceless(spell2)
+		spell2.name = "TEST SPELL - target"
+		spell2.magickaCost = 1
+	
+		local effect = spell2.effects[1]
+		effect.id = tes3.effect.customFireDmg
+		effect.rangeType = tes3.effectRange.target
+		effect.min = 3
+		effect.max = 3
+		effect.duration = 10
+		effect.radius = 15
+		effect.skill = -1
+		effect.attribute = -1
+	
+		local spell3 = tes3.createObject({ objectType = tes3.objectType.spell })
+		tes3.setSourceless(spell3)
+		spell3.name = "TEST SPELL - touch"
+		spell3.magickaCost = 1
+	
+		local effect = spell3.effects[1]
+		effect.id = tes3.effect.customFireDmg
+		effect.rangeType = tes3.effectRange.touch
+		effect.min = 3
+		effect.max = 3
+		effect.duration = 10
+		effect.radius = 0
+		effect.skill = -1
+		effect.attribute = -1
+	
+		tes3.addSpell({ reference = tes3.mobilePlayer, spell = spell1 })
+		tes3.addSpell({ reference = tes3.mobilePlayer, spell = spell2 })
+		tes3.addSpell({ reference = tes3.mobilePlayer, spell = spell3 })
+	end)
+
+	```
 
 ***
 
@@ -271,7 +421,36 @@ local wasAdded = tes3.addSoulGem({ item = ... })
 
 **Returns**:
 
-* `wasAdded` (number)
+* `wasAdded` (boolean)
+
+??? example "Example: Make the Dwemer Tube a Soul gem. Also, make sure Fargoth's soul alway ends up in it if the player has one avilable."
+
+	```lua
+	local function onInitialized()
+	    tes3.addSoulGem({ item = "misc_dwrv_artifact60" })
+	end
+	event.register(tes3.event.initialized, onInitialized)
+	
+	local function onFilterSoulGemTarget(e)
+	    if (e.reference.baseObject.id:lower() == "fargoth") then
+	        return e.soulGem.id == "misc_dwrv_artifact60"
+	    end
+	end
+	event.register(tes3.event.filterSoulGemTarget, onFilterSoulGemTarget)
+	
+	-- calcSoulValue event allows assigning a new soul value to creatures
+	-- If the event was triggered for an NPC, it allows assigning a value
+	-- thus allowing soul-trapping the actor.
+	local function calcSoulValueCallback(e)
+	    if (e.actor.id:lower() == "fargoth") then
+	        e.value = 69
+	        mwse.log("Getting Fargoth's value.")
+	        return
+	    end
+	end
+	event.register(tes3.event.calcSoulValue, calcSoulValueCallback)
+
+	```
 
 ***
 
@@ -289,7 +468,7 @@ local wasAdded = tes3.addSpell({ reference = ..., actor = ..., spell = ..., upda
 	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): Who to give the spell to. To manipulate an actor without specifying any particular reference, use `actor` instead.
 	* `actor` ([tes3actor](../../types/tes3actor), string): Who to give the spell to. Providing a base actor can be done before a save has been loaded, but may not correctly update effects for instanced versions of that actor in an active save.
 	* `spell` ([tes3spell](../../types/tes3spell), string): The spell to add.
-	* `updateGUI` (boolean): *Default*: `true`. If true, the GUI will be updated respsecting the adding of the spell. This can be useful to disable when batch-adding many spells. The batch should be ended with `tes3.updateMagicGUI` to reflect the changes.
+	* `updateGUI` (boolean): *Default*: `true`. If true, the GUI will be updated respsecting the adding of the spell. This can be useful to disable when batch-adding many spells. The batch should be ended with [`tes3.updateMagicGUI`](https://mwse.github.io/MWSE/apis/tes3/#tes3updatemagicgui) to reflect the changes.
 
 **Returns**:
 
@@ -310,7 +489,7 @@ tes3.adjustSoundVolume({ sound = ..., reference = ..., mixChannel = ..., volume 
 * `params` (table)
 	* `sound` ([tes3sound](../../types/tes3sound), string): The sound object, or id of the sound to look for.
 	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): The reference to attach the sound to.
-	* `mixChannel` (number): *Default*: `tes3.audioMixType.effects`. The channel to base volume off of. Maps to tes3.audioMixType constants.
+	* `mixChannel` (number): *Default*: `tes3.soundMix.effects`. The channel to base volume off of. Maps to [`tes3.soundMix`](https://mwse.github.io/MWSE/references/sound-mix-types/) constants.
 	* `volume` (number): *Default*: `1.0`. A value between 0.0 and 1.0 to scale the volume off of.
 
 ***
@@ -347,21 +526,21 @@ local instance = tes3.applyMagicSource({ reference = ..., source = ..., name = .
 **Parameters**:
 
 * `params` (table)
-	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string)
+	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): A reference on which the magic source will be applied.
 	* `source` ([tes3object](../../types/tes3object)): *Optional*. A magic source to apply.
 	* `name` (string): *Optional*. If applying alchemy as a source, you can specifiy a name for the magic source.
 	* `effects` (table): *Optional*. A table of custom effects to apply as a potion. Maximal number of effects is 8.
 		* `id` (boolean): *Default*: `-1`. ID of the effect.
-		* `skill` (tes3.skill.* constants): *Default*: `-1`. If effect parameter specified is: Absorb, Damage, Drain, Fortify or Restore Skill, a skill should be provided. This also applies to any custom spell effect which operates on a certain skill.
-		* `attribute` (tes3.attribute.* constants): *Default*: `-1`. If effect parameter specified is: Absorb, Damage, Drain, Fortify or Restore Attribute, an attribute should be provided. This also applies to any custom spell effect which operates on a certain attribute.
-		* `range` (tes3.effectRange.* constants): *Default*: `tes3.effectRange.self`. The range of the effect. This maps to tes3.effectRange.* constants.
+		* `skill` (number): *Default*: `-1`. If effect parameter specified is: Absorb, Damage, Drain, Fortify or Restore Skill, a skill should be provided. This also applies to any custom spell effect which operates on a certain skill. This value maps to [`tes3.skill`](https://mwse.github.io/MWSE/references/skills/) constants.
+		* `attribute` (number): *Default*: `-1`. If effect parameter specified is: Absorb, Damage, Drain, Fortify or Restore Attribute, an attribute should be provided. This also applies to any custom spell effect which operates on a certain attribute. This value maps to [`tes3.attribute`](https://mwse.github.io/MWSE/references/attributes/) constants.
+		* `range` (number): *Default*: `tes3.effectRange.self`. The range of the effect. This maps to [`tes3.effectRange`](https://mwse.github.io/MWSE/references/effect-ranges/) constants.
 		* `radius` (number): *Default*: `0`. The radius of the effect.
 		* `duration` (number): *Default*: `0`. Number of seconds the effect is going to be active.
 		* `min` (number): *Default*: `0`. The minimal magintude of the effect per tick.
 		* `max` (number): *Default*: `0`. The maximal magnitude of the effect per tick.
 	* `createCopy` (boolean): *Optional*. This parameter controls whether the function will return the original magic source or a copy of the magic source. This parameter is only used if source is alchemy.
 	* `fromStack` ([tes3equipmentStack](../../types/tes3equipmentStack)): *Optional*. The piece of equipment this magic source is coming from. The fromStack has to be an already equipped item from tes3actor.equipment. This will probably change in the future.
-	* `castChance` (number): *Default*: `This parameter allows overriding the casting chance of the magic source.`.
+	* `castChance` (number): *Optional*. This parameter allows overriding the casting chance of the magic source.
 	* `target` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): *Optional*. The target of the magic.
 	* `bypassResistances` (boolean): *Optional*. Is this effect going to bypass magic resistance?
 
@@ -387,6 +566,35 @@ local success = tes3.beginTransform({ reference = ... })
 **Returns**:
 
 * `success` (boolean)
+
+***
+
+### `tes3.calculatePrice`
+
+Calculates a price, given a merchant and associated trading data. This is useful beyond accessing the object's `.value` field in that it raises the appropriate events to let other mods modify the values.
+
+```lua
+local price = tes3.calculatePrice({ object = ..., basePrice = ..., buying = ..., selling = ..., merchant = ..., bartering = ..., repairing = ..., training = ..., count = ..., itemData = ..., skill = ... })
+```
+
+**Parameters**:
+
+* `params` (table)
+	* `object` ([tes3object](../../types/tes3object)): *Optional*. The object to calculate the price for. If not provided, `basePrice` is required.
+	* `basePrice` (number): *Optional*. The base price to calculate the end price for. This defaults to the `object` param's `value`, if provided. This parameter is required if `object` is not provided.
+	* `buying` (boolean): *Default*: `true`. If `true`, uses the logic for buying a service/item. This is exclusive with `selling`.
+	* `selling` (boolean): If `true`, uses the logic for selling an item. This is exclusive with `buying`.
+	* `merchant` ([tes3mobileActor](../../types/tes3mobileActor)): The merchant to use for calculating the price.
+	* `bartering` (boolean): If `true`, a [calcBarterPrice](https://mwse.github.io/MWSE/events/calcBarterPrice) or [calcRepairPrice](https://mwse.github.io/MWSE/events/calcRepairPrice) event will be triggered.
+	* `repairing` (boolean): If `true`, a [calcRepairPrice](https://mwse.github.io/MWSE/events/calcRepairPrice) event will be triggered.
+	* `training` (boolean): If `true`, a [calcTrainingPrice](https://mwse.github.io/MWSE/events/calcTrainingPrice) event will be triggered, passing the given `skill` ID.
+	* `count` (number): *Default*: `1`. If `bartering`, the count passed to the [calcBarterPrice](https://mwse.github.io/MWSE/events/calcBarterPrice) event.
+	* `itemData` ([tes3itemData](../../types/tes3itemData)): *Optional*. If `bartering` or `repairing`, the item data passed to the [calcBarterPrice](https://mwse.github.io/MWSE/events/calcBarterPrice) or [calcRepairPrice](https://mwse.github.io/MWSE/events/calcRepairPrice) event.
+	* `skill` (number): If `training`, the skill ID passed to the [calcTrainingPrice](https://mwse.github.io/MWSE/events/calcTrainingPrice) event.
+
+**Returns**:
+
+* `price` (number): The calculated price, filtered by events.
 
 ***
 
@@ -450,11 +658,40 @@ local executed = tes3.cast({ reference = ..., target = ..., spell = ..., instant
 
 * `executed` (boolean)
 
+??? example "Example: This is an example of how to use tes3.cast instead of mwscript.explodeSpell"
+
+	```lua
+	-- The following code can be tested in-game by pressing Alt + l or Alt + k
+	
+	event.register(tes3.event.keyDown, function(e)
+		if e.isAltDown then
+			tes3.messageBox("mwscript.explodeSpell")
+			mwscript.explodeSpell({
+				reference = tes3.game.playerTarget,
+				spell = "proj_trap_spell"
+			})
+		end
+	end, { filter = tes3.scanCode.l })
+	
+	event.register(tes3.event.keyDown, function(e)
+		if e.isAltDown then
+			tes3.messageBox("tes3.cast")
+			-- This will behave the same as will mwscript.explodeSpell()
+			tes3.cast({
+				target = tes3.game.playerTarget,
+				reference = tes3.game.playerTarget,
+				spell = "proj_trap_spell",
+			})
+		end
+	end, { filter = tes3.scanCode.k })
+
+	```
+
 ***
 
 ### `tes3.checkMerchantOffersService`
 
-Checks if a merchant will offer a service to you, including dialogue checks like disposition and faction membership. A specific service can be checked, or if no service is given, a generic dialogue check is made. If the service if refused, the dialogue reply for the refusal may also returned (it may be nil, as there may not always be a reply available).
+Checks if a merchant will offer a service to you, including dialogue checks like disposition and faction membership. A specific service can be checked, or if no service is given, a generic dialogue check is made. If the service is refused, the dialogue reply for the refusal may also be returned (it may be nil, as there may not always be a reply available).
 
 ```lua
 local offersService, refusalReply = tes3.checkMerchantOffersService(reference, service)
@@ -463,12 +700,12 @@ local offersService, refusalReply = tes3.checkMerchantOffersService(reference, s
 **Parameters**:
 
 * `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string)
-* `service` (number): *Optional*. The specific service to check for availability. Uses the tes3.merchantService.* constants.
+* `service` (number): *Optional*. The specific service to check for availability. Uses the [`tes3.merchantService`](https://mwse.github.io/MWSE/references/merchant-service-types/) constants.
 
 **Returns**:
 
 * `offersService` (boolean)
-* `refusalReply` (tes3DialogueInfo)
+* `refusalReply` ([tes3dialogueInfo](../../types/tes3dialogueInfo))
 
 ***
 
@@ -494,17 +731,16 @@ local trades = tes3.checkMerchantTradesItem({ item = ..., reference = ... })
 
 ### `tes3.claimSpellEffectId`
 
-This function is used to claim a unique spell effect name and id. This is needed before actually creating a new effect by calling tes3.addMagicEffect. A claimed effect id can be retrieved as: tes3.effect.effectName (just like any regular spell effect).
+This function is used to claim a unique spell effect name and id. This is needed before actually creating a new effect by calling `tes3.addMagicEffect()`. A claimed effect id is then available as: `tes3.effect.effectName` (just like any other spell effect). For examples of this function in practice see [`tes3.addMagicEffect()`](https://mwse.github.io/MWSE/apis/tes3/#tes3addmagiceffect) example.
 
 ```lua
-tes3.claimSpellEffectId({ name = ..., id = ... })
+tes3.claimSpellEffectId(name, id)
 ```
 
 **Parameters**:
 
-* `params` (table)
-	* `name` (string): The name of the new spell effect. Must be unique. An error will be thrown if it's non-unique.
-	* `id` (number): A unique number representing the new spell effect. An error will be thrown if it's non-unique.
+* `name` (string): The name of the new spell effect. Must be unique. An error will be thrown if it's non-unique.
+* `id` (number): A unique number representing the new spell effect. An error will be thrown if it's non-unique.
 
 ***
 
@@ -529,7 +765,7 @@ local createdObject = tes3.createObject({ objectType = ..., getIfExists = ... })
 **Parameters**:
 
 * `params` (table)
-	* `objectType` (number): Maps to `tes3.objectType` constants. Used to filter object type to create.
+	* `objectType` (number): Maps to [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/) constants. Used to filter object type to create.
 	* `getIfExists` (boolean): *Default*: `true`. If `true`, an existing object of the same type and ID will be returned instead of creating a new one.
 
 **Returns**:
@@ -673,7 +909,7 @@ tes3.disableKey(keyCode)
 
 **Parameters**:
 
-* `keyCode` (number)
+* `keyCode` (number): Maps to values in [`tes3.scanCode`](https://mwse.github.io/MWSE/references/scan-codes/) namespace.
 
 ***
 
@@ -711,7 +947,7 @@ tes3.enableKey(keyCode)
 
 **Parameters**:
 
-* `keyCode` (number)
+* `keyCode` (number): Maps to values in [`tes3.scanCode`](https://mwse.github.io/MWSE/references/scan-codes/) namespace.
 
 ***
 
@@ -857,8 +1093,8 @@ local dialogue = tes3.findDialogue({ topic = ..., type = ..., page = ... })
 
 * `params` (table)
 	* `topic` (string): *Optional*. The dialogue topic to look for.
-	* `type` (number): *Optional*. The type of dialogue to look for. Uses tes3.dialogueType.* constants.
-	* `page` (number): *Optional*. The page of dialogue to fetch. Uses tes3.dialoguePage.* constants.
+	* `type` (number): *Optional*. The type of dialogue to look for. Uses [`tes3.dialogueType`](https://mwse.github.io/MWSE/references/dialogue-types/) constants.
+	* `page` (number): *Optional*. The page of dialogue to fetch. Uses [`tes3.dialoguePage`](https://mwse.github.io/MWSE/references/dialogue-pages/) constants.
 
 **Returns**:
 
@@ -886,7 +1122,7 @@ local globalVariable = tes3.findGlobal(id)
 
 ### `tes3.findGMST`
 
-Fetches the core game object that represents a game setting. While this function accepts a name, it is recommended to use the tes3.GMST constants.
+Fetches the core game object that represents a game setting. While this function accepts a name, it is recommended to use the [`tes3.GMST`](https://mwse.github.io/MWSE/references/gmst/) constants.
 
 ```lua
 local gameSetting = tes3.findGMST(id)
@@ -913,7 +1149,7 @@ local gameSetting = tes3.findGMST(id)
 	-- Write our markdown header.
 	local f = assert(io.open("Data Files\\MWSE\\tmp\\GMSTs.md", "w"))
 	f:write("# GMSTs\n\n")
-	f:write("Index | Type    | Identifier                       | Default Value\n")
+	f:write("Index | Type	| Identifier					   | Default Value\n")
 	f:write("----- | ------- | -------------------------------- | --------------------------------------------\n")
 	
 	-- Go through all our GMSTs...
@@ -1281,9 +1517,9 @@ local magnitude, unresistedMagnitude = tes3.getEffectMagnitude({ reference = ...
 
 * `params` (table)
 	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): An associated mobile should exist for this function to be able to work.
-	* `effect` (tes3.effect.* constants): Effect ID. Can be any of the predefined spell effects, or one added by tes3.claimSpellEffectId.
-	* `skill` (tes3.skill.* constants): *Default*: `-1`. If effect parameter specified is: Absorb, Damage, Drain, Fortify or Restore Skill, a skill should be provided. This also applies to any custom spell effect which operates on a certain skill.
-	* `attribute` (tes3.attribute.* constants): *Default*: `-1`. If effect parameter specified is: Absorb, Damage, Drain, Fortify or Restore Attribute, an attribute should be provided. This also applies to any custom spell effect which operates on a certain attribute.
+	* `effect` (number): Effect ID. Can be any of the predefined spell effects, or one added by `tes3.claimSpellEffectId()`. Maps to values of [`tes3.effect`](https://mwse.github.io/MWSE/references/magic-effects/) constants
+	* `skill` (number): *Default*: `-1`. If effect parameter specified is: Absorb, Damage, Drain, Fortify or Restore Skill, a skill should be provided. This also applies to any custom spell effect which operates on a certain skill. This value maps to [`tes3.skill`](https://mwse.github.io/MWSE/references/skills/) constants.
+	* `attribute` (number): *Default*: `-1`. If effect parameter specified is: Absorb, Damage, Drain, Fortify or Restore Attribute, an attribute should be provided. This also applies to any custom spell effect which operates on a certain attribute. This value maps to [`tes3.attribute`](https://mwse.github.io/MWSE/references/attributes/) constants.
 
 **Returns**:
 
@@ -1320,9 +1556,9 @@ local stack = tes3.getEquippedItem({ actor = ..., enchanted = ..., objectType = 
 * `params` (table)
 	* `actor` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), [tes3actor](../../types/tes3actor))
 	* `enchanted` (boolean): *Optional*. If true, filters to enchanted items.
-	* `objectType` (number): *Optional*. Maps to tes3.objectType constants. Used to filter equipment by type.
-	* `slot` (number): *Optional*. Maps to tes3.armorSlot or tes3.clothingSlot. Used to filter equipment by slot.
-	* `type` (number): *Optional*. Maps to tes3.weaponType. Used to filter equipment by type.
+	* `objectType` (number): *Optional*. Maps to [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/) constants. Used to filter equipment by type.
+	* `slot` (number): *Optional*. Maps to [`tes3.armorSlot`](https://mwse.github.io/MWSE/references/armor-slots/) or [`tes3.clothingSlot`](https://mwse.github.io/MWSE/references/clothing-slots/). Used to filter equipment by slot.
+	* `type` (number): *Optional*. Maps to [`tes3.weaponType`](https://mwse.github.io/MWSE/references/weapon-types/). Used to filter equipment by type.
 
 **Returns**:
 
@@ -1333,9 +1569,9 @@ local stack = tes3.getEquippedItem({ actor = ..., enchanted = ..., objectType = 
 	```lua
 	local equippedLightStack = tes3.getEquippedItem({ actor = tes3.player, objectType = tes3.objectType.light })
 	if (equippedLightStack) then
-	    mwse.log("Equipped light: %s", equippedLightStack.object.id)
+		mwse.log("Equipped light: %s", equippedLightStack.object.id)
 	else
-	    mwse.log("No light equipped.")
+		mwse.log("No light equipped.")
 	end
 
 	```
@@ -1345,9 +1581,9 @@ local stack = tes3.getEquippedItem({ actor = ..., enchanted = ..., objectType = 
 	```lua
 	local equippedShieldStack = tes3.getEquippedItem({ actor = tes3.player, objectType = tes3.objectType.armor, slot = tes3.armorSlot.shield })
 	if (equippedShieldStack) then
-	    mwse.log("Equipped shield: %s", equippedShieldStack.object.id)
+		mwse.log("Equipped shield: %s", equippedShieldStack.object.id)
 	else
-	    mwse.log("No shield equipped.")
+		mwse.log("No shield equipped.")
 	end
 
 	```
@@ -1436,7 +1672,7 @@ local inputConfig = tes3.getInputBinding(keybind)
 
 **Parameters**:
 
-* `keybind` (number): Maps to tes3.keybind constants.
+* `keybind` (number): Maps to [`tes3.keybind`](https://mwse.github.io/MWSE/references/keybinds/) constants.
 
 **Returns**:
 
@@ -1537,7 +1773,7 @@ local killMap = tes3.getKillCounts()
 
 ### `tes3.getLanguage`
 
-Gets the language as an ISO string (e.g. "eng"), determined by the language entry in Morrowind.ini.
+Gets the language as an ISO string (e.g. "eng"), determined by the language entry in Morrowind.ini and the detected executable.
 
 ```lua
 local code = tes3.getLanguage()
@@ -1551,7 +1787,7 @@ local code = tes3.getLanguage()
 
 ### `tes3.getLanguageCode`
 
-Gets the language code, determined by the language entry in Morrowind.ini.
+Gets the language code, determined by the language entry in Morrowind.ini and the detected executable.
 
 ```lua
 local code = tes3.getLanguageCode()
@@ -1633,6 +1869,27 @@ local magicEffect = tes3.getMagicEffect(id)
 
 ***
 
+### `tes3.getMagicEffectName`
+
+Returns the complex name of a magic effect, taking into account attribute or skill values.
+
+```lua
+local complexName = tes3.getMagicEffectName({ effect = ..., attribute = ..., skill = ... })
+```
+
+**Parameters**:
+
+* `params` (table)
+	* `effect` (number): The effect ID to get the name of.
+	* `attribute` (number): *Optional*. The attribute ID to use, if applicable.
+	* `skill` (number): *Optional*. The skill ID to use, if applicable.
+
+**Returns**:
+
+* `complexName` (string)
+
+***
+
 ### `tes3.getMagicSourceInstanceBySerial`
 
 Fetches an instance of the magic source of a given serial number.
@@ -1699,6 +1956,20 @@ local object = tes3.getOwner(reference)
 **Returns**:
 
 * `object` ([tes3object](../../types/tes3object))
+
+***
+
+### `tes3.getPlayerActivationDistance`
+
+This function returns the distance that the player can activate objects with. This is a sum of the iMaxActivateDist GMST value and the player's telekinesis strength.
+
+```lua
+local result = tes3.getPlayerActivationDistance()
+```
+
+**Returns**:
+
+* `result` (number)
 
 ***
 
@@ -1777,13 +2048,13 @@ local result = tes3.getPlayerTarget()
 This function retrieves data for a quick key.
 
 ```lua
-local result = tes3.getQuickKey({ key = ... })
+local result = tes3.getQuickKey({ slot = ... })
 ```
 
 **Parameters**:
 
 * `params` (table)
-	* `key` (number): The key to retrieve data for. This is a value between 1 and 9.
+	* `slot` (number): The key to retrieve data for. This is a value between 1 and 9.
 
 **Returns**:
 
@@ -1869,7 +2140,7 @@ local skill = tes3.getSkill(id)
 
 **Parameters**:
 
-* `id` (number): Maps to tes3.skill constants.
+* `id` (number): Maps to [`tes3.skill`](https://mwse.github.io/MWSE/references/skills/) constants.
 
 **Returns**:
 
@@ -1920,7 +2191,7 @@ local soundGenerator = tes3.getSoundGenerator(creatureId, soundType)
 **Parameters**:
 
 * `creatureId` (string)
-* `soundType` (number): Maps to tes3.soundGenType constants.
+* `soundType` (number): Maps to [`tes3.soundGenType`](https://mwse.github.io/MWSE/references/sound-generator-types/) constants.
 
 **Returns**:
 
@@ -1995,9 +2266,23 @@ local spell = tes3.getTrap({ reference = ... })
 
 ***
 
+### `tes3.getVanityMode`
+
+The function returns true if the player is in the vanity mode. Vanity mode is triggered by a period of inactivity from the player or by a `tes3.setVanityMode()` function. The view is switched to third person (if not already), and the camera is orbiting slowly around the player character.
+
+```lua
+local result = tes3.getVanityMode()
+```
+
+**Returns**:
+
+* `result` (boolean): Is the vanity mode currently active?
+
+***
+
 ### `tes3.getViewportSize`
 
-Returns both the viewport width and the viewport height. Note that this the real resolution of the screen. For a value scaled by MGE's menu scaling, see the same-named function in the tes3ui namespace. To get the scale used, check getViewportScale in the tes3ui namespace.
+Returns both the viewport width and the viewport height. Note that this is the real resolution of the screen. For a value scaled by MGE's menu scaling, see the [same-named function](https://mwse.github.io/MWSE/apis/tes3ui/#tes3uigetviewportsize) in the tes3ui namespace. To get the scale used, check [getViewportScale](https://mwse.github.io/MWSE/apis/tes3ui/#tes3uigetviewportscale) in the tes3ui namespace.
 
 ```lua
 local width, height = tes3.getViewportSize()
@@ -2048,7 +2333,7 @@ local state = tes3.hasCodePatchFeature(id)
 
 **Parameters**:
 
-* `id` (number)
+* `id` (number): The id of the feature. Maps to values in [`tes3.codePatchFeature`](https://mwse.github.io/MWSE/references/code-patch-features/) constants.
 
 **Returns**:
 
@@ -2128,9 +2413,9 @@ local state = tes3.is3rdPerson()
 
 ### `tes3.isAffectedBy`
 
-This function check whether a reference is affected by a certain object or effect.
+This function performs a check whether the provided reference is affected by a certain object or magic effect.
 
-Note reference.object.spells:contains(spellID) will give the same output as this function for abilities, diseases, and curses, because having them in your spell list also makes them affect you.
+Note `reference.object.spells:contains(spellID)` will give the same output as this function for abilities, diseases, and curses, because having them in your spell list also makes them affect you.
 
 ```lua
 local isAffectedBy = tes3.isAffectedBy({ reference = ..., effect = ..., object = ... })
@@ -2140,12 +2425,42 @@ local isAffectedBy = tes3.isAffectedBy({ reference = ..., effect = ..., object =
 
 * `params` (table)
 	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string)
-	* `effect` (tes3.effect): *Optional*. A tes3.effect constant to check for.
-	* `object` ([tes3alchemy](../../types/tes3alchemy), [tes3enchantment](../../types/tes3enchantment), [tes3spell](../../types/tes3spell), [tes3magicEffect](../../types/tes3magicEffect), string): *Optional*. An object to check for.
+	* `effect` (number): *Optional*. A numerical identifier of the magic effect to perform a check for. Maps to [`tes3.effect`](https://mwse.github.io/MWSE/references/magic-effects/) constant, including those claimed with `tes3.claimSpellEffectId()`, and then added with `tes3.addMagicEffect()`.
+	* `object` ([tes3alchemy](../../types/tes3alchemy), [tes3enchantment](../../types/tes3enchantment), [tes3spell](../../types/tes3spell), [tes3magicEffect](../../types/tes3magicEffect), string): *Optional*. An object to perform a check for.
 
 **Returns**:
 
 * `isAffectedBy` (boolean)
+
+***
+
+### `tes3.isKeyEqual`
+
+Compares two key objects and returns their equality. Returns true if the objects are equal, false otherwise.
+
+```lua
+local equal = tes3.isKeyEqual({ actual = ..., expected = ... })
+```
+
+**Parameters**:
+
+* `params` (table)
+	* `actual` (table): The key object that is being compared.
+		* `keyCode` (number): Value of the actual key scan code, such as the letter `p`. Maps to [`tes3.scanCode.*`](https://mwse.github.io/MWSE/references/scan-codes/).
+		* `isShiftDown` (boolean): Value of whether the shift key is pressed.
+		* `isControlDown` (boolean): Value of whether the control key is pressed.
+		* `isAltDown` (boolean): Value of whether the alt key is pressed.
+		* `isSuperDown` (boolean): Value of whether the super (Windows key) key is pressed.
+	* `expected` (table): The key object that is being compared against.
+		* `keyCode` (number): Value of the expected key scan code, such as the letter `p`. Maps to [`tes3.scanCode.*`](https://mwse.github.io/MWSE/references/scan-codes/).
+		* `isShiftDown` (boolean): Value of whether the shift key is expected to be pressed.
+		* `isControlDown` (boolean): Value of whether the control key is expected to be pressed.
+		* `isAltDown` (boolean): Value of whether the alt key is expected to be pressed.
+		* `isSuperDown` (boolean): Value of whether the super (Windows key) key is pressed.
+
+**Returns**:
+
+* `equal` (boolean)
 
 ***
 
@@ -2170,6 +2485,8 @@ local result = tes3.isModActive(filename)
 ### `tes3.iterate`
 
 This function returns a function that iterates over a tes3iterator object. This is useful for for loops.
+		
+Note that tes3iterator objects support iteration with `pairs()` function.
 
 ```lua
 local function = tes3.iterate(iterator)
@@ -2195,7 +2512,7 @@ local object = tes3.iterateObjects(filter)
 
 **Parameters**:
 
-* `filter` (number): Maps to tes3.objectType constants.
+* `filter` (number): Maps to [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/) constants.
 
 **Returns**:
 
@@ -2315,7 +2632,7 @@ local iterationFunction = tes3.loopTArray(tarray)
 
 ### `tes3.makeSafeObjectHandle`
 
-Returns a safe handle for the object. To use the object use :getObject(). To check if it still exists use :valid().
+Returns a safe handle for the object. To use the object use `:getObject()`. To check if it still exists use `:valid()`.
 
 ```lua
 local object = tes3.makeSafeObjectHandle(unknown, unknown, unknown)
@@ -2358,8 +2675,8 @@ local element = tes3.messageBox({ message = ..., buttons = ..., callback = ..., 
 	* `message` (string)
 	* `buttons` (table): *Optional*. An array of strings to use for buttons.
 	* `callback` (function)
-	* `showInDialog` (boolean): *Optional*. Specifying showInDialog = false forces the toast-style message, which is not shown in the dialog menu. Defaults to true.
-	* `duration` (float): *Optional*. Overrides how long the toast-style message remains visible.
+	* `showInDialog` (boolean): *Default*: `true`. Specifying showInDialog = false forces the toast-style message, which is not shown in the dialog menu.
+	* `duration` (number): *Optional*. Overrides how long the toast-style message remains visible.
 * `formatAdditions` (variadic): *Optional*. Only used if messageOrParams is a string.
 
 **Returns**:
@@ -2393,9 +2710,9 @@ tes3.modStatistic({ reference = ..., name = ..., attribute = ..., skill = ..., b
 
 	```lua
 	tes3.modStatistic({
-	    reference = tes3.mobilePlayer,
-	    name = "health",
-	    current = -10
+		reference = tes3.mobilePlayer,
+		name = "health",
+		current = -10
 	})
 
 	```
@@ -2404,9 +2721,9 @@ tes3.modStatistic({ reference = ..., name = ..., attribute = ..., skill = ..., b
 
 	```lua
 	tes3.modStatistic({
-	    reference = tes3.mobilePlayer,
-	    name = "magicka",
-	    current = 20,
+		reference = tes3.mobilePlayer,
+		name = "magicka",
+		current = 20,
 		limitToBase = true
 	})
 
@@ -2463,9 +2780,9 @@ local success = tes3.persuade({ actor = ..., index = ..., modifier = ... })
 
 Plays a given animation group. Optional flags can be used to define how the group starts.
 
-When 'group' is specified, the actor AI is paused while playing the animation, as if in an idle state. When one or more of 'lower', 'upper', or 'shield' are specified without 'group', the actor AI retains control, and the animations are layered. e.g. tes3.playAnimation{reference = ..., upper = tes3.animationGroup.idle3, loopCount = 0} will play the idle3 animation once (without looping) on the upper body, while the player or NPC is still able to walk around. Using 'upper' defers combat actions until the animation is done. Using 'shield' still allows combat actions.
+When 'group' is specified, the actor AI is paused while playing the animation, as if in an idle state. When one or more of 'lower', 'upper', or 'shield' are specified without 'group', the actor AI retains control, and the animations are layered. e.g. `tes3.playAnimation{reference = ..., upper = tes3.animationGroup.idle3, loopCount = 0}` will play the idle3 animation once (without looping) on the upper body, while the player or NPC is still able to walk around. Using 'upper' defers combat actions until the animation is done. Using 'shield' still allows combat actions.
 
-As a special case, tes3.playAnimation{reference = ..., group = 0} returns control to the AI, as the AI knows that is the actor's neutral idle state.
+As a special case, `tes3.playAnimation{reference = ..., group = 0}` returns control to the AI, as the AI knows that is the actor's neutral idle state.
 
 ```lua
 tes3.playAnimation({ reference = ..., group = ..., lower = ..., upper = ..., shield = ..., startFlag = ..., loopCount = ..., mesh = ... })
@@ -2475,13 +2792,13 @@ tes3.playAnimation({ reference = ..., group = ..., lower = ..., upper = ..., shi
 
 * `params` (table)
 	* `reference` ([tes3mobileActor](../../types/tes3mobileActor), [tes3reference](../../types/tes3reference), string): The reference that will play the animation.
-	* `group` (number): *Optional*. The animation group id to start playing -- a value from 0 to 149. Applies the animation to the whole body. Maps to tes3.animationGroup.* constants.
-	* `lower` (number): *Optional*. Sets the animation group id for the lower body. This is used to combine different animations for each body section. Maps to tes3.animationGroup.* constants.
-	* `upper` (number): *Optional*. Sets the animation group id for the upper body. This is used to combine different animations for each body section. Maps to tes3.animationGroup.* constants.
-	* `shield` (number): *Optional*. Sets the animation group id for the shield arm. This is used to combine different animations for each body section. Maps to tes3.animationGroup.* constants.
-	* `startFlag` (number): *Default*: `tes3.animationStartFlag.immediate`. A flag for starting the group with, using tes3.animationStartFlag.* constants.
+	* `group` (number): *Optional*. The animation group id to start playing -- a value from 0 to 149. Applies the animation to the whole body. Maps to [`tes3.animationGroup`](https://mwse.github.io/MWSE/references/animation-groups/) constants.
+	* `lower` (number): *Optional*. Sets the animation group id for the lower body. This is used to combine different animations for each body section. Maps to [`tes3.animationGroup`](https://mwse.github.io/MWSE/references/animation-groups/) constants.
+	* `upper` (number): *Optional*. Sets the animation group id for the upper body. This is used to combine different animations for each body section. Maps to [`tes3.animationGroup`](https://mwse.github.io/MWSE/references/animation-groups/) constants.
+	* `shield` (number): *Optional*. Sets the animation group id for the shield arm. This is used to combine different animations for each body section. Maps to [`tes3.animationGroup`](https://mwse.github.io/MWSE/references/animation-groups/) constants.
+	* `startFlag` (number): *Default*: `tes3.animationStartFlag.immediate`. A flag for starting the group with, using [`tes3.animationStartFlag`](https://mwse.github.io/MWSE/references/animation-start-flags/) constants.
 	* `loopCount` (number): *Default*: `-1`. If provided, the animation will repeat its loop section a given number of times. To make an animation play through once, set loopCount = 0. Defaults to infinite looping.
-	* `mesh` (string): *Optional*. Deprecated. Please use tes3.loadAnimation (check its documentation) before calling playAnimation. You can also use loadAnimation to reset loaded animations to default.
+	* `mesh` (string): *Optional*. Deprecated. Please use [`tes3.loadAnimation`](https://mwse.github.io/MWSE/apis/tes3/#tes3loadanimation) (check its documentation) before calling `playAnimation`. You can also use `loadAnimation` to reset loaded animations to default.
 
 ***
 
@@ -2509,8 +2826,8 @@ local executed = tes3.playItemPickupSound({ reference = ..., item = ..., pickup 
 ### `tes3.playSound`
 
 Plays a sound on a given reference. Provides control over volume (including volume channel), pitch, and loop control.
-	
-	Note: sounds in MP3 format can only be played if they are inside \Vo\ folder. The format is: 64 Kbps CBR, 44100 kHz, 16-bit mono
+
+**Note**: MP3 sound files can only be played if they are inside \\Vo\\ folder. The files must conform to the MPEG Layer-3, 64 Kbps 44100 kHz, 16-bit mono specification.
 
 ```lua
 local executed = tes3.playSound({ sound = ..., reference = ..., loop = ..., mixChannel = ..., volume = ..., pitch = ..., soundPath = ... })
@@ -2522,7 +2839,7 @@ local executed = tes3.playSound({ sound = ..., reference = ..., loop = ..., mixC
 	* `sound` ([tes3sound](../../types/tes3sound), string): The sound object, or id of the sound to look for.
 	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): *Optional*. The reference to attach the sound to.
 	* `loop` (boolean): If true, the sound will loop.
-	* `mixChannel` (number): *Default*: `tes3.audioMixType.effects`. The channel to base volume off of. Maps to tes3.audioMixType constants.
+	* `mixChannel` (number): *Default*: `tes3.soundMix.effects`. The channel to base volume off of. Maps to [`tes3.soundMix`](https://mwse.github.io/MWSE/references/sound-mix-types/) constants.
 	* `volume` (number): *Default*: `1.0`. A value between 0.0 and 1.0 to scale the volume off of.
 	* `pitch` (number): *Default*: `1.0`. The pitch-shift multiplier. For 22kHz audio (most typical) it can have the range [0.005, 4.5]; for 44kHz audio it can have the range [0.0025, 2.25].
 	* `soundPath` (string): *Optional*. The path to a custom soundfile (useful for playing sounds that are not registered in the Construction Set). Starts in Data Files\Sound.
@@ -2545,7 +2862,7 @@ local played = tes3.playVoiceover({ actor = ..., voiceover = ... })
 
 * `params` (table)
 	* `actor` ([tes3mobileActor](../../types/tes3mobileActor), [tes3reference](../../types/tes3reference), string): The actor to play a voiceover.
-	* `voiceover` (number): Maps to tes3.voiceover constants.
+	* `voiceover` (number): Maps to [`tes3.voiceover`](https://mwse.github.io/MWSE/references/voiceovers/) constants.
 
 **Returns**:
 
@@ -2567,9 +2884,9 @@ local executed = tes3.positionCell({ reference = ..., cell = ..., position = ...
 	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): *Default*: `tes3.mobilePlayer`. The reference to reposition.
 	* `cell` ([tes3cell](../../types/tes3cell)): *Optional*. The cell to move the reference to. If not provided, the reference will be moved to a cell in the exterior worldspace at the position provided.
 	* `position` ([tes3vector3](../../types/tes3vector3), table): The position to move the reference to.
-	* `orientation` ([tes3vector3](../../types/tes3vector3), table): *Optional*. The position to move the reference to.
-	* `forceCellChange` (boolean): When true, forces the game to update a reference that has moved within a single cell, as if it was moved into a new cell.
-	* `suppressFader` (boolean): When moving the player, can be used to prevent the fade in and out visual effect.
+	* `orientation` ([tes3vector3](../../types/tes3vector3), table): *Optional*. The new orientation of the reference.
+	* `forceCellChange` (boolean): *Optional*. When true, forces the game to update a reference that has moved within a single cell, as if it was moved into a new cell.
+	* `suppressFader` (boolean): *Optional*. When moving the player, can be used to prevent the fade in and out visual effect.
 	* `teleportCompanions` (boolean): *Default*: `true`. If used on the player, determines if companions should also be teleported.
 
 **Returns**:
@@ -2588,7 +2905,7 @@ tes3.pushKey(keyCode)
 
 **Parameters**:
 
-* `keyCode` (number)
+* `keyCode` (number): Maps to values in [`tes3.scanCode`](https://mwse.github.io/MWSE/references/scan-codes/) namespace.
 
 ***
 
@@ -2608,7 +2925,7 @@ tes3.random(seed)
 
 ### `tes3.rayTest`
 
-Performs a ray test and returns various information related to the result(s). If findAll is set, the result will be a table of results, otherwise only the first result is returned.
+Performs a ray test and returns various information related to the result(s). If `findAll` is set, the result will be a table of results, otherwise only the first result is returned.
 
 ```lua
 local result = tes3.rayTest({ position = ..., direction = ..., findAll = ..., maxDistance = ..., sort = ..., useModelBounds = ..., useModelCoordinates = ..., useBackTriangles = ..., observeAppCullFlag = ..., root = ..., ignoreSkinned = ..., returnColor = ..., returnNormal = ..., returnSmoothNormal = ..., returnTexture = ..., ignore = ... })
@@ -2680,20 +2997,20 @@ local result = tes3.rayTest({ position = ..., direction = ..., findAll = ..., ma
 
 	```lua
 	local result = tes3.rayTest{ -- result can get invalidated
-	    position = tes3.getPlayerEyePosition(),
-	    direction = tes3.getPlayerEyeVector(),
-	    ignore = { tes3.player }
+		position = tes3.getPlayerEyePosition(),
+		direction = tes3.getPlayerEyeVector(),
+		ignore = { tes3.player }
 	}
 	
 	local ref
 	
 	if result then
-	    ref = tes3.makeSafeObjectHandle(result.reference)
+		ref = tes3.makeSafeObjectHandle(result.reference)
 	end
 	
 	-- Before using ref, now we can chack if it is valid
 	if ref:valid() then
-	    -- Now we can safely do something with ref
+		-- Now we can safely do something with ref
 	
 	end
 
@@ -2711,13 +3028,13 @@ tes3.releaseKey(keyCode)
 
 **Parameters**:
 
-* `keyCode` (number)
+* `keyCode` (number): Maps to values in [`tes3.scanCode`](https://mwse.github.io/MWSE/references/scan-codes/) namespace.
 
 ***
 
 ### `tes3.removeEffects`
 
-Removes magic effects from a given reference. Requires that either the effect or castType parameter be provided.
+Removes magic effects from a given reference. Requires that either the `effect` or `castType` parameter be provided.
 
 ```lua
 tes3.removeEffects(reference, effect, castType, chance, removeSpell)
@@ -2726,10 +3043,46 @@ tes3.removeEffects(reference, effect, castType, chance, removeSpell)
 **Parameters**:
 
 * `reference` ([tes3reference](../../types/tes3reference)): Target reference to remove effects from.
-* `effect` (number): *Optional*. Maps to tes3.effect constants.
-* `castType` (number): *Optional*. Maps to tes3.castType constants.
+* `effect` (number): *Optional*. Maps to [`tes3.effect`](https://mwse.github.io/MWSE/references/magic-effects/) constants.
+* `castType` (number): *Optional*. Maps to [`tes3.spellType`](https://mwse.github.io/MWSE/references/spell-types/) constants.
 * `chance` (number): *Default*: `100`. The chance for the effect to be removed.
-* `removeSpell` (boolean): *Optional*. If removing by cast type, determines if the spell should be removed from the target's spell list. Defaults to true if castType is not tes3.castType.spell. This causes diseases and curses to be removed when dispelled.
+* `removeSpell` (boolean): *Optional*. If removing by cast type, determines if the spell should be removed from the target's spell list. Defaults to true if `castType` is not `tes3.spellType.spell.` This causes diseases and curses to be removed when dispelled.
+
+??? example "Example: Simulating a Dispel"
+
+	```lua
+	local function example(e)
+			-- We only care about the player
+		if (e.mobile.objectType ~= tes3.objectType.mobilePlayer) then
+			return
+		end
+	
+		local cell = tes3.mobilePlayer.cell
+	
+		if (cell.isInterior and not cell.hasWater) then
+			return
+		end
+	
+		local waterLevel = cell.waterLevel
+		local headPosition = tes3.mobilePlayer.position.z + tes3.mobilePlayer.height
+	
+		local underwater = headPosition < waterLevel
+	
+		if underwater then
+			-- There is a 50 % chance that any Water Breathing effect will be removed from the player
+			tes3.removeEffects({
+				reference = tes3.player,
+				chance = 50,
+				effect = tes3.effect.waterBreathing,
+			})
+		end
+	end
+	
+	event.register(tes3.event.initialized, function ()
+		event.register(tes3.event.calcMoveSpeed, example)
+	end)
+
+	```
 
 ***
 
@@ -2738,7 +3091,7 @@ tes3.removeEffects(reference, effect, castType, chance, removeSpell)
 Removes an item from a given reference's inventory.
 
 ```lua
-local removedCount = tes3.removeItem({ reference = ..., item = ..., itemData = ..., deleteItemData = ..., count = ..., playSound = ..., updateGUI = ... })
+local removedCount = tes3.removeItem({ reference = ..., item = ..., itemData = ..., deleteItemData = ..., count = ..., playSound = ..., reevaluateEquipment = ..., updateGUI = ... })
 ```
 
 **Parameters**:
@@ -2750,11 +3103,36 @@ local removedCount = tes3.removeItem({ reference = ..., item = ..., itemData = .
 	* `deleteItemData` ([tes3itemData](../../types/tes3itemData)): *Optional*. Whether to delete the item data after remove succeeds. Automatically set if itemData is used. Does not need to be specified for normal usage.
 	* `count` (number): *Default*: `1`. The maximum number of items to remove.
 	* `playSound` (boolean): *Default*: `true`. If false, the up/down sound for the item won't be played.
-	* `updateGUI` (boolean): *Default*: `true`. If false, the function won't manually resync the player's GUI state. This can result in some optimizations, though `tes3ui.forcePlayerInventoryUpdate()` must manually be called after all inventory updates are finished.
+	* `reevaluateEquipment` (boolean): *Default*: `true`. If true, and the item removed is armor, clothing, or a weapon, the actor will reevaluate its equipment choices to see if it needs to equip a new item. This does not affect the player.
+	* `updateGUI` (boolean): *Default*: `true`. If false, the function won't manually resync the player's GUI state. This can result in some optimizations, though [`tes3ui.forcePlayerInventoryUpdate()`](https://mwse.github.io/MWSE/apis/tes3ui/#tes3uiforceplayerinventoryupdate) must manually be called after all inventory updates are finished.
 
 **Returns**:
 
 * `removedCount` (number)
+
+***
+
+### `tes3.removeItemData`
+
+Removes and deletes item data from a given reference, or from their inventory. If no `itemData` is provided, it will be removed from the reference itself.
+
+```lua
+local wasRemoved = tes3.removeItemData({ from = ..., item = ..., itemData = ..., force = ..., ignoreOwnership = ..., updateGUI = ... })
+```
+
+**Parameters**:
+
+* `params` (table)
+	* `from` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): The reference or mobile whose inventory will be modified.
+	* `item` ([tes3item](../../types/tes3item), string): The item to remove item data for.
+	* `itemData` ([tes3itemData](../../types/tes3itemData)): *Optional*. The exact item data to remove. If no itemData is provided, the itemData from the reference itself will be removed.
+	* `force` (boolean): If true, no checks are made to see if the item data should be deleted. It will always be purged.
+	* `ignoreOwnership` (boolean): *Default*: `true`. If `force` is false, a check will be made to see if the item data is empty and can be deleted. By default this ignores any ownership data. Setting this to false will override that behavior.
+	* `updateGUI` (boolean): *Default*: `true`. If false, the player or contents menu won't be updated.
+
+**Returns**:
+
+* `wasRemoved` (boolean)
 
 ***
 
@@ -2788,7 +3166,7 @@ local wasRemoved = tes3.removeSpell({ reference = ..., actor = ..., spell = ...,
 	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): Who to remove the spell from. To manipulate an actor without specifying any particular reference, use `actor` instead.
 	* `actor` ([tes3actor](../../types/tes3actor), string): Who to remove the spell from. Providing a base actor can be done before a save has been loaded, but may not correctly update effects for instanced versions of that actor in an active save.
 	* `spell` ([tes3spell](../../types/tes3spell), string): The spell to remove.
-	* `updateGUI` (boolean): *Default*: `true`. If true, the GUI will be updated respsecting the removal of the spell. This can be useful to disable when batch-removing many spells. The batch should be ended with `tes3.updateMagicGUI` to reflect the changes.
+	* `updateGUI` (boolean): *Default*: `true`. If true, the GUI will be updated respecting the removal of the spell. This can be useful to disable when batch-removing many spells. The batch should be ended with [`tes3.updateMagicGUI`](https://mwse.github.io/MWSE/apis/tes3/#tes3updatemagicgui) to reflect the changes.
 
 **Returns**:
 
@@ -3001,8 +3379,8 @@ tes3.setDestination({ reference = ..., position = ..., orientation = ..., cell =
 
 * `params` (table)
 	* `reference` ([tes3reference](../../types/tes3reference)): The door reference that will be updated.
-	* `position` (tes3vector, table): The new coordinates of the transition.
-	* `orientation` (tes3vector, table): The new rotation to use after transition.
+	* `position` ([tes3vector3](../../types/tes3vector3), table): The new coordinates of the transition.
+	* `orientation` ([tes3vector3](../../types/tes3vector3), table): The new rotation to use after transition.
 	* `cell` ([tes3cell](../../types/tes3cell), string): *Optional*. The cell to transition to, if transitioning to an interior.
 
 ***
@@ -3020,7 +3398,7 @@ local success = tes3.setEnabled({ reference = ..., toggle = ..., enabled = ... }
 * `params` (table)
 	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): The reference to enable/disable.
 	* `toggle` (boolean): If true, the enabled state will be toggled.
-	* `enabled` (boolean): *Default*: `true`. If not toggling, will set true to enable or false to disable.
+	* `enabled` (boolean): *Default*: `true`. If not toggling, setting `enabled` to true will enable the reference or to false will disable the reference.
 
 **Returns**:
 
@@ -3049,7 +3427,7 @@ local value = tes3.setGlobal(id, value)
 
 ### `tes3.setItemIsStolen`
 
-This function changes an item's stolen flag. Morrowind handles stealing by marking the base item (not the inventory stack) with with NPCs that you have stolen that item from. The NPC will recognize an item is stolen if they are marked as stolen on the base item.
+This function changes an item's stolen flag. Morrowind handles stealing by marking the base item (not the inventory stack) with NPCs that you have stolen that item from. The NPC will recognize an item as stolen if they are marked as stolen on the base item.
 
 ```lua
 tes3.setItemIsStolen(item, from, stolen)
@@ -3152,8 +3530,8 @@ tes3.setOwner({ reference = ..., remove = ..., owner = ..., requiredGlobal = ...
 	* `reference` ([tes3reference](../../types/tes3reference), [tes3mobileActor](../../types/tes3mobileActor), string): A reference whose owner to set.
 	* `remove` (boolean): *Optional*. If this parameter is set to true, reference's owner field will be removed.
 	* `owner` ([tes3npc](../../types/tes3npc), [tes3faction](../../types/tes3faction), string): Assigns this NPC or a faction as the owner of the reference.
-	* `requiredGlobal` ([tes3globalVariable](../../types/tes3globalVariable)): *Optional*. If owner is set to NPC, requiredGlobal variable can be set.
-	* `requiredRank` (number): *Default*: `0`. If owner is set to faction, requitedRank variable controls minimal rank in faction the player has to have to be able to freely take the reference.
+	* `requiredGlobal` ([tes3globalVariable](../../types/tes3globalVariable)): *Optional*. If `owner` is set to NPC, `requiredGlobal` variable can be set.
+	* `requiredRank` (number): *Default*: `0`. If `owner` is set to faction, `requitedRank` variable controls minimal rank in faction the player has to have to be able to freely take the reference.
 
 ***
 
@@ -3192,8 +3570,8 @@ tes3.setSourceless({ object = ..., sourceless = ... })
 **Parameters**:
 
 * `params` (table)
-	* `object` ([tes3baseObject](../../types/tes3baseObject)): 
-	* `sourceless` (boolean): *Default*: `true`. 
+	* `object` ([tes3baseObject](../../types/tes3baseObject)): The object whose sourceless flag to modify.
+	* `sourceless` (boolean): *Default*: `true`. Allows flagging an object as sourceless or undoing that action.
 
 ***
 
@@ -3241,7 +3619,7 @@ local trapped = tes3.setTrap({ reference = ..., spell = ... })
 
 ### `tes3.setVanityMode`
 
-Toggles the camera into third person mode. Returns true if changed to vanity mode.
+Toggles the camera into vanity mode. In vanity mode the camera is in third person and it is orbiting slowly around the player character. Returns true if changed to vanity mode.
 
 Note that unlike the vanity mode caused by not doing anything for a while, this vanity mode must be toggled to go off.
 
@@ -3252,9 +3630,9 @@ local changedVanityMode = tes3.setVanityMode({ enabled = ..., checkVanityDisable
 **Parameters**:
 
 * `params` (table)
-	* `enabled` (boolean): *Default*: `true`. 
-	* `checkVanityDisabled` (boolean): *Default*: `true`. 
-	* `toggle` (boolean): *Optional*. 
+	* `enabled` (boolean): *Default*: `true`. This flag sets the vanity mode as enabled or disabled.
+	* `checkVanityDisabled` (boolean): *Default*: `true`. This will prevent changing vanity mode according to vanityDisabled flag on tes3.mobilePlayer.
+	* `toggle` (boolean): *Optional*. When this flag is set to true. The vanity mode will be toggled. If the player was in vanity mode, this will make the player leave vanity mode. Conversly, if the player wasn't in the vanity mode, this will turn on the vanity mode.
 
 **Returns**:
 
@@ -3351,7 +3729,7 @@ local executed = tes3.streamMusic({ path = ..., situation = ..., crossfade = ...
 
 * `params` (table)
 	* `path` (string): Path to the music file, relative to Data Files/music/.
-	* `situation` (number): *Default*: `tes3.musicSituation.uninterruptible`. Determines what kind of gameplay situation the music should stay active for. Explore music plays during non-combat, and ends when combat starts. Combat music starts during combat, and ends when combat ends. Uninterruptible music always plays, ending only when the track does.
+	* `situation` (number): *Default*: `tes3.musicSituation.uninterruptible`. Determines what kind of gameplay situation the music should stay active for. Explore music plays during non-combat, and ends when combat starts. Combat music starts during combat, and ends when combat ends. Uninterruptible music always plays, ending only when the track does. This value maps to [`tes3.musicSituation`](https://mwse.github.io/MWSE/references/music-situations/) constants.
 	* `crossfade` (number): *Default*: `1.0`. The duration in seconds of the crossfade from the old to the new track. The default is 1.0.
 
 **Returns**:
@@ -3370,7 +3748,7 @@ tes3.tapKey(keyCode)
 
 **Parameters**:
 
-* `keyCode` (number)
+* `keyCode` (number): Maps to values in [`tes3.scanCode`](https://mwse.github.io/MWSE/references/scan-codes/) namespace.
 
 ***
 
@@ -3422,7 +3800,7 @@ local was3rdPerson = tes3.togglePOV()
 Moves one or more items from one reference to another. Returns the actual amount of items successfully transferred.
 
 ```lua
-local transferredCount = tes3.transferItem({ from = ..., to = ..., item = ..., itemData = ..., count = ..., playSound = ..., limitCapacity = ..., updateGUI = ... })
+local transferredCount = tes3.transferItem({ from = ..., to = ..., item = ..., itemData = ..., count = ..., playSound = ..., limitCapacity = ..., reevaluateEquipment = ..., updateGUI = ... })
 ```
 
 **Parameters**:
@@ -3435,7 +3813,8 @@ local transferredCount = tes3.transferItem({ from = ..., to = ..., item = ..., i
 	* `count` (number): *Default*: `1`. The maximum number of items to transfer.
 	* `playSound` (boolean): *Default*: `true`. If false, the up/down sound for the item won't be played.
 	* `limitCapacity` (boolean): *Default*: `true`. If false, items can be placed into containers that shouldn't normally be allowed. This includes organic containers, and containers that are full.
-	* `updateGUI` (boolean): *Default*: `true`. If false, the function won't manually resync the player's GUI state. This can result in some optimizations, though `tes3ui.forcePlayerInventoryUpdate()` must manually be called after all inventory updates are finished.
+	* `reevaluateEquipment` (boolean): *Default*: `true`. If true, and the item transferred is armor, clothing, or a weapon, the actors will reevaluate their equipment choices to see if the new item is worth equipping. This does not affect the player.
+	* `updateGUI` (boolean): *Default*: `true`. If false, the function won't manually resync the player's GUI state. This can result in some optimizations, though [`tes3ui.forcePlayerInventoryUpdate()`](https://mwse.github.io/MWSE/apis/tes3ui/#tes3uiforceplayerinventoryupdate) must manually be called after all inventory updates are finished.
 
 **Returns**:
 
@@ -3456,7 +3835,7 @@ local executed = tes3.triggerCrime({ criminal = ..., forceDetection = ..., type 
 * `params` (table)
 	* `criminal` ([tes3mobileActor](../../types/tes3mobileActor), [tes3reference](../../types/tes3reference), string): *Default*: `tes3.mobilePlayer`.
 	* `forceDetection` (boolean): Can be set to true to ignore normal detection checks.
-	* `type` (number): *Default*: `tes3.crimeType.stealing`. Maps to tes3.crimeType constants.
+	* `type` (number): *Default*: `tes3.crimeType.stealing`. Maps to [`tes3.crimeType`](https://mwse.github.io/MWSE/references/crime-types/) constants.
 	* `value` (number): Penalty for the crime. Defaults to 25 for pickpocketing.
 	* `victim` ([tes3mobileActor](../../types/tes3mobileActor), [tes3reference](../../types/tes3reference), string): *Default*: `tes3.mobilePlayer`.
 
@@ -3495,7 +3874,7 @@ tes3.unhammerKey(keyCode)
 
 **Parameters**:
 
-* `keyCode` (number)
+* `keyCode` (number): Maps to values in [`tes3.scanCode`](https://mwse.github.io/MWSE/references/scan-codes/) namespace.
 
 ***
 

@@ -82,6 +82,20 @@ tes3matrix33:fromEulerZYX(z, y, x)
 
 ***
 
+### `fromQuaternion`
+
+Fill the matrix by converting a quaternion.
+
+```lua
+tes3matrix33:fromQuaternion(quaternion)
+```
+
+**Parameters**:
+
+* `quaternion` ([niQuaternion](../../types/niQuaternion))
+
+***
+
 ### `invert`
 
 Inverts the matrix.
@@ -111,6 +125,36 @@ local result = tes3matrix33:reorthogonalize()
 
 ***
 
+### `toEulerXYZ`
+
+Converts the matrix to a vector with 3 Euler angles.
+
+```lua
+local isUnique, vector3 = tes3matrix33:toEulerXYZ()
+```
+
+**Returns**:
+
+* `isUnique` (boolean)
+* `vector3` ([tes3vector3](../../types/tes3vector3))
+
+***
+
+### `toEulerZYX`
+
+Converts the matrix to a vector with 3 Euler angles.
+
+```lua
+local isUnique, vector3 = tes3matrix33:toEulerZYX()
+```
+
+**Returns**:
+
+* `isUnique` (boolean)
+* `vector3` ([tes3vector3](../../types/tes3vector3))
+
+***
+
 ### `toIdentity`
 
 Converts the matrix to the identity matrix's values.
@@ -118,6 +162,20 @@ Converts the matrix to the identity matrix's values.
 ```lua
 tes3matrix33:toIdentity()
 ```
+
+***
+
+### `toQuaternion`
+
+Convert the matrix into a quaternion.
+
+```lua
+local result = tes3matrix33:toQuaternion()
+```
+
+**Returns**:
+
+* `result` ([niQuaternion](../../types/niQuaternion))
 
 ***
 

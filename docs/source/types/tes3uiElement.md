@@ -9,8 +9,8 @@ Elements can have custom data attached using their `Property`_ key-value store, 
 ### `absolutePosAlignX`
 
 Sets element position to a point relative to the parent element. 0.0 = left/top content edge, 1.0 = right/bottom content edge. The positioning is absolute, which frees the element from the standard flow layout and allows overlapping elements.
-    
-    Bug note: Elements may not respond to widthProportional/heightProportional sizing after either of these properties are set. If you need to use both you should consider testing if it works first.
+	
+	Bug note: Elements may not respond to widthProportional/heightProportional sizing after either of these properties are set. If you need to use both you should consider testing if it works first.
 
 **Returns**:
 
@@ -40,7 +40,7 @@ Element alpha colour, using range [0.0, 1.0]. Used to composite elements. If you
 
 ### `autoHeight`
 
-When `true`, automatically expands element dimensions to fit child elements. Dimensions are restricted by minWidth, minHeight, maxWidth and maxHeight properties.
+When `true`, automatically expands element dimensions to fit child elements. Dimensions are restricted by `minWidth`, `minHeight`, `maxWidth` and `maxHeight` properties.
 
 **Returns**:
 
@@ -50,7 +50,7 @@ When `true`, automatically expands element dimensions to fit child elements. Dim
 
 ### `autoWidth`
 
-When `true`, automatically expands element dimensions to fit child elements. Dimensions are restricted by minWidth, minHeight, maxWidth and maxHeight properties.
+When `true`, automatically expands element dimensions to fit child elements. Dimensions are restricted by `minWidth`, `minHeight`, `maxWidth` and `maxHeight` properties.
 
 **Returns**:
 
@@ -70,7 +70,7 @@ Integer number. Border size in pixels. Border is the extra empty space around an
 
 ### `borderBottom`
 
-Integer number. Bottom border size in pixels. When this is set to -1, the borderAllSides setting is used for this side instead.
+Integer number. Bottom border size in pixels. When this is set to `-1`, the borderAllSides setting is used for this side instead.
 
 **Returns**:
 
@@ -80,7 +80,7 @@ Integer number. Bottom border size in pixels. When this is set to -1, the border
 
 ### `borderLeft`
 
-Integer number. Left border size in pixels. When this is set to -1, the borderAllSides setting is used for this side instead.
+Integer number. Left border size in pixels. When this is set to `-1`, the borderAllSides setting is used for this side instead.
 
 **Returns**:
 
@@ -90,7 +90,7 @@ Integer number. Left border size in pixels. When this is set to -1, the borderAl
 
 ### `borderRight`
 
-Integer number. Left border size in pixels. When this is set to -1, the borderAllSides setting is used for this side instead.
+Integer number. Left border size in pixels. When this is set to `-1`, the borderAllSides setting is used for this side instead.
 
 **Returns**:
 
@@ -100,7 +100,7 @@ Integer number. Left border size in pixels. When this is set to -1, the borderAl
 
 ### `borderTop`
 
-Integer number. Top border size in pixels. When this is set to -1, the borderAllSides setting is used for this side instead.
+Integer number. Top border size in pixels. When this is set to `-1`, the borderAllSides setting is used for this side instead.
 
 **Returns**:
 
@@ -111,8 +111,8 @@ Integer number. Top border size in pixels. When this is set to -1, the borderAll
 ### `childAlignX`
 
 Sets alignment of child elements inside its parent, though it only works in specific conditions. 0.0 = left/top edge touches left/top edge of parent, 0.5 = centred, 1.0 = right/bottom edge touches right/bottom edge of parent. For negative values, there is a special case behaviour: all children but the last will be left-aligned/top-aligned, the last child will be right-aligned/bottom-aligned.
-    
-    Child alignment only works if the element has proportional sizing (using widthProportional/heightProportional) and all children use non-proportional sizing (widthProportional and heightProportional are nil).
+	
+	Child alignment only works if the element has proportional sizing (using widthProportional/heightProportional) and all children use non-proportional sizing (widthProportional and heightProportional are nil).
 
 **Returns**:
 
@@ -180,6 +180,16 @@ When `true`, mouse events over this element are sent to event handlers, or disca
 
 ***
 
+### `contentType`
+
+*Read-only*. The type of content this `tes3uiElement` represents. Maps to values in [`tes3.contentType`](https://mwse.github.io/MWSE/references/content-types/).
+
+**Returns**:
+
+* `result` (string)
+
+***
+
 ### `disabled`
 
 Disables user actions on this element. Widgets may stop accepting mouse and keyboard input while disabled.
@@ -192,7 +202,7 @@ Disables user actions on this element. Widgets may stop accepting mouse and keyb
 
 ### `flowDirection`
 
-Can have values `"left_to_right"` or `"top_to_bottom"`. Indicates which direction child elements are laid out.
+Can have values `"left_to_right"` or `"top_to_bottom"`. These values are available as [`tes3.flowDirection`](https://mwse.github.io/MWSE/references/flow-directions/) enumeration. Indicates which direction child elements are laid out.
 
 **Returns**:
 
@@ -203,9 +213,9 @@ Can have values `"left_to_right"` or `"top_to_bottom"`. Indicates which directio
 ### `font`
 
 Index of font to use for text.
-        0 - Magic Cards (default)
-        1 - Century Sans
-        2 - Daedric
+		0 - Magic Cards (default)
+		1 - Century Sans
+		2 - Daedric
 
 **Returns**:
 
@@ -226,14 +236,14 @@ Element dimensions in pixels. Integer number.
 ### `heightProportional`
 
 Sets element dimensions using a proportional sizer. The sizer starts with the parent dimension in the flow direction, subtracts any fixed dimension children leaving the proportional sizer space. Each proportionally sized element then gets an equal division of the space, multiplied by this member. Values above 1.0 are permissible.
-    
-    Bug note: If widthProportional is used without heightProportional, an element may not respond to changes in parent size. It is recommended to set heightProportional, or have a fixed size sibling element if dynamic reflow is required.
-    
-    Overrides fixed, minimum and maximum sizes unless this value is `nil` (default).
+
+	Bug note: If widthProportional is used without heightProportional, an element may not respond to changes in parent size. It is recommended to set heightProportional, or have a fixed size sibling element if dynamic reflow is required.
+
+	Overrides fixed, minimum and maximum sizes unless this value is `nil` (default).
 
 **Returns**:
 
-* `result` (boolean)
+* `result` (number)
 
 ***
 
@@ -269,7 +279,7 @@ Image scaling multipliers. Only applies to image elements.
 
 ### `justifyText`
 
-Can have values `"left"`, `"center"`, or `"right"`. Controls text justification. To work correctly for center/right justification,  `wrapText` must be `true`.
+Can have values `"left"`, `"center"`, or `"right"`. Controls text justification. These values are available as [`tes3.justifyText`](https://mwse.github.io/MWSE/references/justify-text/) enumeration. To work correctly for center/right justification,  `wrapText` must be `true`.
 
 **Returns**:
 
@@ -329,7 +339,7 @@ Minimum dimensions for auto-size layout and resizable frames. Integer number.
 
 ### `paddingAllSides`
 
-Integer number. Padding size in pixels. Padding is the blank space between the edge of an element and its contents. Individual padding sizes default to -1, making it use the paddingAllSides setting.
+Integer number. Padding size in pixels. Padding is the blank space between the edge of an element and its contents. Individual padding sizes default to `-1`, making it use the paddingAllSides setting.
 
 **Returns**:
 
@@ -339,7 +349,7 @@ Integer number. Padding size in pixels. Padding is the blank space between the e
 
 ### `paddingBottom`
 
-Integer number. Bottom padding size in pixels. When this is set to -1, the paddingAllSides setting is used for this side instead.
+Integer number. Bottom padding size in pixels. When this is set to `-1`, the paddingAllSides setting is used for this side instead.
 
 **Returns**:
 
@@ -349,7 +359,7 @@ Integer number. Bottom padding size in pixels. When this is set to -1, the paddi
 
 ### `paddingLeft`
 
-Integer number. Left padding size in pixels. When this is set to -1, the paddingAllSides setting is used for this side instead.
+Integer number. Left padding size in pixels. When this is set to `-1`, the paddingAllSides setting is used for this side instead.
 
 **Returns**:
 
@@ -359,7 +369,7 @@ Integer number. Left padding size in pixels. When this is set to -1, the padding
 
 ### `paddingRight`
 
-Integer number. Right padding size in pixels. When this is set to -1, the paddingAllSides setting is used for this side instead.
+Integer number. Right padding size in pixels. When this is set to `-1`, the paddingAllSides setting is used for this side instead.
 
 **Returns**:
 
@@ -369,7 +379,7 @@ Integer number. Right padding size in pixels. When this is set to -1, the paddin
 
 ### `paddingTop`
 
-Integer number. Top padding size in pixels. When this is set to -1, the paddingAllSides setting is used for this side instead.
+Integer number. Top padding size in pixels. When this is set to `-1`, the paddingAllSides setting is used for this side instead.
 
 **Returns**:
 
@@ -441,6 +451,8 @@ When set to `true` on image and NIF elements, they are scaled to fit `width` and
 
 The element's text. Text input can be read by accessing this property.
 
+	tip: If your element's text is a number, you need to manually convert it to string using `tostring()`.
+
 **Returns**:
 
 * `result` (string)
@@ -459,11 +471,11 @@ Controls if the element is visible.
 
 ### `widget`
 
-Access to custom properties specific to a widget. These properties are documented in the widget create* function descriptions.
+Access to element specific properties. This will be `nil` if there are no element specific properties. See the return types and the create* functions for more details.
 
 **Returns**:
 
-* `result` (table)
+* `result` ([tes3uiButton](../../types/tes3uiButton), [tes3uiFillBar](../../types/tes3uiFillBar), [tes3uiParagraphInput](../../types/tes3uiParagraphInput), [tes3uiSlider](../../types/tes3uiSlider), [tes3uiScrollPane](../../types/tes3uiScrollPane), [tes3uiTextInput](../../types/tes3uiTextInput), [tes3uiTextSelect](../../types/tes3uiTextSelect), nil)
 
 ***
 
@@ -480,14 +492,14 @@ Element dimensions in pixels. Integer number.
 ### `widthProportional`
 
 Sets element dimensions using a proportional sizer. The sizer starts with the parent dimension in the flow direction, subtracts any fixed dimension children leaving the proportional sizer space. Each proportionally sized element then gets an equal division of the space, multiplied by this member. Values above 1.0 are permissible.
-    
-    Bug note: If widthProportional is used without heightProportional, an element may not respond to changes in parent size. It is recommended to set heightProportional, or have a fixed size sibling element if dynamic reflow is required.
-    
-    Overrides fixed, minimum and maximum sizes unless this value is `nil` (default).
+
+	Bug note: If widthProportional is used without heightProportional, an element may not respond to changes in parent size. It is recommended to set heightProportional, or have a fixed size sibling element if dynamic reflow is required.
+
+	Overrides fixed, minimum and maximum sizes unless this value is `nil` (default).
 
 **Returns**:
 
-* `result` (boolean)
+* `result` (number)
 
 ***
 
@@ -513,7 +525,7 @@ local result = tes3uiElement:createBlock(id)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 
 **Returns**:
 
@@ -523,19 +535,9 @@ local result = tes3uiElement:createBlock(id)
 
 ### `createButton`
 
-Creates a clickable button. Register the "mouseClick" event to capture a button press.
-    
-    Custom widget properties:
-        | `number`_ `element.widget.state`: Interaction state. 1 = normal, 2 = disabled, 4 = active. Controls which colour set to use for text.
-        | `table`_ (float[3]) `element.widget.idle`: Text colour for normal state, no mouse interaction.
-        | `table`_ (float[3]) `element.widget.over`: Text colour for normal state, on mouseOver.
-        | `table`_ (float[3]) `element.widget.pressed`: Text colour for normal state, on mouseDown.
-        | `table`_ (float[3]) `element.widget.idleDisabled`: Text colour for disabled state, no mouse interaction.
-        | `table`_ (float[3]) `element.widget.overDisabled`: Text colour for disabled state, on mouseOver.
-        | `table`_ (float[3]) `element.widget.pressedDisabled`: Text colour for disabled state, on mouseDown.
-        | `table`_ (float[3]) `element.widget.idleActive`: Text colour for active state, no mouse interaction.
-        | `table`_ (float[3]) `element.widget.overActive`: Text colour for active state, on mouseOver.
-        | `table`_ (float[3]) `element.widget.pressedActive`: Text colour for active state, on mouseDown.
+Creates a clickable button. Register the `mouseClick` event to capture a button press.
+
+Button specific properties can be accessed through the `widget` property. The widget type for buttons is [`tes3uiButton`](https://mwse.github.io/MWSE/types/tes3uiButton/).
 
 ```lua
 local result = tes3uiElement:createButton(id)
@@ -543,7 +545,7 @@ local result = tes3uiElement:createButton(id)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 
 **Returns**:
 
@@ -561,7 +563,7 @@ local result = tes3uiElement:createDivider(id)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 
 **Returns**:
 
@@ -573,12 +575,7 @@ local result = tes3uiElement:createDivider(id)
 
 Creates a horizontal quantity indicator bar.
 
-    Custom widget properties:
-        | `number`_ (integer) `element.widget.current`: Current (filled) value.
-        | `number`_ (integer) `element.widget.max`: Maximum value.
-        | `boolean`_ `element.widget.showText`: If text of the format "current/max" is shown. Default is `true`.
-        | `table`_ (float[3]) `element.widget.fillColor`: Colour of filled area.
-        | `number`_ (float) `element.widget.fillAlpha`: Alpha transparency of filled area.
+Fillbar specific properties can be accessed through the `widget` property. The widget type for fillbars is [`tes3uiFillBar`](https://mwse.github.io/MWSE/types/tes3uiFillBar/).
 
 ```lua
 local result = tes3uiElement:createFillBar(id, current, max)
@@ -586,9 +583,9 @@ local result = tes3uiElement:createFillBar(id, current, max)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
-* `current` (number): *Optional*. The initial current value.
-* `max` (number): *Optional*. The initial maximum value.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
+* `current` (number): *Optional*. The current value of the fillbar.
+* `max` (number): *Optional*. The maximum value of the fillbar.
 
 **Returns**:
 
@@ -600,12 +597,7 @@ local result = tes3uiElement:createFillBar(id, current, max)
 
 Creates a horizontally scrolling pane.
 
-    Custom widget properties:
-        | `number`_ `element.widget.positionX`: Horizontal scroll offset in pixels.
-        | `boolean`_ `element.widget.scrollbarVisible`: Set if the scrollbar is displayed.
-
-    Custom widget methods:
-        | `element.widget:contentsChanged()`: Call to update scroll bar slider and limits after adding or removing elements to the content container. Because content size depends on layout, this must be run after a menu:updateLayout(). Only required if the content size changes.
+Scroll pane specific properties can be accessed through the `widget` property. The widget type for scroll panes is [`tes3uiScrollPane`](https://mwse.github.io/MWSE/types/tes3uiScrollPane/).
 
 ```lua
 local result = tes3uiElement:createHorizontalScrollPane(id)
@@ -613,7 +605,7 @@ local result = tes3uiElement:createHorizontalScrollPane(id)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 
 **Returns**:
 
@@ -631,7 +623,7 @@ local result = tes3uiElement:createHypertext(id)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 
 **Returns**:
 
@@ -649,7 +641,7 @@ local result = tes3uiElement:createImage(id, path)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 * `path` (string): An image path. This path is relative to `Data Files`.
 
 **Returns**:
@@ -668,7 +660,7 @@ local result = tes3uiElement:createImageButton(id, idle, over, path)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 * `idle` (string): The path to the idle image. This path is relative to `Data Files`.
 * `over` (string): The path to the mouse hover image. This path is relative to `Data Files`.
 * `path` (string): The path to the mouse pressed image. This path is relative to `Data Files`.
@@ -689,7 +681,7 @@ local result = tes3uiElement:createLabel(id, text)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 * `text` (string): The text to display.
 
 **Returns**:
@@ -708,7 +700,7 @@ local result = tes3uiElement:createNif(id, text)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 * `text` (string): A model path. This path is relative to `Data Files`.
 
 **Returns**:
@@ -721,8 +713,7 @@ local result = tes3uiElement:createNif(id, text)
 
 Creates a multi-line text input element, with line wrapping on. To receive input the keyboard must be captured with `tes3ui.acquireTextInput(element)`. Read the input with the `text` property. Write an initial value to edit by setting the `text` property.
 
-    Custom widget properties:
-        | `number`_ (integer) `element.widget.lengthLimit`: Maximum input length. Default is `1023`.
+Paragraph input specific properties can be accessed through the `widget` property. The widget type for paragraph inputs is [`tes3uiParagraphInput`](https://mwse.github.io/MWSE/types/tes3uiParagraphInput/).
 
 ```lua
 local result = tes3uiElement:createParagraphInput(id)
@@ -730,7 +721,7 @@ local result = tes3uiElement:createParagraphInput(id)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 
 **Returns**:
 
@@ -748,7 +739,7 @@ local result = tes3uiElement:createRect(id, color)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 * `color` (table): *Optional*. The fill colour for the element.
 
 **Returns**:
@@ -761,14 +752,7 @@ local result = tes3uiElement:createRect(id, color)
 
 Creates a horizontal slider.
 
-    Custom widget properties:
-        | `number`_ (integer) `element.widget.current`: Current value.
-        | `number`_ (integer) `element.widget.max`: Maximum value.
-        | `number`_ (integer) `element.widget.step`: Amount changed by left and right arrow buttons.
-        | `number`_ (integer) `element.widget.jump`: Amount changed by clicking inside the slider area.
-
-    Custom events used with register:
-        | `"PartScrollBar_changed"`: Triggers on value change; moving the slider is not enough if the value is the same.
+Slider specific properties can be accessed through the `widget` property. The widget type for sliders is [`tes3uiSlider`](https://mwse.github.io/MWSE/types/tes3uiSlider/).
 
 ```lua
 local result = tes3uiElement:createSlider(id, current, max, step, jump)
@@ -776,11 +760,11 @@ local result = tes3uiElement:createSlider(id, current, max, step, jump)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
-* `current` (number): The initial value for the slider.
-* `max` (number): The maximum value for the slider.
-* `step` (number): *Optional*. Amount changed by left and right arrow buttons.
-* `jump` (number): *Optional*. Amount changed by clicking inside the slider area.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
+* `current` (number): The current value of the slider.
+* `max` (number): The maximum value of the slider.
+* `step` (number): *Default*: `1`. The change in value when clicking the left and right arrow buttons.
+* `jump` (number): *Default*: `5`. The change in value when clicking into the empty areas next to the slider handle.
 
 **Returns**:
 
@@ -792,14 +776,7 @@ local result = tes3uiElement:createSlider(id, current, max, step, jump)
 
 Creates a vertical slider.
 
-    Custom widget properties:
-        | `number`_ (integer) `element.widget.current`: Current value.
-        | `number`_ (integer) `element.widget.max`: Maximum value.
-        | `number`_ (integer) `element.widget.step`: Amount changed by up and down arrow buttons.
-        | `number`_ (integer) `element.widget.jump`: Amount changed by clicking inside the slider area.
-
-    Custom events used with register:
-        | `"PartScrollBar_changed"`: Triggers on value change; moving the slider is not enough if the value is the same.
+Slider specific properties can be accessed through the `widget` property. The widget type for sliders is [`tes3uiSlider`](https://mwse.github.io/MWSE/types/tes3uiSlider/).
 
 ```lua
 local result = tes3uiElement:createSliderVertical(id, current, max, step, jump)
@@ -807,11 +784,11 @@ local result = tes3uiElement:createSliderVertical(id, current, max, step, jump)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
-* `current` (number): The initial value for the slider.
-* `max` (number): The maximum value for the slider.
-* `step` (number): *Optional*. Amount changed by left and right arrow buttons. The default is 1.
-* `jump` (number): *Optional*. Amount changed by clicking inside the slider area. The default is 5.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
+* `current` (number): The current value of the slider.
+* `max` (number): The maximum value of the slider.
+* `step` (number): *Default*: `1`. The change in value when clicking the left and right arrow buttons.
+* `jump` (number): *Default*: `5`. The change in value when clicking into the empty areas next to the slider handle.
 
 **Returns**:
 
@@ -823,9 +800,7 @@ local result = tes3uiElement:createSliderVertical(id, current, max, step, jump)
 
 Creates a single line text input element. To receive input the keyboard must be captured with `tes3ui.acquireTextInput(element)`. Read the input with the `text` property. Write an initial value to display by setting the `text` property; that value will be cleared on the first keypress.
 
-    Custom widget properties:
-        | `boolean`_ `element.widget.eraseOnFirstKey`: Clears the initial value if the first keypress is not an edit action. Default is `true`.
-        | `number`_ (integer) `element.widget.lengthLimit"`: Maximum input length, or `nil` for no limit. If you are setting names, the engine limits most identifiers to 31 characters. Default is `nil`.
+Text input specific properties can be accessed through the `widget` property. The widget type for text inputs is [`tes3uiTextInput`](https://mwse.github.io/MWSE/types/tes3uiTextInput/).
 
 ```lua
 local result = tes3uiElement:createTextInput(id)
@@ -833,7 +808,7 @@ local result = tes3uiElement:createTextInput(id)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 
 **Returns**:
 
@@ -843,7 +818,9 @@ local result = tes3uiElement:createTextInput(id)
 
 ### `createTextSelect`
 
-Creates a selectable line of text, with configurable hover, click, and disabled colours. Can be used to create a list box by placing them in a ScrollPane. `state` sets the initial interaction state.
+Creates a selectable line of text, with configurable hover, click, and disabled colours. Can be used to create a list box by placing them in a ScrollPane.
+	
+Text select specific properties can be accessed through the `widget` property. The widget type for text selects is [`tes3uiTextSelect`](https://mwse.github.io/MWSE/types/tes3uiTextSelect/).
 
 ```lua
 local result = tes3uiElement:createTextSelect(id, text, state)
@@ -851,13 +828,13 @@ local result = tes3uiElement:createTextSelect(id, text, state)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 * `text` (string): *Optional*. The text to display.
-* `state` (number): *Optional*. The initial interaction state. Defaults to normal.
+* `state` (number): *Default*: `tes3.uiState.normal`. The initial interaction state.
 
 **Returns**:
 
-* `result` (tes3uiWidgetTextSelect)
+* `result` ([tes3uiElement](../../types/tes3uiElement))
 
 ***
 
@@ -871,7 +848,7 @@ local result = tes3uiElement:createThinBorder(id)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 
 **Returns**:
 
@@ -883,12 +860,7 @@ local result = tes3uiElement:createThinBorder(id)
 
 Creates a vertically scrolling pane. Useful as a list box.
 
-    Custom widget properties:
-        | `number`_ `element.widget.positionY`: Vertical scroll offset in pixels.
-        | `boolean`_ `element.widget.scrollbarVisible`: Set if the scrollbar is displayed.
-
-    Custom widget methods:
-        | `element.widget:contentsChanged()`: Call to update scroll bar slider and limits after adding or removing elements to the content container. Because content size depends on layout, this must be run after a menu:updateLayout(). Only required if the content size changes.
+Scroll pane specific properties can be accessed through the `widget` property. The widget type for scroll panes is [`tes3uiScrollPane`](https://mwse.github.io/MWSE/types/tes3uiScrollPane/).
 
 ```lua
 local result = tes3uiElement:createVerticalScrollPane(id)
@@ -896,7 +868,7 @@ local result = tes3uiElement:createVerticalScrollPane(id)
 
 **Parameters**:
 
-* `id` (number): *Optional*. A registered identifier to help find this element later.
+* `id` (string, number): *Optional*. An identifier to help find this element later.
 
 **Returns**:
 
@@ -934,7 +906,7 @@ local result = tes3uiElement:findChild(id)
 
 **Parameters**:
 
-* `id` (number): The id to search for.
+* `id` (string, number): The id to search for.
 
 **Returns**:
 
@@ -960,7 +932,7 @@ tes3uiElement:forwardEvent(id)
 
 Returns the descendant element that creation functions used on this element will place children into, or the calling element if there is no specific descendant for children.
 
-    Some widgets like ScrollPanes are built of multiple layers of elements. When an element is created in a complex widget, it is automatically placed as a child of a content element, but other functions do not access this content element directly. This function finds this content container for any element, so that changing layout and accessing children is possible. For simple elements, the calling element will be returned so that there is always a valid container element.
+	Some widgets like ScrollPanes are built of multiple layers of elements. When an element is created in a complex widget, it is automatically placed as a child of a content element, but other functions do not access this content element directly. This function finds this content container for any element, so that changing layout and accessing children is possible. For simple elements, the calling element will be returned so that there is always a valid container element.
 
 ```lua
 local result = tes3uiElement:getContentElement()
@@ -1029,8 +1001,8 @@ local result = tes3uiElement:getPropertyInt(propName)
 ### `getPropertyObject`
 
 Properties are named variables attached to an element. Gets a property value with `propName` as the property key. Morrowind uses these to bind variables to the UI. Useful for element class-specific properties. Returns `nil` if the property key did not have data, or if it could not guess the type of the property value.
-    
-    For `getPropertyObject`, an expected return value not derived from `tes3baseObject` requires the usertype to be provided as well. Currently accepted usertypes are:
+	
+	For `getPropertyObject`, an expected return value not derived from `tes3baseObject` requires the usertype to be provided as well. Currently accepted usertypes are:
 	`tes3itemData`
 	`tes3itemStack`
 	`tes3gameFile`
@@ -1080,61 +1052,56 @@ tes3uiElement:loadMenuPosition()
 
 ### `register`
 
-Sets an `event` handler, which can add or override an existing event handler. The use of `registerBefore` or `registerAfter` is recommended if you do not want to replace the existing event handler. The eventID can be a standard `event` name, or an event specific to an element class. The callback receives an argument with the event data. See below for details.
-    
+Sets an `event` handler, which can add or override an existing event handler. The use of `registerBefore` or `registerAfter` is recommended if you do not want to replace the existing event handler. The eventID can be a standard `event` name, or an event specific to an element class. These can be accessed through [`tes3.uiEvent`](https://mwse.github.io/MWSE/references/ui-events/) for convenience. The callback receives an argument with the event data. See below for details.
+	
 The original Morrowind callback is captured and can be invoked with the `forwardEvent` method on the event argument. If there is an existing Lua callback, it is replaced.
 
+	Standard events:
+		**mouseLeave**
+			Mouse cursor moving outside an element. Triggers once.
+		**mouseOver**
+			Mouse cursor moving over an element. Triggers once.
+		**mouseDown**
+			Left mouse button down over an element.
+		**mouseClick**
+			Left mouse button up over an element, after a mouseDown over the element.
+		**mouseScrollUp**
+			..
+		**mouseScrollDown**
+			Mouse wheel scrolling.
+		**mouseDoubleClick**
+			Standard double-click.
+		**mouseStillIdle**
+			Mouse cursor positioned outside an element. Triggers every frame.
+		**mouseStillOver**
+			Mouse cursor positioned over an element. Triggers every frame.
+		**mouseStillPressed**
+			Mouse cursor positioned over an element, after a mouseDown over the element. Triggers every frame.
+		**mouseStillPressedOutside**
+			Apparently not working in the engine. Mouse cursor positioned outside an element, after a mouseDown over the element. Triggers every frame.
+		**mouseRelease**
+			Left mouse button up over an element.
+		**keyPress**
+			A raw key press.
+		**keyEnter**
+			The Return key is pressed.
+		**help**
+			On mouseover, but also marking the element as having a tooltip. Create a tooltip within the callback using the `tes3ui.createTooltipMenu` function.
+		**focus**
+			When a menu is clicked on, and moved on top of other menus.
+		**unfocus**
+			Just before another menu is clicked on, or a widget in that menu receives an event, or when the menu mode is toggled off. You may return false from this event to prevent the menu from being deselected, and to prevent leaving menu mode.
+		**preUpdate**
+			Before the menu layout is updated.
+		**update**
+			After the menu layout is updated.
+		**destroy**
+			When the UI element is destroyed, before any data or children are destroyed.
 
-
-Lua UI event specification:
-
-Events can be bound to elements via the `Element`_ `register` method, which takes an event name. Event names can be one of the standard events listed here, or a widget-specific event.
-
-Standard events:
-    **mouseLeave**
-        Mouse cursor moving outside an element. Triggers once.
-    **mouseOver**
-        Mouse cursor moving over an element. Triggers once.
-    **mouseDown**
-        Left mouse button down over an element.
-    **mouseClick**
-        Left mouse button up over an element, after a mouseDown over the element.
-    **mouseScrollUp**
-        ..
-    **mouseScrollDown**
-        Mouse wheel scrolling.
-    **mouseDoubleClick**
-        Standard double-click.
-    **mouseStillIdle**
-        Mouse cursor positioned outside an element. Triggers every frame.
-    **mouseStillOver**
-        Mouse cursor positioned over an element. Triggers every frame.
-    **mouseStillPressed**
-        Mouse cursor positioned over an element, after a mouseDown over the element. Triggers every frame.
-    **mouseStillPressedOutside**
-        Apparently not working in the engine. Mouse cursor positioned outside an element, after a mouseDown over the element. Triggers every frame.
-    **mouseRelease**
-        Left mouse button up over an element.
-    **keyPress**
-        A raw key press.
-    **keyEnter**
-        The Return key is pressed.
-    **help**
-        On mouseover, but also marking the element as having a tooltip. Create a tooltip within the callback using the `tes3ui.createTooltipMenu`_ function.
-    **focus**
-        When a menu is clicked on, and moved on top of other menus.
-    **unfocus**
-        Just before another menu is clicked on, or a widget in that menu receives an event, or when the menu mode is toggled off. You may return false from this event to prevent the menu from being deselected, and to prevent leaving menu mode.
-    **preUpdate**
-        Before the menu layout is updated.
-    **update**
-        After the menu layout is updated.
-    **destroy**
-        When the UI element is destroyed, before any data or children are destroyed.
-
-
-**Widget-specific events**
-    To be documented.
+	Widget-specific events:
+		Slider:
+			**PartScrollBar_changed**
+				Triggers on value change; moving the slider is not enough if the value is the same.
 
 
 Event forwarding
@@ -1144,16 +1111,14 @@ The original Morrowind event handler is saved when you first register an event. 
 
 **Example**
 
-.. code-block:: lua
-
-    local function onClick(e)
-        -- pre-event code
-        e.source:forwardEvent(e)
-        -- post-event code
-    end
-    
-    local button = menu:findChild("MenuExample_Ok")
-    button:register("mouseClick", onClick)
+	local function onClick(e)
+		-- pre-event code
+		e.source:forwardEvent(e)
+		-- post-event code
+	end
+	
+	local button = menu:findChild("MenuExample_Ok")
+	button:register("mouseClick", onClick)
 
 
 Event handler
@@ -1161,31 +1126,31 @@ Event handler
 
 The standard type signature for events.
 
-`boolean`_ eventHandler(**EventData** e)
-    Returns: `optional`
-        Returning `false` may cancel an interaction for certain events. e.g. unfocus
-   
-    EventData:
-        **source** (`Element`_)
-            The source element of the event.
-        
-        **id** (`number`_)
-            The numeric id of the event type.
-    
-        **widget** (`Element`_)
-            The widget element that the source belongs to, if the element is a sub-part of a widget. May not be accurate if the element is not a sub-part.
-        
-        **data0** (`number`_)
-            ..
-            
-        **data1** (`number`_)
-            Event-specific raw data values. For mouse events, these are the screen X and Y coordinates of the pointer. For keyboard events, data0 is the `scan code`_.
-        
-        **relativeX** (`number`_)
-            ..
-            
-        **relativeY** (`number`_)
-            For mouse events only. X and Y coordinates of the pointer relative to the top-left of the element.
+	`boolean`_ eventHandler(**EventData** e)
+		Returns: `optional`
+			Returning `false` may cancel an interaction for certain events. e.g. unfocus
+	
+		EventData:
+			**source** (`Element`_)
+				The source element of the event.
+			
+			**id** (`number`_)
+				The numeric id of the event type.
+		
+			**widget** (`Element`_)
+				The widget element that the source belongs to, if the element is a sub-part of a widget. May not be accurate if the element is not a sub-part.
+			
+			**data0** (`number`_)
+				..
+				
+			**data1** (`number`_)
+				Event-specific raw data values. For mouse events, these are the screen X and Y coordinates of the pointer. For keyboard events, data0 is the `scan code`_.
+			
+			**relativeX** (`number`_)
+				..
+				
+			**relativeY** (`number`_)
+				For mouse events only. X and Y coordinates of the pointer relative to the top-left of the element.
 
 ```lua
 tes3uiElement:register(eventID, callback)
@@ -1193,7 +1158,7 @@ tes3uiElement:register(eventID, callback)
 
 **Parameters**:
 
-* `eventID` (string): The event id.
+* `eventID` (string): The event id. Maps to values in [`tes3.uiEvent`](https://mwse.github.io/MWSE/references/ui-events/).
 * `callback` (function): The callback function.
 
 ***
@@ -1230,9 +1195,9 @@ tes3uiElement:registerBefore(eventID, callback)
 
 ### `reorderChildren`
 
-    Moves the layout order of the children of this element. `count` elements are taken from starting child `Element`_ or index (0-based) `moveFrom`, and moved before the child `Element`_ or index (0-based) `insertBefore`. If `count` is -1, all children after `moveFrom` are moved. If any index is a negative number, then the index represents a distance from the end of the child list.
-    
-    Returns `true` if the operation succeeded, or `false` if at least one argument was invalid.
+	Moves the layout order of the children of this element. `count` elements are taken from starting child `Element`_ or index (0-based) `moveFrom`, and moved before the child `Element`_ or index (0-based) `insertBefore`. If `count` is -1, all children after `moveFrom` are moved. If any index is a negative number, then the index represents a distance from the end of the child list.
+
+	Returns `true` if the operation succeeded, or `false` if at least one argument was invalid.
 
 ```lua
 local result = tes3uiElement:reorderChildren(insertBefore, moveFrom, count)
@@ -1242,7 +1207,7 @@ local result = tes3uiElement:reorderChildren(insertBefore, moveFrom, count)
 
 * `insertBefore` ([tes3uiElement](../../types/tes3uiElement), number): The insertion point (or its 0-based child index).
 * `moveFrom` ([tes3uiElement](../../types/tes3uiElement), number): The first child (or 0-based child index) to be moved.
-* `count` (number): The property name.
+* `count` (number): The number of child elements to move.
 
 **Returns**:
 

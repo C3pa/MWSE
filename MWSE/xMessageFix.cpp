@@ -1,24 +1,3 @@
-/************************************************************************
-
-	xMessageFix.cpp - Copyright (c) 2008 The MWSE Project
-	https://github.com/MWSE/MWSE/
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-**************************************************************************/
-
 #include "VMExecuteInterface.h"
 #include "Stack.h"
 #include "InstructionInterface.h"
@@ -27,24 +6,20 @@
 #include "StringUtil.h"
 #include "TES3Script.h"
 
-using namespace mwse;
 
 namespace mwse {
-	class xMessageFix : mwse::InstructionInterface_t {
+	class xMessageFix : InstructionInterface_t {
 	public:
 		xMessageFix();
-		virtual float execute(VMExecuteInterface &virtualMachine);
-		virtual void loadParameters(VMExecuteInterface &virtualMachine);
+		virtual float execute(VMExecuteInterface& virtualMachine);
 	};
 
 	static xMessageFix xMessageFixInstance;
 
 	xMessageFix::xMessageFix() : mwse::InstructionInterface_t(OpCode::xMessageFix) {}
 
-	void xMessageFix::loadParameters(mwse::VMExecuteInterface &virtualMachine) {}
-
-	// This function changes the script at runtime. 
-	float xMessageFix::execute(mwse::VMExecuteInterface &virtualMachine) {
+	// This function changes the script at runtime.
+	float xMessageFix::execute(mwse::VMExecuteInterface& virtualMachine) {
 		unsigned short mboxhdr[2];
 
 		// We want to modify the real script SCDT info. We'll keep track of where we're reading/writing with a read/write pointer,
@@ -71,7 +46,7 @@ namespace mwse {
 		if (format != 0 && !format.empty()) {
 			bool suppressNull = false;
 			std::string badCodes;
-			std::string& newString = mwse::string::interpolate(format, virtualMachine, &suppressNull, &badCodes);
+			std::string newString = mwse::string::interpolate(format, virtualMachine, &suppressNull, &badCodes);
 			if (badCodes != "") {
 				mwse::log::getLog() << "xMessageFix: Bad format \"" << badCodes << "\" in \"" << format << "\" generating \"" << newString << "\"." << std::endl;
 			}
@@ -116,7 +91,7 @@ namespace mwse {
 			if (!newButtonText.empty()) {
 				bool suppressNull = false;
 				std::string badCodes;
-				std::string& newString = mwse::string::interpolate(newButtonText, virtualMachine, &suppressNull, &badCodes);
+				std::string newString = mwse::string::interpolate(newButtonText, virtualMachine, &suppressNull, &badCodes);
 				if (badCodes != "") {
 					mwse::log::getLog() << "xMessageFix: Bad format \"" << badCodes << "\" in \"" << format << "\" generating \"" << newString << "\"." << std::endl;
 				}

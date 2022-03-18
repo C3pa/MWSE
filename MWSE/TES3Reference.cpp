@@ -40,14 +40,6 @@
 
 #include "BitUtil.h"
 
-#define TES3_Reference_activate 0x4E9610
-#define TES3_Reference_setActionFlag 0x4E55A0
-#define TES3_Reference_clearActionFlag 0x4E55E0
-#define TES3_Reference_testActionFlag 0x4E5520
-#define TES3_Reference_setActionReference 0x4E5610
-#define TES3_Reference_getActionReference 0x4E5650
-
-#define TES3_Reference_addItemDataAttachment 0x4E5360
 
 namespace TES3 {
 	Reference::Reference() {
@@ -74,6 +66,7 @@ namespace TES3 {
 		TES3_Reference_dtor(this);
 	}
 
+	const auto TES3_Reference_activate = reinterpret_cast<void(__thiscall*)(Reference*, Reference*, int)>(0x4E9610);
 	void Reference::activate(Reference* activator, int unknown) {
 		// If our event data says to block, don't let the object activate.
 		if (mwse::lua::event::ActivateEvent::getEventEnabled()) {
@@ -87,31 +80,37 @@ namespace TES3 {
 			}
 		}
 
-		reinterpret_cast<void(__thiscall *)(Reference*, Reference*, int)>(TES3_Reference_activate)(this, activator, unknown);
+		TES3_Reference_activate(this, activator, unknown);
 	}
 
+	const auto TES3_Reference_setActionFlag = reinterpret_cast<void(__thiscall*)(Reference*, int)>(0x4E55A0);
 	void Reference::setActionFlag(int flag) {
-		reinterpret_cast<void(__thiscall *)(Reference*, int)>(TES3_Reference_setActionFlag)(this, flag);
+		TES3_Reference_setActionFlag(this, flag);
 	}
 
+	const auto TES3_Reference_clearActionFlag = reinterpret_cast<void(__thiscall*)(Reference*, int)>(0x4E55E0);
 	void Reference::clearActionFlag(int flag) {
-		reinterpret_cast<void(__thiscall *)(Reference*, int)>(TES3_Reference_clearActionFlag)(this, flag);
+		TES3_Reference_clearActionFlag(this, flag);
 	}
 
+	const auto TES3_Reference_testActionFlag = reinterpret_cast<bool(__thiscall*)(Reference*, int)>(0x4E5520);
 	bool Reference::testActionFlag(int flag) {
-		return (reinterpret_cast<signed char(__thiscall *)(Reference*, int)>(TES3_Reference_testActionFlag)(this, flag) != 0);
+		return TES3_Reference_testActionFlag(this, flag);
 	}
 
+	const auto TES3_Reference_setActionReference = reinterpret_cast<void(__thiscall*)(Reference*, Reference*)>(0x4E5610);
 	void Reference::setActionReference(Reference* reference) {
-		reinterpret_cast<void (__thiscall *)(Reference*, Reference*)>(TES3_Reference_setActionReference)(this, reference);
+		TES3_Reference_setActionReference(this, reference);
 	}
 
+	const auto TES3_Reference_getActionReference = reinterpret_cast<Reference * (__thiscall*)(Reference*)>(0x4E5650);
 	Reference* Reference::getActionReference() {
-		return reinterpret_cast<Reference* (__thiscall *)(Reference*)>(TES3_Reference_getActionReference)(this);
+		return TES3_Reference_getActionReference(this);
 	}
 
+	const auto TES3_Reference_addItemDataAttachment = reinterpret_cast<ItemDataAttachment * (__thiscall*)(Reference*, ItemData*)>(0x4E5360);
 	ItemDataAttachment* Reference::addItemDataAttachment(ItemData* data) {
-		return reinterpret_cast<ItemDataAttachment* (__thiscall *)(Reference*, ItemData*)>(TES3_Reference_addItemDataAttachment)(this, data);
+		return TES3_Reference_addItemDataAttachment(this, data);
 	}
 
 	Vector3* Reference::getOrCreateOrientationFromAttachment() {
@@ -254,7 +253,6 @@ namespace TES3 {
 
 
 	const auto TES3_MobilePlayer_sub566500 = reinterpret_cast<void(__thiscall*)(MobilePlayer*)>(0x566500);
-	const auto TES3_ModelLoader_loadAnimKF = reinterpret_cast<TES3::KeyframeDefinition * (__thiscall*)(void*, const char*, const char*)>(0x4EE200);
 
 	void Reference::setModelPath(const char* path, bool temporary) {
 		auto baseObject = static_cast<TES3::Object*>(getBaseObject());
@@ -316,7 +314,7 @@ namespace TES3 {
 					if (this == firstPersonRef && path != nullptr) {
 						auto animData = getAttachedAnimationData();
 						auto modelLoader = TES3::DataHandler::get()->nonDynamicData->meshData;
-						auto keyframes = TES3_ModelLoader_loadAnimKF(modelLoader, path, "MWSE Anim");
+						auto keyframes = modelLoader->loadKeyframes(path, "MWSE Anim");
 
 						if (animData && keyframes) {
 							animData->setOverrideLayerKeyframes(keyframes);
@@ -422,7 +420,10 @@ namespace TES3 {
 		// Enable simulation for creatures/NPCs.
 		if (baseObject->objectType == TES3::ObjectType::Creature || baseObject->objectType == TES3::ObjectType::NPC) {
 			TES3::WorldController::get()->mobController->addMob(this);
-			getAttachedMobileActor()->enterLeaveSimulationByDistance();
+			auto mobile = getAttachedMobileActor();
+			if (mobile) {
+				mobile->enterLeaveSimulationByDistance();
+			}
 		}
 		// Activators, containers, and statics need collision.
 		else if (baseObject->objectType == TES3::ObjectType::Activator || baseObject->objectType == TES3::ObjectType::Container || baseObject->objectType == TES3::ObjectType::Static) {
@@ -499,6 +500,10 @@ namespace TES3 {
 	}
 
 	void Reference::setDeleted(bool deleted) {
+		if (deleted == getDeleted()) {
+			return;
+		}
+
 		// Deactivate the reference if needed.
 		if (objectType == ObjectType::Reference) {
 			// Are we marking a reference deleted in an active cell?
@@ -648,11 +653,11 @@ namespace TES3 {
 
 	bool Reference::getEmptyInventoryFlag() {
 		return BIT_TEST(objectFlags, ObjectFlag::EmptyInventoryBit);
-    }
+	}
 
-    void Reference::setEmptyInventoryFlag(bool set) {
+	void Reference::setEmptyInventoryFlag(bool set) {
 		BIT_SET(objectFlags, ObjectFlag::EmptyInventoryBit, set);
-    }
+	}
 
 	void Reference::attemptUnlockDisarm(MobileNPC * disarmer, Item * tool, ItemData * toolItemData) {
 		if (baseObject->objectType != ObjectType::Door && baseObject->objectType != ObjectType::Container) {
@@ -903,13 +908,113 @@ namespace TES3 {
 		return &reinterpret_cast<Actor*>(baseObject)->equipment;
 	}
 
+	void __cdecl TES3_game_relocateReference_replacement(Reference* reference, Cell* cell, const Vector3* position, float rotationInDegrees) {
+		// Parameter guards.
+		if (!cell || !position) {
+			return;
+		}
+
+		// Recalculate rotation to always be between [0,2pi].
+		constexpr auto math2Pi = (M_PI * 2);
+		auto rotationInRadians = fmod(rotationInDegrees * (M_PI / 180.f), math2Pi);
+		if (rotationInRadians < 0)
+			rotationInRadians += math2Pi;
+
+		// Get reused variables.
+		auto dataHandler = TES3::DataHandler::get();
+		const auto isCellInMemory = dataHandler->isCellInMemory(cell, false);
+
+		do {
+			// Update reference position/orientation.
+			reference->position = *position;
+			reference->orientation.z = rotationInRadians;
+
+			// Update scene node.
+			auto sceneNode = reference->getSceneGraphNode();
+			if (sceneNode) {
+				Matrix33 rotationMatrix;
+				reference->updateSceneMatrix(&rotationMatrix, false);
+				sceneNode->setLocalRotationMatrix(&rotationMatrix);
+				sceneNode->localTranslate = *position;
+				sceneNode->update();
+			}
+
+			if (cell != reference->getCell()) {
+				if (sceneNode || isCellInMemory) {
+					if (isCellInMemory) {
+						if (reference->baseObject->objectType != ObjectType::Static) {
+							cell->getOrCreateActivatorsNode()->attachChild(reference->getSceneGraphNode(), true);
+						}
+					}
+					else {
+						reference->resetVisualNode();
+					}
+				}
+
+				const auto global_dontSaveObject = *reinterpret_cast<bool*>(0x7CEBDD);
+				if (!global_dontSaveObject) {
+					reference->setObjectModified(true);
+				}
+
+				cell->setObjectModified(true);
+				cell->addReference(reference);
+			}
+
+			// Update mobile.
+			auto mobile = reference->getAttachedMobileActor();
+			if (mobile) {
+				cell->getOrCreateActivatorsNode()->attachChild(reference->getSceneGraphNode(), true);
+				mobile->setFootPoint(position);
+				mobile->setFacing(rotationInRadians);
+				mobile->vTable.mobileObject->setActorFlag40(mobile, true);
+				mobile->actorFlags &= ~MobileActorFlag::GroundCollision;
+				mobile->unknown_0x230 = 1;
+				mobile->collidingReference = nullptr;
+				mobile->enterLeaveSimulationByDistance();
+				if (isCellInMemory) {
+					WorldController::get()->mobController->addMob(reference);
+				}
+				else {
+					WorldController::get()->mobController->removeMob(reference);
+				}
+			}
+			else if (isCellInMemory) {
+				// Create mobile if needed.
+				if (sceneNode) {
+					if (reference->baseObject->objectType == ObjectType::Creature || reference->baseObject->objectType == ObjectType::NPC) {
+						WorldController::get()->mobController->addMob(reference);
+						mobile = reference->getAttachedMobileActor();
+						if (mobile) {
+							mobile->setFootPoint(position);
+							mobile->setFacing(rotationInRadians);
+							mobile->vTable.mobileObject->setActorFlag40(mobile, true);
+							mobile->actorFlags &= ~MobileActorFlag::GroundCollision;
+							mobile->unknown_0x230 = 1;
+							mobile->collidingReference = nullptr;
+							mobile->enterLeaveSimulationByDistance();
+
+						}
+					}
+				}
+			}
+
+			// Skip if we're not looking at leveled creatures.
+			if (reference->baseObject->objectType != ObjectType::LeveledCreature) {
+				break;
+			}
+
+			// Move on to the leveled source reference.
+			reference = reference->getLeveledBaseReference();
+		} while (reference);
+	}
+
 	const auto TES3_game_relocateReference = reinterpret_cast<void(__cdecl*)(Reference*, Cell*, const Vector3*, float)>(0x50EDD0);
 	void Reference::relocate(Cell * cell, const Vector3 * position, float rotation) {
 		// Store old cell.
 		const auto oldCell = getCell();
 
 		// Fire off original function.
-		TES3_game_relocateReference(this, cell, position, rotation);
+		TES3_game_relocateReference_replacement(this, cell, position, rotation);
 		
 		// Determine if cell active state changed.
 		const auto oldCellActive = oldCell ? oldCell->getCellActive() : false;
@@ -923,9 +1028,17 @@ namespace TES3 {
 	}
 
 	void Reference::relocateNoRotation(Cell* cell, const Vector3* position) {
-		const auto z = orientation.z;
-		relocate(cell, position, z);
-		orientation.z = z;
+		// Save current rotation and restore it once relocate has finished.
+		Vector3 cachedOrientation = *getOrientation();
+
+		// The orientation member may not be reliable (SetAngle bug), so calculate it manually.
+		if (sceneNode) {
+			sceneNode->localRotation->toEulerXYZ(&cachedOrientation);
+		}
+
+		relocate(cell, position, cachedOrientation.z * (180.0f / M_PI));
+
+		setOrientation(&cachedOrientation);
 	}
 
 	bool Reference::clone() {

@@ -2,13 +2,13 @@
 
 The **weatherTransitionFinished** event occurs when the currently simulated weather finished transitioning to a new weather.
 
-Weather will continue transitioning in interiors, and may finish while in an interior. The transition may be interrupted at any time by the weatherChangedImmediate event, and this finish event will not be triggered.
+Weather will continue transitioning in interiors, and may finish while in an interior. The transition may be interrupted at any time by the `weatherChangedImmediate` event, and this finish event will not be triggered.
 
 ```lua
 --- @param e weatherTransitionFinishedEventData
 local function weatherTransitionFinishedCallback(e)
 end
-event.register("weatherTransitionFinished", weatherTransitionFinishedCallback)
+event.register(tes3.event.weatherTransitionFinished, weatherTransitionFinishedCallback)
 ```
 
 !!! tip

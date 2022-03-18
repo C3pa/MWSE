@@ -6,7 +6,7 @@ This event is invoked whenever the player naturally gains a new level a skill. T
 --- @param e skillRaisedEventData
 local function skillRaisedCallback(e)
 end
-event.register("skillRaised", skillRaisedCallback)
+event.register(tes3.event.skillRaised, skillRaisedCallback)
 ```
 
 !!! tip
@@ -19,5 +19,5 @@ event.register("skillRaised", skillRaisedCallback)
 
 * `level` (number): *Read-only*. The new level of the skill.
 * `skill` (number): *Read-only*. The skill that gained a new level experience.
-* `source` (): The source of the skill raise. Its values are tes3.skillRaiseSource.* constants.
+* `source` (string): The source of the skill raise. Maps to values in [`tes3.skillRaiseSource`](https://mwse.github.io/MWSE/references/skill-raise-sources/) enumeration.
 

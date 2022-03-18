@@ -1,6 +1,6 @@
 # tes3dialogueInfo
 
-A child for a given dialogue. Whereas a dialogue may be a conversation topic, a tes3dialogueInfo would be an individual response.
+A child for a given dialogue. Whereas a dialogue may be a conversation topic, a `tes3dialogueInfo` would be an individual response.
 
 This type inherits the following: [tes3baseObject](../../types/tes3baseObject)
 ## Properties
@@ -57,7 +57,7 @@ The blocked state of the object.
 
 ### `disposition`
 
-*Read-only*. The minimum disposition that the info is filtered for.
+The minimum disposition that the info is filtered for. For journal-based dialogues, this is the same as the `journalIndex` property, which should be used instead.
 
 **Returns**:
 
@@ -82,6 +82,46 @@ The actor that the player first heard the info from.
 **Returns**:
 
 * `result` (string)
+
+***
+
+### `isQuestFinished`
+
+Quick access to the "quest finished" flag. For dialogues that aren't journal-based, this will be `nil`.
+
+**Returns**:
+
+* `result` (boolean, nil)
+
+***
+
+### `isQuestName`
+
+Quick access to the "quest name" flag. If this is true, this info contains the name of the quest. For dialogues that aren't journal-based, this will be `nil`.
+
+**Returns**:
+
+* `result` (boolean, nil)
+
+***
+
+### `isQuestRestart`
+
+Quick access to the "quest restart" flag. For dialogues that aren't journal-based, this will be `nil`.
+
+**Returns**:
+
+* `result` (boolean, nil)
+
+***
+
+### `journalIndex`
+
+The current index for the quest. For dialogues that aren't journal-based, this will be `nil`.
+
+**Returns**:
+
+* `result` (number, nil)
 
 ***
 
@@ -157,7 +197,7 @@ The modification state of the object since the last save.
 
 ### `objectType`
 
-*Read-only*. The type of object. Maps to values in tes3.objectType.
+*Read-only*. The type of object. Maps to values in [`tes3.objectType`](https://mwse.github.io/MWSE/references/object-types/).
 
 **Returns**:
 
@@ -237,7 +277,7 @@ If true, references of this object can store temporary or persistent lua data.
 
 ### `type`
 
-*Read-only*. The type of the info.
+*Read-only*. The type of the info. Maps to values in [`tes3.dialogueType`](https://mwse.github.io/MWSE/references/dialogue-types/) namespace.
 
 **Returns**:
 
@@ -263,7 +303,7 @@ local string = tes3baseObject:__tojson()
 
 ### `filter`
 
-This method filters the associated dialogue info for given arguments and returns true if the dialogue info filtering passes. This method rises infoFilter event.
+This method filters the associated dialogue info for given arguments and returns true if the dialogue info filtering passes. This method rises [`infoFilter`](https://mwse.github.io/MWSE/events/infoFilter/) event.
 
 ```lua
 local result = tes3dialogueInfo:filter(actor, reference, source, dialogue)

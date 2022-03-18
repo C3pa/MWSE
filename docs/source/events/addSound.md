@@ -1,12 +1,12 @@
 # addSound
 
-This event is triggered when a sound is played by the game or when tes3.playSound is called.
+This event is triggered when a sound is played by the game or when `tes3.playSound()` is called.
 
 ```lua
 --- @param e addSoundEventData
 local function addSoundCallback(e)
 end
-event.register("addSound", addSoundCallback)
+event.register(tes3.event.addSound, addSoundCallback)
 ```
 
 !!! tip

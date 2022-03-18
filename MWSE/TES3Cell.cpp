@@ -22,10 +22,6 @@ namespace TES3 {
 		return TES3_Cell_getFirstObjectOfType(this, type, skipDeleted);
 	}
 
-	bool Cell::isInterior() const {
-		return getCellFlag(TES3::CellFlag::Interior);
-	}
-
 	const auto TES3_Cell_getExteriorGridX = reinterpret_cast<int(__thiscall *)(const Cell*)>(0x4DB9D0);
 	int Cell::getGridX() const {
 		return TES3_Cell_getExteriorGridX(this);
@@ -56,6 +52,11 @@ namespace TES3 {
 		TES3_Cell_addMapNote(this, position, unknown, text);
 	}
 
+	const auto TES3_Cell_addReference = reinterpret_cast<void(__thiscall*)(Cell*, Reference*)>(0x4DC0A0);
+	void Cell::addReference(Reference* reference) {
+		TES3_Cell_addReference(this, reference);
+	}
+
 	const auto TES3_Cell_insertReference = reinterpret_cast<void(__thiscall *)(Cell*, Reference*)>(0x4DC030);
 	void Cell::insertReference(Reference* reference) {
 		TES3_Cell_insertReference(this, reference);
@@ -64,6 +65,11 @@ namespace TES3 {
 		if (getCellActive()) {
 			reference->setReferenceActive();
 		}
+	}
+
+	const auto TES3_Cell_getOrCreateActivatorsNode = reinterpret_cast<NI::Node*(__thiscall*)(Cell*)>(0x4E2680);
+	NI::Node* Cell::getOrCreateActivatorsNode() {
+		return TES3_Cell_getOrCreateActivatorsNode(this);
 	}
 
 	const char* Cell::getName() const {
@@ -84,41 +90,41 @@ namespace TES3 {
 	}
 
 	std::optional<float> Cell::getFogDensity() const {
-		if (cellFlags & CellFlag::Interior) {
+		if (getIsInterior()) {
 			return variantData.interior.fogDensity;
 		}
 		return {};
 	}
 
 	void Cell::setFogDensity(float value) {
-		if (cellFlags & CellFlag::Interior) {
+		if (getIsInterior()) {
 			variantData.interior.fogDensity = value;
 		}
 	}
 
 	std::optional<float> Cell::getWaterLevel() const {
-		if (!(cellFlags & CellFlag::Interior) || cellFlags & CellFlag::BehavesAsExterior) {
+		if (getIsOrBehavesAsExterior()) {
 			return 0.0;
 		}
-		else if (cellFlags & CellFlag::HasWater) {
+		else if (getHasWater()) {
 			return waterLevelOrRegion.waterLevel;
 		}
 		return {};
 	}
 
 	void Cell::setWaterLevel(float value) {
-		if (!(cellFlags & CellFlag::Interior) || cellFlags & CellFlag::BehavesAsExterior) {
+		if (getIsOrBehavesAsExterior()) {
 			return;
 		}
 		else {
-			if (cellFlags & CellFlag::HasWater) {
+			if (getHasWater()) {
 				waterLevelOrRegion.waterLevel = value;
 			}
 		}
 	}
 
 	Region * Cell::getRegion() const {
-		if (!(cellFlags & CellFlag::Interior) || cellFlags & CellFlag::BehavesAsExterior) {
+		if (getIsOrBehavesAsExterior()) {
 			return waterLevelOrRegion.region;
 		}
 		else {
@@ -127,21 +133,21 @@ namespace TES3 {
 	}
 
 	TES3::PackedColor* Cell::getAmbientColor() {
-		if (cellFlags & TES3::CellFlag::Interior) {
+		if (getIsInterior()) {
 			return &variantData.interior.ambientColor;
 		}
 		return nullptr;
 	}
 
 	TES3::PackedColor* Cell::getFogColor() {
-		if (cellFlags & TES3::CellFlag::Interior) {
+		if (getIsInterior()) {
 			return &variantData.interior.fogColor;
 		}
 		return nullptr;
 	}
 
 	TES3::PackedColor* Cell::getSunColor() {
-		if (cellFlags & TES3::CellFlag::Interior) {
+		if (getIsInterior()) {
 			return &variantData.interior.sunColor;
 		}
 		return nullptr;
@@ -177,6 +183,14 @@ namespace TES3 {
 
 	void Cell::setSleepingIsIllegal(bool value) {
 		setCellFlag(TES3::CellFlag::SleepIsIllegal, value);
+	}
+
+	bool Cell::getIsLoaded() const {
+		return getCellFlag(TES3::CellFlag::IsLoaded);
+	}
+
+	bool Cell::getIsOrBehavesAsExterior() const {
+		return !getIsInterior() || getBehavesAsExterior();
 	}
 
 	static std::unordered_set<const TES3::Cell*> activeCells;
@@ -220,6 +234,21 @@ namespace TES3 {
 		return activeCells.find(this) != activeCells.end();
 	}
 
+	bool Cell::getHasCellMarker() const {
+		// Interiors never have a marker.
+		if (getIsInterior()) {
+			return false;
+		}
+
+		// If we don't have a name, we don't have a marker.
+		auto name = getName();
+		if (name == nullptr || name[0] == '\0') {
+			return false;
+		}
+
+		return true;
+	}
+
 	const char* Cell::getDisplayName() const {
 		// Try the cell name first.
 		auto name = getName();
@@ -241,7 +270,7 @@ namespace TES3 {
 		std::stringstream ss;
 
 		ss << getDisplayName();
-		if (!isInterior()) {
+		if (!getIsInterior()) {
 			ss << " (" << getGridX() << ", " << getGridY() << ")";
 		}
 
@@ -249,7 +278,7 @@ namespace TES3 {
 	}
 
 	bool Cell::isPointInCell(float x, float y) const {
-		if (isInterior()) {
+		if (getIsInterior()) {
 			return true;
 		}
 
